@@ -1,13 +1,11 @@
+pub mod assets;
 pub mod profiles;
 pub mod users;
-//pub mod orders;
 
 mod mutation;
 mod query;
 
-use crate::{
-    db::{new_pool, DbExecutor},
-};
+use crate::db::{new_pool, DbExecutor};
 use actix::prelude::{Addr, SyncArbiter};
 use actix_cors::Cors;
 use actix_http::header::{HeaderMap, ORIGIN};
@@ -19,11 +17,11 @@ use actix_web::{
     web::Data,
     App, HttpRequest, HttpResponse, HttpServer, Result,
 };
-use std::{env, sync::Mutex};
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use query::QueryRoot;
 use mutation::MutationRoot;
+use query::QueryRoot;
+use std::{env, sync::Mutex};
 
 pub struct Token(pub String);
 
@@ -100,7 +98,7 @@ pub async fn start_server() -> std::io::Result<()> {
     .await
 }
 
-fn routes(app: &mut web::ServiceConfig)  {
+fn routes(app: &mut web::ServiceConfig) {
     app.service(web::resource("/").guard(guard::Post()).to(index))
         .service(web::resource("/").guard(guard::Get()).to(index_graphiql));
 }

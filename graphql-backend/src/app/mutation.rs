@@ -13,12 +13,12 @@ use crate::{
 };
 
 use super::{
+    assets::{AddAssetRequest, AssetResponse},
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     Token,
 };
 
 pub struct MutationRoot;
-
 
 #[Object]
 impl MutationRoot {
@@ -91,50 +91,18 @@ impl MutationRoot {
         Ok(res)
     }
 
-    // unfollow a user
-    // async fn post_order<'ctx>(
-    //     &self,
-    //     ctx: &Context<'ctx>,
-    //     params: OrderRequest,
-    // ) -> Result<serde_json::Value> {
-    //     params.validate()?;
+    // add user set to portfolio
+    async fn add_asset<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: AddAssetRequest,
+    ) -> Result<AssetResponse> {
+        params.validate()?;
 
-    //     let state = ctx.data_unchecked::<AppState>();
-    //     let token = ctx.data::<Token>()?.0.clone();
-    //     let _auth = authenticate_token(state, token).await?;
-
-    //     let req: OrderRequest = params.into();
-    //     let order_asset = BrokerAsset::from_string(&req.order_asset)?;
-    //     let price_asset = BrokerAsset::from_string(&req.price_asset)?;
-    //     let side = OrderSide::from_string(&req.side)?;
-    //     let qty: BigDecimal = FromPrimitive::from_f64(req.qty).ok_or(
-    //          "qty cannot be converted to BigDecimal".to_string(),
-    //     )?;
-    
-    //     let order = match req.price {
-    //         Some(price) => {
-    //             let price: BigDecimal = FromPrimitive::from_f64(price).ok_or(
-    //                "price cannot be converted to BigDecimal".to_string())?;
-    
-    //             orders::new_limit_order_request(
-    //                 order_asset,
-    //                 price_asset,
-    //                 side,
-    //                 price,
-    //                 qty,
-    //                 SystemTime::now(),
-    //             )
-    //         }
-    //         None => {
-    //             orders::new_market_order_request(order_asset, price_asset, side, qty, SystemTime::now())
-    //         }
-    //     };
-
-    //     let mut book = state.order_book.lock().unwrap();
-    //     let results: OrderProcessingResult = book.process_order(order);
-
-    //     let json = serde_json::json!(results);
-    //     Ok(json)
-
-    // }
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let _auth = authenticate_token(state, token).await?;
+        let res = state.db.send(params).await??;
+        Ok(res)
+    }
 }

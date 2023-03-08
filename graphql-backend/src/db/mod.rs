@@ -1,5 +1,5 @@
+mod assets;
 mod auth;
-//mod orders;
 mod profiles;
 mod users;
 
