@@ -6,8 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-orderbook = { path = "crates/orderbook" }
-
 async-graphql = "5.0.5"
 async-graphql-actix-web = "5.0.5"
 slab = "0.4.2"
