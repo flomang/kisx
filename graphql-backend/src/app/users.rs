@@ -9,7 +9,7 @@ use crate::utils::{
 };
 
 lazy_static! {
-    static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z]+$").unwrap();
+    static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z ]+$").unwrap();
 }
 
 // #[derive(Debug, Deserialize)]

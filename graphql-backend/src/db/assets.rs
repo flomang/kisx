@@ -32,6 +32,7 @@ impl Handler<AddAssetRequest> for DbExecutor {
         {
             Ok(o) => Ok(o.into()),
             Err(e) => {
+                // TODO better handling of errors
                 println!("Error: {:?}", e);
                 Err(e.into())}
                 ,
