@@ -1,5 +1,5 @@
 # KISX  
-![kisx](logo.webp)
+![kisx](kisx.webp)
 
 ## Description
 
