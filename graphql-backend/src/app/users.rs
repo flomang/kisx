@@ -3,11 +3,9 @@ use std::convert::From;
 use validator::{Validate, ValidationError};
 
 use crate::models::User;
-use crate::utils::{
-    auth::Auth,
-    jwt::CanGenerateJwt,
-};
+use crate::utils::{auth::Auth, jwt::CanGenerateJwt};
 
+use crate::prelude::*;
 use super::AppState;
 
 lazy_static! {
@@ -20,10 +18,12 @@ pub struct In<U> {
 }
 
 // Client Messages ↓
-#[derive(async_graphql::InputObject)]
-#[derive(Debug, Validate, Deserialize)]
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct RegisterUser {
-    #[validate(length(min = 3), custom(function = "validate_unique_username", arg = "&'v_a AppState"))]
+    #[validate(
+        length(min = 3, message = "fails validation - must be at least 3 characters long"),
+        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "fails validation - username already taken")
+    )]
     pub username: String,
     #[validate(email(message = "fails validation - is not a valid email address"))]
     pub email: String,
@@ -37,21 +37,19 @@ pub struct RegisterUser {
 }
 
 fn validate_unique_username(username: &str, state: &AppState) -> Result<(), ValidationError> {
-    if username == "God" {
-        // the value of the username will automatically be added later
-        return Err(ValidationError::new("terrible username"));
-    }
+    let result = async_std::task::block_on(state.db.send(FindUser {
+        username: username.to_string(),
+    }))
+    .unwrap();
 
-    let result = async_std::task::block_on(state.db.send(FindUser { username: username.to_string() }));
-    match result.unwrap() {
-        Ok(_) => Err(ValidationError::new("username already taken")),
+    match result {
+        // if the username is already taken, return an error
+        Ok(_) => Err(ValidationError::new("invalid_username")),
         Err(_) => Ok(()),
     }
 }
 
-
-#[derive(async_graphql::InputObject)]
-#[derive(Debug, Validate, Deserialize)]
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct LoginUser {
     #[validate(email(message = "fails validation - is not a valid email address"))]
     pub email: String,
@@ -67,9 +65,7 @@ pub struct FindUser {
     pub username: String,
 }
 
-
-#[derive(async_graphql::InputObject)]
-#[derive(Debug, Validate, Deserialize)]
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct UpdateUser {
     #[validate(
         length(
@@ -105,14 +101,12 @@ pub struct UpdateUserOuter {
 
 // JSON response objects ↓
 
-#[derive(async_graphql::SimpleObject)]
-#[derive(Debug, Serialize)]
+#[derive(async_graphql::SimpleObject, Debug, Serialize)]
 pub struct UserResponse {
     pub user: UserResponseInner,
 }
 
-#[derive(async_graphql::SimpleObject)]
-#[derive(Debug, Serialize)]
+#[derive(async_graphql::SimpleObject, Debug, Serialize)]
 pub struct UserResponseInner {
     pub email: String,
     pub token: String,
