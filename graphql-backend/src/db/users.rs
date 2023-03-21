@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use libreauth::pass::HashBuilder;
 
 use super::DbExecutor;
-use crate::app::users::{LoginUser, RegisterUser, UpdateUserOuter, UserResponse};
+use crate::app::users::{LoginUser, RegisterUser, UpdateUserOuter, FindUser, UserResponse};
 use crate::models::{NewUser, User, UserChange};
 use crate::prelude::*;
 use crate::utils::{HASHER, PWD_SCHEME_VERSION};
@@ -76,6 +76,24 @@ impl Handler<LoginUser> for DbExecutor {
         }
     }
 }
+
+impl Message for FindUser {
+    type Result = Result<UserResponse>;
+}
+
+impl Handler<FindUser> for DbExecutor {
+    type Result = Result<UserResponse>;
+
+    fn handle(&mut self, msg: FindUser, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+
+        let conn = &mut self.0.get()?;
+
+        let stored_user: User = users.filter(username.eq(msg.username)).first(conn)?;
+        Ok(stored_user.into())
+    }
+}
+
 
 impl Message for UpdateUserOuter {
     type Result = Result<UserResponse>;

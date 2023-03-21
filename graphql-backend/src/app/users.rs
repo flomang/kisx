@@ -8,6 +8,8 @@ use crate::utils::{
     jwt::CanGenerateJwt,
 };
 
+use super::AppState;
+
 lazy_static! {
     static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z]+$").unwrap();
 }
@@ -21,18 +23,7 @@ pub struct In<U> {
 #[derive(async_graphql::InputObject)]
 #[derive(Debug, Validate, Deserialize)]
 pub struct RegisterUser {
-    // #[validate(
-    //     length(
-    //         min = 1,
-    //         max = 255,
-    //         message = "fails validation - must be 1-20 characters long"
-    //     ),
-    //     regex(
-    //         path = "RE_USERNAME ",
-    //         message = "fails validation - must be only alphanumeric/underscore characters"
-    //     )
-    // )]
-    #[validate(length(min = 3), custom = "validate_unique_username")]
+    #[validate(length(min = 3), custom(function = "validate_unique_username", arg = "&'v_a AppState"))]
     pub username: String,
     #[validate(email(message = "fails validation - is not a valid email address"))]
     pub email: String,
@@ -41,17 +32,21 @@ pub struct RegisterUser {
         max = 72,
         message = "fails validation - must be 8-72 characters long"
     ))]
+    #[graphql(secret)]
     pub password: String,
 }
 
-fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
+fn validate_unique_username(username: &str, state: &AppState) -> Result<(), ValidationError> {
     if username == "God" {
         // the value of the username will automatically be added later
         return Err(ValidationError::new("terrible username"));
     }
-    // TODO check if username is unique from DB
 
-    Ok(())
+    let result = async_std::task::block_on(state.db.send(FindUser { username: username.to_string() }));
+    match result.unwrap() {
+        Ok(_) => Err(ValidationError::new("username already taken")),
+        Err(_) => Ok(()),
+    }
 }
 
 
@@ -66,6 +61,10 @@ pub struct LoginUser {
         message = "fails validation - must be 8-72 characters long"
     ))]
     pub password: String,
+}
+
+pub struct FindUser {
+    pub username: String,
 }
 
 

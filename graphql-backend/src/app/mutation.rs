@@ -1,5 +1,5 @@
 use async_graphql::*;
-use validator::Validate;
+use validator::{Validate, ValidateArgs};
 
 use crate::{
     app::{
@@ -27,9 +27,9 @@ impl MutationRoot {
         ctx: &Context<'ctx>,
         params: RegisterUser,
     ) -> Result<UserResponse> {
-        params.validate()?;
-
         let state = ctx.data_unchecked::<AppState>();
+        params.validate_args(state)?;
+
         let res = state.db.send(params).await??;
         Ok(res)
     }
