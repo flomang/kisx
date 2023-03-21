@@ -1,11 +1,15 @@
-use crate::utils::auth::{Auth};
+use actix_web::{web::Data, web::Path, HttpRequest, HttpResponse};
+
+use super::AppState;
+use crate::prelude::*;
+use crate::utils::auth::{authenticate, Auth};
 
 // Extractors ↓
 
-// #[derive(Debug, Deserialize)]
-// pub struct ProfilePath {
-//     username: String,
-// }
+#[derive(Debug, Deserialize)]
+pub struct ProfilePath {
+    username: String,
+}
 
 // Client Messages ↓
 

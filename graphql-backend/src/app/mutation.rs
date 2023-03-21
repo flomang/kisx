@@ -1,7 +1,4 @@
-use std::time::SystemTime;
-
 use async_graphql::*;
-use bigdecimal::{BigDecimal, FromPrimitive};
 use validator::Validate;
 
 use crate::{
@@ -13,11 +10,13 @@ use crate::{
 };
 
 use super::{
-    assets::{AddAssetRequest, AssetResponse},
+    articles::{
+        ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
+        UpdateArticle, UpdateArticleOuter, UnfavoriteArticle, comments::{AddCommentOuter, AddComment, CommentResponse, DeleteComment},
+    },
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     Token,
 };
-
 pub struct MutationRoot;
 
 #[Object]
@@ -91,18 +90,121 @@ impl MutationRoot {
         Ok(res)
     }
 
-    // add user set to portfolio
-    async fn add_asset<'ctx>(
+    // create article
+    async fn create_acticle<'ctx>(
         &self,
         ctx: &Context<'ctx>,
-        params: AddAssetRequest,
-    ) -> Result<AssetResponse> {
+        params: CreateArticle,
+    ) -> Result<ArticleResponse> {
         params.validate()?;
 
         let state = ctx.data_unchecked::<AppState>();
         let token = ctx.data::<Token>()?.0.clone();
-        let _auth = authenticate_token(state, token).await?;
-        let res = state.db.send(params).await??;
+        let auth = authenticate_token(state, token).await?;
+        let res = state
+            .db
+            .send(CreateArticleOuter {
+                auth,
+                article: params,
+            })
+            .await??;
+
         Ok(res)
+    }
+
+    // update article
+    async fn update_acticle<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        slug: String,
+        params: UpdateArticle,
+    ) -> Result<ArticleResponse> {
+        params.validate()?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        let res = state
+            .db
+            .send(UpdateArticleOuter {
+                auth,
+                slug,
+                article: params,
+            })
+            .await??;
+
+        Ok(res)
+    }
+
+    // update article
+    async fn delete_acticle<'ctx>(&self, ctx: &Context<'ctx>, slug: String) -> Result<bool> {
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        state.db.send(DeleteArticle { auth, slug }).await??;
+        Ok(true)
+    }
+
+    // favorite article
+    async fn favorite_acticle<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        slug: String,
+    ) -> Result<ArticleResponse> {
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        let res = state.db.send(FavoriteArticle { auth, slug }).await??;
+        Ok(res)
+    }
+
+    // unfavorite article
+    async fn unfavorite_acticle<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        slug: String,
+    ) -> Result<ArticleResponse> {
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        let res = state.db.send(UnfavoriteArticle { auth, slug }).await??;
+        Ok(res)
+    }
+
+    // add comment to article
+    async fn add_comment<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        slug: String,
+        comment: AddComment,
+    ) -> Result<CommentResponse> {
+        comment.validate()?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        let res = state
+            .db
+            .send(AddCommentOuter {
+                auth,
+                slug,
+                comment
+            })
+            .await??;
+        Ok(res)
+    }
+
+    // delete comment from article
+    async fn delete_comment<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        slug: String,
+        comment_id: i32,
+    ) -> Result<bool> {
+        let state = ctx.data_unchecked::<AppState>();
+        let token = ctx.data::<Token>()?.0.clone();
+        let auth = authenticate_token(state, token).await?;
+        state.db.send(DeleteComment { auth, slug, comment_id }).await??;
+        Ok(true)
     }
 }

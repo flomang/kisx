@@ -4,6 +4,7 @@ A lego DEX built on ETH.
 
 > ### [Actix](https://actix.rs/) codebase containing real world examples (CRUD, auth, advanced patterns, etc)
 
+
 This codebase was created to demonstrate a fully fledged fullstack application built with [Actix](https://actix.rs/) including CRUD operations, authentication, routing, pagination, and more. CORS, however, is not yet added.
 
 This implementation is not reviewed. See the [Contributing](#contributing) section below.
@@ -16,6 +17,7 @@ This is an application written in [Rust](https://www.rust-lang.org/) that utiliz
 
 You can view a full list of crates being used in [Cargo.toml](./Cargo.toml), but here are some of the main ones of note:
 
+* [Async-graphql](https://github.com/async-graphql) - async graphQL server framework
 * [Actix](https://actix.rs/) - a powerful Actor framework
 * [Chrono](https://github.com/chronotope/chrono) - a Date and Time library for Rust
 * [Failure](https://rust-lang-nursery.github.io/failure/) - a system for creating and managing errors in Rust

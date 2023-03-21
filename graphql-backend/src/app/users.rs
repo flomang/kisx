@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::convert::From;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 use crate::models::User;
 use crate::utils::{
@@ -9,29 +9,30 @@ use crate::utils::{
 };
 
 lazy_static! {
-    static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z ]+$").unwrap();
+    static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z]+$").unwrap();
 }
 
-// #[derive(Debug, Deserialize)]
-// pub struct In<U> {
-//     user: U,
-// }
+#[derive(Debug, Deserialize)]
+pub struct In<U> {
+    user: U,
+}
 
 // Client Messages ↓
 #[derive(async_graphql::InputObject)]
 #[derive(Debug, Validate, Deserialize)]
 pub struct RegisterUser {
-    #[validate(
-        length(
-            min = 1,
-            max = 20,
-            message = "fails validation - must be 1-20 characters long"
-        ),
-        regex(
-            path = "RE_USERNAME",
-            message = "fails validation - is not only alphanumeric/underscore characters"
-        )
-    )]
+    // #[validate(
+    //     length(
+    //         min = 1,
+    //         max = 255,
+    //         message = "fails validation - must be 1-20 characters long"
+    //     ),
+    //     regex(
+    //         path = "RE_USERNAME ",
+    //         message = "fails validation - must be only alphanumeric/underscore characters"
+    //     )
+    // )]
+    #[validate(length(min = 3), custom = "validate_unique_username")]
     pub username: String,
     #[validate(email(message = "fails validation - is not a valid email address"))]
     pub email: String,
@@ -42,6 +43,17 @@ pub struct RegisterUser {
     ))]
     pub password: String,
 }
+
+fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
+    if username == "God" {
+        // the value of the username will automatically be added later
+        return Err(ValidationError::new("terrible username"));
+    }
+    // TODO check if username is unique from DB
+
+    Ok(())
+}
+
 
 #[derive(async_graphql::InputObject)]
 #[derive(Debug, Validate, Deserialize)]

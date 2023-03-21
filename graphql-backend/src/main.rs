@@ -1,6 +1,4 @@
-
 #![allow(unused_must_use)]
-#![allow(dead_code)]
 
 #[macro_use]
 extern crate diesel;
@@ -13,7 +11,6 @@ extern crate lazy_static;
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-
 
 mod app;
 mod db;
@@ -29,7 +26,7 @@ fn main() {
     dotenv::dotenv().ok();
 
     if env::var("RUST_LOG").ok().is_none() {
-        env::set_var("RUST_LOG", "graphql_exchange=debug,actix_web=info");
+        env::set_var("RUST_LOG", "pagecraft=debug,actix_web=info");
     }
     env_logger::init();
     app::start_server();
