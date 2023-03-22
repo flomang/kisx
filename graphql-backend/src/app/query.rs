@@ -17,8 +17,7 @@ impl QueryRoot {
     // get the current logged in user by token
     async fn get_current_user<'ctx>(&self, ctx: &Context<'ctx>) -> Result<UserResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         Ok(UserResponse::create_with_auth(auth))
     }
 
@@ -29,8 +28,7 @@ impl QueryRoot {
         username: String,
     ) -> Result<ProfileResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token)
+        let auth = authenticate_token(state, ctx)
             .await
             .map(|auth| Some(auth))
             .unwrap_or(None);
@@ -47,8 +45,7 @@ impl QueryRoot {
         slug: String,
     ) -> Result<ArticleResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token)
+        let auth = authenticate_token(state, ctx)
             .await
             .map(|auth| Some(auth))
             .unwrap_or(None);
@@ -65,8 +62,7 @@ impl QueryRoot {
         filter: ArticlesParams,
     ) -> Result<ArticleListResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token)
+        let auth = authenticate_token(state, ctx)
             .await
             .map(|auth| Some(auth))
             .unwrap_or(None);
@@ -89,8 +85,7 @@ impl QueryRoot {
         params: FeedParams,
     ) -> Result<ArticleListResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
 
         let res = state
             .db
@@ -110,8 +105,7 @@ impl QueryRoot {
         slug: String,
     ) -> Result<CommentListResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token)
+        let auth = authenticate_token(state, ctx)
             .await
             .map(|auth| Some(auth))
             .unwrap_or(None);

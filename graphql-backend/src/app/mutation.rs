@@ -11,8 +11,9 @@ use crate::{
 
 use super::{
     articles::{
+        comments::{AddComment, AddCommentOuter, CommentResponse, DeleteComment},
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
-        UpdateArticle, UpdateArticleOuter, UnfavoriteArticle, comments::{AddCommentOuter, AddComment, CommentResponse, DeleteComment},
+        UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     Token,
@@ -49,11 +50,11 @@ impl MutationRoot {
         ctx: &Context<'ctx>,
         params: UpdateUser,
     ) -> Result<UserResponse> {
-        params.validate()?;
-
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
+
+        params.validate_args(state)?;
+
         let res = state
             .db
             .send(UpdateUserOuter {
@@ -71,8 +72,7 @@ impl MutationRoot {
         username: String,
     ) -> Result<ProfileResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state.db.send(FollowProfile { auth, username }).await??;
         Ok(res)
     }
@@ -84,8 +84,7 @@ impl MutationRoot {
         username: String,
     ) -> Result<ProfileResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state.db.send(UnfollowProfile { auth, username }).await??;
         Ok(res)
     }
@@ -99,8 +98,7 @@ impl MutationRoot {
         params.validate()?;
 
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state
             .db
             .send(CreateArticleOuter {
@@ -122,8 +120,7 @@ impl MutationRoot {
         params.validate()?;
 
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state
             .db
             .send(UpdateArticleOuter {
@@ -139,8 +136,7 @@ impl MutationRoot {
     // update article
     async fn delete_acticle<'ctx>(&self, ctx: &Context<'ctx>, slug: String) -> Result<bool> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         state.db.send(DeleteArticle { auth, slug }).await??;
         Ok(true)
     }
@@ -152,8 +148,7 @@ impl MutationRoot {
         slug: String,
     ) -> Result<ArticleResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state.db.send(FavoriteArticle { auth, slug }).await??;
         Ok(res)
     }
@@ -165,8 +160,7 @@ impl MutationRoot {
         slug: String,
     ) -> Result<ArticleResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state.db.send(UnfavoriteArticle { auth, slug }).await??;
         Ok(res)
     }
@@ -181,14 +175,13 @@ impl MutationRoot {
         comment.validate()?;
 
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
+        let auth = authenticate_token(state, ctx).await?;
         let res = state
             .db
             .send(AddCommentOuter {
                 auth,
                 slug,
-                comment
+                comment,
             })
             .await??;
         Ok(res)
@@ -202,9 +195,15 @@ impl MutationRoot {
         comment_id: i32,
     ) -> Result<bool> {
         let state = ctx.data_unchecked::<AppState>();
-        let token = ctx.data::<Token>()?.0.clone();
-        let auth = authenticate_token(state, token).await?;
-        state.db.send(DeleteComment { auth, slug, comment_id }).await??;
+        let auth = authenticate_token(state, ctx).await?;
+        state
+            .db
+            .send(DeleteComment {
+                auth,
+                slug,
+                comment_id,
+            })
+            .await??;
         Ok(true)
     }
 }

@@ -1,8 +1,4 @@
-use actix_web::{web::Data, web::Path, HttpRequest, HttpResponse};
-
-use super::AppState;
-use crate::prelude::*;
-use crate::utils::auth::{authenticate, Auth};
+use crate::utils::auth::Auth;
 
 // Extractors ↓
 

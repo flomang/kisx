@@ -1,11 +1,8 @@
-use actix_web::{web::Data, web::Json, web::Path, HttpRequest, HttpResponse};
 use validator::Validate;
 
-use super::super::AppState;
 use crate::app::profiles::ProfileResponseInner;
-use crate::prelude::*;
 use crate::utils::{
-    auth::{authenticate, Auth},
+    auth::Auth,
     CustomDateTime,
 };
 

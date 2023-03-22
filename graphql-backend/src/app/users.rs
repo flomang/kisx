@@ -22,7 +22,7 @@ pub struct In<U> {
 pub struct RegisterUser {
     #[validate(
         length(min = 3, message = "must be at least 3 characters long"),
-        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "username already taken")
+        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "already taken")
     )]
     pub username: String,
     #[validate(email(message = "not a valid email address"))]
@@ -51,12 +51,12 @@ fn validate_unique_username(username: &str, state: &AppState) -> Result<(), Vali
 
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct LoginUser {
-    #[validate(email(message = "fails validation - is not a valid email address"))]
+    #[validate(email(message = "not a valid email address"))]
     pub email: String,
     #[validate(length(
         min = 8,
         max = 72,
-        message = "fails validation - must be 8-72 characters long"
+        message = "must be 8-72 characters long"
     ))]
     pub password: String,
 }
@@ -68,15 +68,8 @@ pub struct FindUser {
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct UpdateUser {
     #[validate(
-        length(
-            min = 1,
-            max = 20,
-            message = "fails validation - must be 1-20 characters long"
-        ),
-        regex(
-            path = "RE_USERNAME",
-            message = "fails validation - is not only alphanumeric/underscore characters"
-        )
+        length(min = 3, message = "must be at least 3 characters long"),
+        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "already taken")
     )]
     pub username: Option<String>,
     #[validate(email)]
@@ -84,10 +77,10 @@ pub struct UpdateUser {
     #[validate(length(
         min = 8,
         max = 72,
-        message = "fails validation - must be 8-72 characters long"
+        message = "must be 8-72 characters long"
     ))]
     pub password: Option<String>,
-    #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
+    #[validate(length(min = 1, message = "cannot be empty"))]
     pub bio: Option<String>,
     #[validate(url(message = "is not a URL"))]
     pub image: Option<String>,

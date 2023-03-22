@@ -1,5 +1,5 @@
-use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use actix::MailboxError;
+use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use diesel::{
     r2d2::PoolError,
     result::{DatabaseErrorKind, Error as DieselError},
@@ -14,7 +14,7 @@ use validator::ValidationErrors;
 pub enum Error {
     // 401
     #[fail(display = "Unauthorized: {}", _0)]
-    Unauthorized(JsonValue),
+    Unauthorized(String),
 
     // 403
     #[fail(display = "Forbidden: {}", _0)]
@@ -60,15 +60,9 @@ impl From<MailboxError> for Error {
 impl From<JwtError> for Error {
     fn from(error: JwtError) -> Self {
         match error.kind() {
-            JwtErrorKind::InvalidToken => Error::Unauthorized(json!({
-                "error": "Token is invalid",
-            })),
-            JwtErrorKind::InvalidIssuer => Error::Unauthorized(json!({
-                "error": "Issuer is invalid",
-            })),
-            _ => Error::Unauthorized(json!({
-                "error": "An issue was found with the token provided",
-            })),
+            JwtErrorKind::InvalidToken => Error::Unauthorized("Token is invalid".to_string()),
+            JwtErrorKind::InvalidIssuer => Error::Unauthorized("Issuer is invalid".to_string()),
+            _ => Error::Unauthorized("An issue was found with the token provided".to_string()),
         }
     }
 }
