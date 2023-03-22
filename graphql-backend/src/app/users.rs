@@ -21,16 +21,16 @@ pub struct In<U> {
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct RegisterUser {
     #[validate(
-        length(min = 3, message = "fails validation - must be at least 3 characters long"),
-        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "fails validation - username already taken")
+        length(min = 3, message = "must be at least 3 characters long"),
+        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "username already taken")
     )]
     pub username: String,
-    #[validate(email(message = "fails validation - is not a valid email address"))]
+    #[validate(email(message = "not a valid email address"))]
     pub email: String,
     #[validate(length(
         min = 8,
         max = 72,
-        message = "fails validation - must be 8-72 characters long"
+        message = "must be 8-72 characters long"
     ))]
     #[graphql(secret)]
     pub password: String,
@@ -38,7 +38,7 @@ pub struct RegisterUser {
 
 fn validate_unique_username(username: &str, state: &AppState) -> Result<(), ValidationError> {
     let result = async_std::task::block_on(state.db.send(FindUser {
-        username: username.to_string(),
+        username: username.trim().to_string(),
     }))
     .unwrap();
 

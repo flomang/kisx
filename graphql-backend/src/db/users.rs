@@ -21,7 +21,7 @@ impl Handler<RegisterUser> for DbExecutor {
         use crate::schema::users::dsl::*;
 
         let new_user = NewUser {
-            username: msg.username.clone(),
+            username: msg.username.trim().to_string(),
             email: msg.email.clone(),
             password: HASHER.hash(&msg.password)?,
             bio: None,
