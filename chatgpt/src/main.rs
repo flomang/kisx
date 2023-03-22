@@ -17,6 +17,18 @@ async fn main() -> Result<()> {
 
     let key = env::var("CHATGPT_KEY").unwrap();
     let client = ChatGPT::new(key)?;
+    let mut conversation: Conversation = client.new_conversation();
+
+    print!("Please enter a previous saved conversation (type 'new' for new conversation): ");
+    io::stdout().flush().unwrap();
+
+    let mut convo = String::new();
+    io::stdin().read_line(&mut convo).unwrap();
+
+    if convo.trim() != "new" {
+        convo = format!("{}.json", convo.trim());
+        conversation = client.restore_conversation_json(convo).await?
+    } 
 
     loop {
         print!("Please enter a command (type 'exit' to quit): ");
@@ -26,7 +38,23 @@ async fn main() -> Result<()> {
         io::stdin().read_line(&mut input).unwrap();
 
         if input.trim() == "exit" {
-            println!("Exiting...");
+            print!("{}", style("Save conversation before exiting? (y / n) ").red());
+            io::stdout().flush().unwrap();
+
+            let mut save = String::new();
+            io::stdin().read_line(&mut save).unwrap();
+
+            if save.trim() == "y" {
+                print!("{}", style("Enter conversation name: "));
+                io::stdout().flush().unwrap();
+
+                let mut file_name = String::new();
+                io::stdin().read_line(&mut file_name).unwrap();
+
+                file_name = format!("{}.json", file_name.trim());
+                conversation.save_history_json(file_name).await?;
+            }
+
             break;
         }
 
@@ -41,13 +69,14 @@ async fn main() -> Result<()> {
         pb.enable_steady_tick(Duration::from_millis(50));
         pb.tick();
 
-        let response: CompletionResponse = client.send_message(input).await?;
+        //let response: CompletionResponse = client.send_message(input).await?;
+        let response: CompletionResponse = conversation.send_message(input).await?;
         let response = response.message().content.clone();
         let wrapped = textwrap::wrap(&response, 100);
 
         pb.finish_and_clear();
 
-        print!("{}", style("Response:").green());
+        println!("{}", style("Response:").green());
         for line in wrapped {
             println!("{}", style(line).green());
         }
