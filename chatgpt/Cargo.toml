@@ -3,9 +3,16 @@ name = "chatgpt"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+# chatgpt
 chatgpt_rs = "1.0.0"
+# terminal console
+console = "0.15.5"
+# env variables
 dotenv = "0.15.0"
+# cli indicators
+indicatif = "0.17.3"
+# limit text length on CLI
+textwrap = "0.16.0"
+# runtime
 tokio = { version = "1", features = ["full"] }

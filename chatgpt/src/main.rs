@@ -1,6 +1,8 @@
-use std::env;
 use chatgpt::{prelude::*, types::CompletionResponse};
+use console::style;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
+use std::{env, time::Duration};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -28,11 +30,27 @@ async fn main() -> Result<()> {
             break;
         }
 
-        let response: CompletionResponse = client
-         .send_message(input)
-         .await?;
+        let pb = ProgressBar::new_spinner();
 
-        println!("response: {}", response.message().content);
+        pb.set_style(
+            ProgressStyle::with_template("{prefix:.bold.dim} {spinner} {wide_msg}")
+                .unwrap()
+                .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ "),
+        );
+        pb.set_message("Processing...");
+        pb.enable_steady_tick(Duration::from_millis(50));
+        pb.tick();
+
+        let response: CompletionResponse = client.send_message(input).await?;
+        let response = response.message().content.clone();
+        let wrapped = textwrap::wrap(&response, 100);
+
+        pb.finish_and_clear();
+
+        print!("{}", style("Response:").green());
+        for line in wrapped {
+            println!("{}", style(line).green());
+        }
     }
     Ok(())
 }
