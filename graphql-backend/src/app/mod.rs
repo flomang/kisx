@@ -6,7 +6,7 @@ mod mutation;
 mod query;
 
 use crate::{
-    db::{new_pool, DbExecutor},
+    db::{new_pool, DbExecutor}, utils::auth::Token,
 };
 use actix::prelude::{Addr, SyncArbiter};
 use actix_cors::Cors;
@@ -24,8 +24,6 @@ use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use query::QueryRoot;
 use mutation::MutationRoot;
-
-pub struct Token(pub String);
 
 pub type GraphqlSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 
