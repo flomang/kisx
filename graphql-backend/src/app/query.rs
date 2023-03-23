@@ -7,7 +7,7 @@ use async_graphql::*;
 use super::{
     articles::{ArticleListResponse, ArticleResponse, ArticlesParams, GetArticle, GetArticles, FeedParams, GetFeed, comments::{GetComments, CommentListResponse}},
     profiles::{GetProfile, ProfileResponse},
-    Token, tags::{GetTags, TagsResponse},
+    tags::{GetTags, TagsResponse},
 };
 
 pub struct QueryRoot;

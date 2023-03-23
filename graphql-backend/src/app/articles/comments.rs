@@ -6,20 +6,20 @@ use crate::utils::{
     CustomDateTime,
 };
 
-#[derive(Debug, Deserialize)]
-pub struct In<T> {
-    comment: T,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct In<T> {
+//     comment: T,
+// }
 
 // Extractors ↓
 
-use super::ArticlePath;
+// use super::ArticlePath;
 
-#[derive(Debug, Deserialize)]
-pub struct ArticleCommentPath {
-    slug: String,
-    comment_id: i32,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct ArticleCommentPath {
+//     slug: String,
+//     comment_id: i32,
+// }
 
 // Client Messages ↓
 

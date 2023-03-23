@@ -7,10 +7,10 @@ use crate::utils::{
     CustomDateTime,
 };
 
-#[derive(Debug, Deserialize)]
-pub struct In<T> {
-    article: T,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct In<T> {
+//     article: T,
+// }
 
 // Extractors ↓
 

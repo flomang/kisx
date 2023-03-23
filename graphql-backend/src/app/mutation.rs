@@ -16,7 +16,6 @@ use super::{
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
-    Token,
 };
 pub struct MutationRoot;
 

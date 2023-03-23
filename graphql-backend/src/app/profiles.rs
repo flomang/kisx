@@ -2,10 +2,10 @@ use crate::utils::auth::Auth;
 
 // Extractors ↓
 
-#[derive(Debug, Deserialize)]
-pub struct ProfilePath {
-    username: String,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct ProfilePath {
+//     username: String,
+// }
 
 // Client Messages ↓
 
