@@ -1,13 +1,11 @@
 <script lang="ts">
-    //import { gql } from "@apollo/client";
-    import { gql } from "@apollo/client/core";
+    import { ApolloError, gql } from "@apollo/client/core";
     import client from "../../lib/apollo";
 
-    let username: string | undefined;
-    interface SigninProps {
-        // add props here
-        //onSignin?: () => void;
-    }
+    // interface SigninProps {
+    //     // add props here
+    //     //onSignin?: () => void;
+    // }
 
     interface SigninResult {
         signin: {
@@ -20,10 +18,11 @@
 
     let email = "";
     let password = "";
+    let message = "";
 
     const SIGNIN_MUTATION = gql`
         mutation SigninMutation($email: String!, $password: String!) {
-            signin(params: {email: $email, password: $password}) {
+            signin(params: { email: $email, password: $password }) {
                 user {
                     token
                     username
@@ -33,16 +32,30 @@
     `;
 
     const handleSignin = async () => {
-        const { data } = await client.mutate<SigninResult>({
-            mutation: SIGNIN_MUTATION,
-            variables: { email, password },
-        });
-        //console.log("Object: %o", data?.signin.user.token);
+        try {
+            const { data } = await client.mutate<SigninResult>({
+                mutation: SIGNIN_MUTATION,
+                variables: { email, password },
+            });
 
-        let token = data?.signin.user.token;
-        if (token != undefined) {
-            username = data?.signin.user.username;
-            localStorage.setItem("token", token);
+            const { token, username } = data?.signin.user ?? {};
+            if (token) {
+                localStorage.setItem("token", token);
+                message = username ?? message;
+            }
+        } catch (error: any) {
+            if (
+                error instanceof ApolloError &&
+                error.message.includes("Unauthorized")
+            ) {
+                message = "invalid email / password";
+            } else {
+                console.error(
+                    "encountered unexpected error from signin request:",
+                    error
+                );
+                alert(error.message);
+            }
         }
     };
 </script>
@@ -51,5 +64,5 @@
     <input type="email" bind:value={email} required />
     <input type="password" bind:value={password} required />
     <button type="submit">Sign In</button>
-    <div>{username}</div>
+    <div>{message}</div>
 </form>
