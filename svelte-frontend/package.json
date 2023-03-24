@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@apollo/client": "^3.7.10",
 		"graphql": "^16.6.0",
-		"svelte-apollo": "^0.5.0"
+		"svelte-apollo": "^0.5.0",
+		"svelte-use-form": "^2.6.1"
 	}
 }
