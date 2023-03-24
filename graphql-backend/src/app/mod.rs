@@ -1,16 +1,17 @@
 pub mod articles;
+mod mutation;
 pub mod profiles;
+mod query;
 pub mod tags;
 pub mod users;
-mod mutation;
-mod query;
 
 use crate::{
-    db::{new_pool, DbExecutor}, utils::auth::Token,
+    db::{new_pool, DbExecutor},
+    utils::auth::Token,
 };
 use actix::prelude::{Addr, SyncArbiter};
 use actix_cors::Cors;
-use actix_http::header::{HeaderMap, ORIGIN};
+use actix_http::header::{HeaderMap, ACCEPT, ORIGIN};
 use actix_web::{
     guard,
     http::header::{AUTHORIZATION, CONTENT_TYPE},
@@ -19,11 +20,11 @@ use actix_web::{
     web::Data,
     App, HttpRequest, HttpResponse, HttpServer, Result,
 };
-use std::env;
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use query::QueryRoot;
 use mutation::MutationRoot;
+use query::QueryRoot;
+use std::env;
 
 pub type GraphqlSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 
@@ -72,14 +73,17 @@ pub async fn start_server() -> std::io::Result<()> {
             db: database_address.clone(),
         };
 
-        let _cors = match frontend_origin {
+        let cors = match frontend_origin {
+            // TODO production should not be allowed to send wildcard
             Some(ref origin) if origin != "*" => Cors::default()
                 .allowed_origin(origin)
                 .allowed_headers(vec![AUTHORIZATION, CONTENT_TYPE])
                 .max_age(3600),
             _ => Cors::default()
                 .send_wildcard()
-                .allowed_headers(vec![AUTHORIZATION, CONTENT_TYPE, ORIGIN])
+                .allow_any_origin()
+                .allow_any_method()
+                .allow_any_header()
                 .max_age(3600),
         };
 
@@ -90,7 +94,7 @@ pub async fn start_server() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(schema.clone()))
             .wrap(Logger::default())
-            //.wrap(cors)
+            .wrap(cors)
             .configure(routes)
     })
     .bind(&bind_address)?
@@ -98,7 +102,7 @@ pub async fn start_server() -> std::io::Result<()> {
     .await
 }
 
-fn routes(app: &mut web::ServiceConfig)  {
+fn routes(app: &mut web::ServiceConfig) {
     app.service(web::resource("/").guard(guard::Post()).to(index))
         .service(web::resource("/").guard(guard::Get()).to(index_graphiql));
 }
