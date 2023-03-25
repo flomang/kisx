@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use libreauth::pass::HashBuilder;
 
 use super::DbExecutor;
-use crate::app::users::{LoginUser, RegisterUser, UpdateUserOuter, FindUser, UserResponse};
+use crate::app::users::{FindUser, LoginUser, RegisterUser, UpdateUserOuter, UserResponse};
 use crate::models::{NewUser, User, UserChange};
 use crate::prelude::*;
 use crate::utils::{HASHER, PWD_SCHEME_VERSION};
@@ -50,28 +50,30 @@ impl Handler<LoginUser> for DbExecutor {
     fn handle(&mut self, msg: LoginUser, _: &mut Self::Context) -> Self::Result {
         use crate::schema::users::dsl::*;
 
-        let provided_password_raw = &msg.password;
-
         let conn = &mut self.0.get()?;
 
-        let stored_user: User = users.filter(email.eq(msg.email)).first(conn)?;
-        let checker = HashBuilder::from_phc(&stored_user.password)?;
+        let stored_user: User = users
+            .filter(email.eq(msg.email))
+            .first(conn)
+            .map_err(|_| Error::Unauthorized("invalid email/password".to_string()))?;
 
-        if checker.is_valid(provided_password_raw) {
-            if checker.needs_update(Some(PWD_SCHEME_VERSION)) {
-                let new_password = HASHER.hash(provided_password_raw)?;
-                return match diesel::update(users.find(stored_user.id))
-                    .set(password.eq(new_password))
-                    .get_result::<User>(conn)
-                {
-                    Ok(user) => Ok(user.into()),
-                    Err(e) => Err(e.into()),
-                };
-            }
-            Ok(stored_user.into())
-        } else {
-            Err(Error::Unauthorized("invalid email/password".to_string()))
+        let checker = HashBuilder::from_phc(&stored_user.password)?;
+        let provided_password_raw = &msg.password;
+
+        if !checker.is_valid(provided_password_raw) {
+            return Err(Error::Unauthorized("invalid email/password".to_string()));
         }
+
+        if checker.needs_update(Some(PWD_SCHEME_VERSION)) {
+            let new_password = HASHER.hash(provided_password_raw)?;
+            let updated_user = diesel::update(users.find(stored_user.id))
+                .set(password.eq(new_password))
+                .get_result::<User>(conn)
+                .map_err(|e| Error::from(e))?;
+
+            return Ok(updated_user.into());
+        }
+        Ok(stored_user.into())
     }
 }
 
@@ -91,7 +93,6 @@ impl Handler<FindUser> for DbExecutor {
         Ok(stored_user.into())
     }
 }
-
 
 impl Message for UpdateUserOuter {
     type Result = Result<UserResponse>;

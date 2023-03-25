@@ -53,11 +53,6 @@ fn validate_unique_username(username: &str, state: &AppState) -> Result<(), Vali
 pub struct LoginUser {
     #[validate(email(message = "not a valid email address"))]
     pub email: String,
-    #[validate(length(
-        min = 8,
-        max = 72,
-        message = "must be 8-72 characters long"
-    ))]
     pub password: String,
 }
 

@@ -11,7 +11,7 @@ use crate::{
 };
 use actix::prelude::{Addr, SyncArbiter};
 use actix_cors::Cors;
-use actix_http::header::{HeaderMap, ACCEPT, ORIGIN};
+use actix_http::header::HeaderMap;
 use actix_web::{
     guard,
     http::header::{AUTHORIZATION, CONTENT_TYPE},
