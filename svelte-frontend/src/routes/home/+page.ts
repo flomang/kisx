@@ -3,7 +3,6 @@ import { browser } from '$app/environment';
 import { ApolloError, gql } from "@apollo/client/core";
 import client from "../../lib/apollo";
 import { redirect } from '@sveltejs/kit';
-import { goto } from '$app/navigation';
 
 
 interface GetCurrentUserResult {
@@ -42,7 +41,7 @@ export const load = (async ({ }) => {
                 localStorage.setItem("token", token);
                 currentUser = username ?? currentUser;
             }
-            
+
             return {
                 username: currentUser,
             };
@@ -52,7 +51,7 @@ export const load = (async ({ }) => {
                 error instanceof ApolloError &&
                 error.message.includes("Unauthorized")
             ) {
-                goto("/signin");
+                throw redirect(307, '/signin');
             } else {
                 console.error(
                     "encountered unexpected error from signin request:",

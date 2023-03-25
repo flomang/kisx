@@ -2,8 +2,6 @@
     import {
         useForm,
         validators,
-        HintGroup,
-        Hint,
         email as emailFunc,
         required,
     } from "svelte-use-form";
@@ -36,6 +34,10 @@
         }
     `;
 
+    const handleInput = (event: Event) => {
+        message = "";
+    }
+
     const handleSignin = async () => {
         try {
             const { data } = await client.mutate<SigninResult>({
@@ -45,15 +47,14 @@
 
             const { token, username } = data?.signin.user ?? {};
             if (token) {
-                addToken(token)
+                addToken(token);
                 message = username ?? message;
                 goto("/home");
             }
         } catch (error: any) {
             if (
                 error instanceof ApolloError &&
-                error.message.includes("Unauthorized") || 
-                error.message.includes("not found")
+                error.message.includes("Unauthorized")
             ) {
                 message = "invalid email / password";
             } else {
@@ -70,14 +71,23 @@
 <form use:form on:submit|preventDefault={handleSignin}>
     <h1>Login</h1>
 
-    <input type="email" name="email" use:validators={[required, emailFunc]}  bind:value={email} required  />
-    <HintGroup for="email">
-        <Hint on="required">This is a mandatory field</Hint>
-        <Hint on="email" hideWhenRequired>Email is not valid</Hint>
-    </HintGroup>
+    <input
+        type="email"
+        name="email"
+        use:validators={[required, emailFunc]}
+        bind:value={email}
+        on:input={handleInput}
+        required
+    />
 
-    <input type="password" name="password" use:validators={[required]}  bind:value={password} required />
-    <Hint for="password" on="required">This is a mandatory field</Hint>
+    <input
+        type="password"
+        name="password"
+        use:validators={[required]}
+        bind:value={password}
+        on:input={handleInput}
+        required
+    />
 
     <button disabled={!$form.valid}>Login</button>
 </form>
