@@ -45,3 +45,10 @@ Run the migrations via:
 diesel setup 
 ```
 
+
+## Running
+```
+cargo watch -x 'run'
+```
+
+The graphql schema should be accessible from bind address specified in the env file.  
