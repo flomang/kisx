@@ -30,3 +30,6 @@ Cargo.lock
 .DS_Store
 
 # End of https://www.gitignore.io/api/rust,code
+
+# ignore forge generated contracts folder
+contracts/
