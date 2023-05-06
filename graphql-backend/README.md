@@ -37,18 +37,5 @@ You can view a full list of crates being used in [Cargo.toml](./Cargo.toml), but
 * Copy (`cp`) [.env.example](./.env.example) to `.env` within this directory, and change the environment variables accordingly to your system.
 * Setup your database by running `diesel database setup`. Make sure it has completed successfully.
 * Build this project with `cargo build`. You are welcome to compile with `--release` if you'd like.
-* Run with `cargo run`.
-* The API URL will be whatever the `BIND_ADDRESS` value is in `.env` with the `/api` path included e.g. `https://127.0.0.1:3000/api`. Set it as such in your REST client ([Postman](https://www.getpostman.com/), [Insomnia](https://insomnia.rest/), etc.), import the [postman collection](https://github.com/gothinkster/realworld/blob/master/api/Conduit.postman_collection.json) and start testing it out!
-
-Run the migrations via:
-```
-diesel setup 
-```
-
-
-## Running
-```
-cargo watch -x 'run'
-```
-
-The graphql schema should be accessible from bind address specified in the env file.  
+* Run with `cargo watch -x 'run'`.
+* Open a browser window at the configured server bind address to view the browser GraphiQL IDE. i.e. `BIND_ADDRESS` value declared in `.env`.
