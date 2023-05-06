@@ -1,5 +1,5 @@
 # foundry-contracts  
-![kisx](kisx.webp)
+![kisx](../kisx.webp)
 
 This is a [Foundry](https://book.getfoundry.sh/) subproject. Foundry manages your dependencies, compiles your project, runs tests, deploys, and lets you interact with the chain from the command-line and via Solidity scripts.
 
