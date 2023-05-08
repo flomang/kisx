@@ -36,7 +36,7 @@
 
     const handleInput = (event: Event) => {
         message = "";
-    }
+    };
 
     const handleSignin = async () => {
         try {
@@ -68,34 +68,155 @@
     };
 </script>
 
-<form use:form on:submit|preventDefault={handleSignin}>
-    <h1>Login</h1>
+<body>
+    <div class="main">
+        <input type="checkbox" id="chk" aria-hidden="true" />
 
-    <input
-        type="email"
-        name="email"
-        use:validators={[required, emailFunc]}
-        bind:value={email}
-        on:input={handleInput}
-        required
-    />
+        <div class="signup">
+            <form use:form on:submit|preventDefault={handleSignin}>
+                <label for="chk" aria-hidden="true">Login</label>
+                <input
+                    type="email"
+                    name="email"
+                    use:validators={[required, emailFunc]}
+                    bind:value={email}
+                    on:input={handleInput}
+                    required
+                />
 
-    <input
-        type="password"
-        name="password"
-        use:validators={[required]}
-        bind:value={password}
-        on:input={handleInput}
-        required
-    />
+                <input
+                    type="password"
+                    name="password"
+                    use:validators={[required]}
+                    bind:value={password}
+                    on:input={handleInput}
+                    required
+                />
 
-    <button disabled={!$form.valid}>Login</button>
-</form>
-<div>{message}</div>
+                <button disabled={!$form.valid}>Login</button>
+                <span class="fade-in-span {message ? 'show' : ''}">{message}</span>
+            </form>
+        </div>
+
+        <div class="login">
+            <label for="chk" aria-hidden="true">Sign up</label>
+            <input type="text" name="txt" placeholder="User name" />
+            <input type="email" name="email" placeholder="Email" />
+            <input type="password" name="pswd" placeholder="Password" />
+            <button>Sign up</button>
+        </div>
+    </div>
+</body>
 
 <style>
     :global(.touched:invalid) {
         border-color: red;
         outline-color: red;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: "Jost", sans-serif;
+        background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    }
+    .main {
+        width: 350px;
+        height: 500px;
+        background: red;
+        overflow: hidden;
+        background: url("https://doc-08-2c-docs.googleusercontent.com/docs/securesc/68c90smiglihng9534mvqmq1946dmis5/fo0picsp1nhiucmc0l25s29respgpr4j/1631524275000/03522360960922298374/03522360960922298374/1Sx0jhdpEpnNIydS4rnN4kHSJtU1EyWka?e=view&authuser=0&nonce=gcrocepgbb17m&user=03522360960922298374&hash=tfhgbs86ka6divo3llbvp93mg4csvb38")
+            no-repeat center/ cover;
+        border-radius: 10px;
+        box-shadow: 1px 10px 25px #000;
+    }
+    #chk {
+        display: none;
+    }
+    .signup {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    label {
+        color: #fff;
+        font-size: 2.3em;
+        justify-content: center;
+        display: flex;
+        margin: 60px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.5s ease-in-out;
+    }
+    .fade-in-span {
+        color: red;
+        font-size: 1em;
+        justify-content: center;
+        display: flex;
+        /* margin: 7px; */
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.1s ease-in-out;
+    }
+    .fade-in-span.show {
+        opacity: 1;
+    }
+
+    input {
+        width: 60%;
+        height: 20px;
+        background: #e0dede;
+        justify-content: center;
+        display: flex;
+        margin: 20px auto;
+        padding: 10px;
+        /* border: none; */
+        outline: none;
+        border-radius: 5px;
+    }
+    button {
+        width: 60%;
+        height: 40px;
+        margin: 10px auto;
+        justify-content: center;
+        display: block;
+        color: #fff;
+        background: #573b8a;
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 20px;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        /* transition: 0.2s ease-in; */
+        cursor: pointer;
+    }
+    button:hover {
+        background: #6d44b8;
+    }
+    .login {
+        height: 460px;
+        background: #eee;
+        border-radius: 60% / 10%;
+        transform: translateY(-180px);
+        transition: 0.8s ease-in-out;
+    }
+    .login label {
+        color: #573b8a;
+        transform: scale(0.6);
+    }
+
+    #chk:checked ~ .login {
+        transform: translateY(-500px);
+    }
+    #chk:checked ~ .login label {
+        transform: scale(1);
+    }
+    #chk:checked ~ .signup label {
+        transform: scale(0.6);
     }
 </style>
