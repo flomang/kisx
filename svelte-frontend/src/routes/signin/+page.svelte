@@ -9,10 +9,16 @@
     import client, { addToken, removeToken } from "../../lib/apollo";
     import { goto } from "$app/navigation";
 
-    const form = useForm();
-    let email = "";
-    let password = "";
-    let message = "";
+    const form1 = useForm();
+    const form2 = useForm();
+    let loginEmail = "";
+    let loginPassword = "";
+    let loginError = "";
+    let signupEmail = ""
+    let signupUsername = "";
+    let signupPassword = "";
+    let signupError = "";
+    let disableSignup = true;
 
     interface SigninResult {
         signin: {
@@ -34,21 +40,27 @@
         }
     `;
 
-    const handleInput = (event: Event) => {
-        message = "";
+    const handleLoginInput = (event: Event) => {
+        loginError = "";
+    };
+    const handleSigninInput = (event: Event) => {
+        signupError = "";
+    };
+    const handleToggleForm = (event: Event) => {
+        disableSignup = !disableSignup;
     };
 
     const handleSignin = async () => {
         try {
             const { data } = await client.mutate<SigninResult>({
                 mutation: SIGNIN_MUTATION,
-                variables: { email, password },
+                variables: { email: loginEmail, password: loginPassword },
             });
 
             const { token, username } = data?.signin.user ?? {};
             if (token) {
                 addToken(token);
-                message = username ?? message;
+                loginError = username ?? loginError;
                 goto("/home");
             }
         } catch (error: any) {
@@ -56,7 +68,7 @@
                 error instanceof ApolloError &&
                 error.message.includes("Unauthorized")
             ) {
-                message = "invalid email / password";
+                loginError = "invalid email / password";
             } else {
                 console.error(
                     "encountered unexpected error from signin request:",
@@ -66,44 +78,90 @@
             }
         }
     };
+
+    const handleSignup = async () => {
+        signupError = "username check...";
+    };
 </script>
 
 <body>
     <div class="main">
-        <input type="checkbox" id="chk" aria-hidden="true" />
+        <input
+            type="checkbox"
+            id="chk"
+            aria-hidden="true"
+            on:input={handleToggleForm}
+        />
 
-        <div class="signup">
-            <form use:form on:submit|preventDefault={handleSignin}>
+        <div class="login">
+            <form use:form1 on:submit|preventDefault={handleSignin}>
                 <label for="chk" aria-hidden="true">Login</label>
                 <input
                     type="email"
                     name="email"
+                    placeholder="Email"
                     use:validators={[required, emailFunc]}
-                    bind:value={email}
-                    on:input={handleInput}
+                    bind:value={loginEmail}
+                    on:input={handleLoginInput}
                     required
                 />
 
                 <input
                     type="password"
                     name="password"
+                    placeholder="Password"
                     use:validators={[required]}
-                    bind:value={password}
-                    on:input={handleInput}
+                    bind:value={loginPassword}
+                    on:input={handleLoginInput}
                     required
                 />
 
-                <button disabled={!$form.valid}>Login</button>
-                <span class="fade-in-span {message ? 'show' : ''}">{message}</span>
+                <button class={$form1.valid ? "enable" : ""}>Login</button>
+                <span class="fade-in-span {loginError ? 'show' : ''}">
+                    {loginError}
+                </span>
             </form>
         </div>
 
-        <div class="login">
-            <label for="chk" aria-hidden="true">Sign up</label>
-            <input type="text" name="txt" placeholder="User name" />
-            <input type="email" name="email" placeholder="Email" />
-            <input type="password" name="pswd" placeholder="Password" />
-            <button>Sign up</button>
+        <div class="signup">
+            <form use:form2 on:submit|preventDefault={handleSignup}>
+                <label for="chk" aria-hidden="true">Sign up</label>
+                <input
+                    type="text"
+                    name="txt"
+                    placeholder="User name"
+                    disabled={disableSignup}
+                    bind:value={signupUsername}
+                    on:input={handleSigninInput}
+                    use:validators={[required]}
+                    required
+                />
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    use:validators={[required, emailFunc]}
+                    bind:value={signupEmail}
+                    on:input={handleSigninInput}
+                    disabled={disableSignup}
+                    required
+                />
+                <input
+                    type="password"
+                    name="pswd"
+                    placeholder="Password"
+                    use:validators={[required]}
+                    bind:value={signupPassword}
+                    on:input={handleSigninInput}
+                    disabled={disableSignup}
+                    required
+                />
+
+                <button disabled={disableSignup} class={$form2.valid ? "enable" : ""}>Sign up</button>
+                <span class="fade-in-span {signupError? 'show' : ''}">
+                    {signupError}
+                </span>
+            </form>
         </div>
     </div>
 </body>
@@ -137,7 +195,7 @@
     #chk {
         display: none;
     }
-    .signup {
+    .login {
         position: relative;
         width: 100%;
         height: 100%;
@@ -184,39 +242,43 @@
         margin: 10px auto;
         justify-content: center;
         display: block;
-        color: #fff;
-        background: #573b8a;
+        color: #ffffff63;
+        background: #573b8a63;
         font-size: 1em;
         font-weight: bold;
         margin-top: 20px;
         outline: none;
         border: none;
         border-radius: 5px;
-        /* transition: 0.2s ease-in; */
+    }
+    button.enable {
+        background: #573b8a;
+        color: #fff;
         cursor: pointer;
     }
-    button:hover {
+    button:hover.enable {
         background: #6d44b8;
     }
-    .login {
-        height: 460px;
+
+    .signup {
+        height: 560px;
         background: #eee;
         border-radius: 60% / 10%;
-        transform: translateY(-180px);
-        transition: 0.8s ease-in-out;
+        transform: translateY(-160px);
+        transition: 0.6s ease-in-out;
     }
-    .login label {
+    .signup label {
         color: #573b8a;
         transform: scale(0.6);
     }
 
-    #chk:checked ~ .login {
+    #chk:checked ~ .signup {
         transform: translateY(-500px);
     }
-    #chk:checked ~ .login label {
+    #chk:checked ~ .signup label {
         transform: scale(1);
     }
-    #chk:checked ~ .signup label {
+    #chk:checked ~ .login label {
         transform: scale(0.6);
     }
 </style>
