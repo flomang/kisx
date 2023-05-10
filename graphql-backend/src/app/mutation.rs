@@ -1,11 +1,13 @@
 use async_graphql::*;
 use validator::{Validate, ValidateArgs};
+//use super::MyResult as Result;
 
 use crate::{
     app::{
         users::{LoginUser, RegisterUser, UpdateUser, UpdateUserOuter, UserResponse},
         AppState,
     },
+    error::validation_errors_to_error,
     utils::auth::authenticate_token,
 };
 
@@ -28,7 +30,10 @@ impl MutationRoot {
         params: RegisterUser,
     ) -> Result<UserResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        params.validate_args(state)?;
+
+        params
+            .validate_args(state)
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let res = state.db.send(params).await??;
         Ok(res)
@@ -36,7 +41,9 @@ impl MutationRoot {
 
     // login a user
     async fn signin<'ctx>(&self, ctx: &Context<'ctx>, params: LoginUser) -> Result<UserResponse> {
-        params.validate()?;
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let state = ctx.data_unchecked::<AppState>();
         let res = state.db.send(params).await??;
@@ -52,7 +59,9 @@ impl MutationRoot {
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;
 
-        params.validate_args(state)?;
+        params
+            .validate_args(state)
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let res = state
             .db
@@ -94,7 +103,9 @@ impl MutationRoot {
         ctx: &Context<'ctx>,
         params: CreateArticle,
     ) -> Result<ArticleResponse> {
-        params.validate()?;
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;
@@ -116,7 +127,9 @@ impl MutationRoot {
         slug: String,
         params: UpdateArticle,
     ) -> Result<ArticleResponse> {
-        params.validate()?;
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;
@@ -171,7 +184,9 @@ impl MutationRoot {
         slug: String,
         comment: AddComment,
     ) -> Result<CommentResponse> {
-        comment.validate()?;
+        comment
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;

@@ -1,13 +1,13 @@
 use actix::MailboxError;
-use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
+// use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use diesel::{
     r2d2::PoolError,
     result::{DatabaseErrorKind, Error as DieselError},
 };
 use jwt::errors::{Error as JwtError, ErrorKind as JwtErrorKind};
 use libreauth::pass::ErrorCode as PassErrorCode;
-use serde_json::{Map as JsonMap, Value as JsonValue};
-use std::convert::From;
+use serde_json::Value as JsonValue;
+use std::{collections::HashMap, convert::From};
 use validator::ValidationErrors;
 
 #[derive(Fail, Debug)]
@@ -28,6 +28,9 @@ pub enum Error {
     #[fail(display = "Unprocessable Entity: {}", _0)]
     UnprocessableEntity(JsonValue),
 
+    #[fail(display = "Validation Errors")]
+    ValidationErrors(HashMap<String, String>),
+
     // 500
     #[fail(display = "Internal Server Error")]
     InternalServerError,
@@ -35,21 +38,21 @@ pub enum Error {
 
 // the ResponseError trait lets us convert errors to http responses with appropriate data
 // https://actix.rs/docs/errors/
-impl ResponseError for Error {
-    fn error_response(&self) -> HttpResponse {
-        match *self {
-            Error::Unauthorized(ref message) => HttpResponse::Unauthorized().json(message),
-            Error::Forbidden(ref message) => HttpResponse::Forbidden().json(message),
-            Error::NotFound(ref message) => HttpResponse::NotFound().json(message),
-            Error::UnprocessableEntity(ref message) => {
-                HttpResponse::build(StatusCode::UNPROCESSABLE_ENTITY).json(message)
-            }
-            Error::InternalServerError => {
-                HttpResponse::InternalServerError().json("Internal Server Error")
-            }
-        }
-    }
-}
+// impl ResponseError for Error {
+//     fn error_response(&self) -> HttpResponse {
+//         match *self {
+//             Error::Unauthorized(ref message) => HttpResponse::Unauthorized().json(message),
+//             Error::Forbidden(ref message) => HttpResponse::Forbidden().json(message),
+//             Error::NotFound(ref message) => HttpResponse::NotFound().json(message),
+//             Error::UnprocessableEntity(ref message) => {
+//                 HttpResponse::build(StatusCode::UNPROCESSABLE_ENTITY).json(message)
+//             }
+//             Error::InternalServerError => {
+//                 HttpResponse::InternalServerError().json("Internal Server Error")
+//             }
+//         }
+//     }
+// }
 
 impl From<MailboxError> for Error {
     fn from(_error: MailboxError) -> Self {
@@ -99,22 +102,51 @@ impl From<PassErrorCode> for Error {
 
 impl From<ValidationErrors> for Error {
     fn from(errors: ValidationErrors) -> Self {
-        let mut err_map = JsonMap::new();
+        let mut errs_map: HashMap<String, String> = HashMap::new();
 
-        // transforms errors into objects that err_map can take
         for (field, errors) in errors.field_errors().iter() {
-            let errors: Vec<JsonValue> = errors
+
+            let error_messages: Vec<String> = errors
                 .iter()
-                .map(|error| {
-                    // dbg!(error) // <- Uncomment this if you want to see what error looks like
-                    json!(error.message)
-                })
+                .filter_map(|error| error.message.clone().map(|message| message.into_owned()))
                 .collect();
-            err_map.insert(field.to_string(), json!(errors));
+            errs_map.insert(field.to_string(), error_messages.join(", "));
         }
 
-        Error::UnprocessableEntity(json!({
-            "errors": err_map,
-        }))
+        Error::ValidationErrors(errs_map)
+    }
+}
+
+// converts validation errors to Error
+pub fn validation_errors_to_error(errors: ValidationErrors) -> Error {
+    let mut errs_map: HashMap<String, String> = HashMap::new();
+
+    // transforms errors into objects that err_map can take
+    for (field, errors) in errors.field_errors().iter() {
+        let error_messages: Vec<String> = errors
+            .iter()
+            //json!(error.message)
+            .filter_map(|error| error.message.clone().map(|message| message.into_owned()))
+            .collect();
+        errs_map.insert(field.to_string(), error_messages.join(", "));
+    }
+
+    Error::ValidationErrors(errs_map)
+}
+
+impl async_graphql::ErrorExtensions for Error {
+    // lets define our base extensions
+    fn extend(&self) -> async_graphql::FieldError {
+        self.extend_with(|err, e| match err {
+            Error::ValidationErrors(errs) => {
+                println!("extensions: {:?}", errs);
+                errs.iter().for_each(|(k, v)| {
+                    e.set(k, v.to_string());
+                });
+            }
+            _ => e.set("code", "NOT_FOUND"),
+            // MyError::ServerError(reason) => e.set("reason", reason.to_string()),
+            // MyError::ErrorWithoutExtensions => {}
+        })
     }
 }

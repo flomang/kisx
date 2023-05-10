@@ -5,7 +5,6 @@ use validator::{Validate, ValidationError};
 use crate::models::User;
 use crate::utils::{auth::Auth, jwt::CanGenerateJwt};
 
-use crate::prelude::*;
 use super::AppState;
 
 lazy_static! {
@@ -21,7 +20,7 @@ lazy_static! {
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct RegisterUser {
     #[validate(
-        length(min = 3, message = "must be at least 3 characters long"),
+        length(min = 3, message = "must be at least 3 characters"),
         custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "already taken")
     )]
     pub username: String,
@@ -30,7 +29,7 @@ pub struct RegisterUser {
     #[validate(length(
         min = 8,
         max = 72,
-        message = "must be 8-72 characters long"
+        message = "must be 8-72 characters"
     ))]
     #[graphql(secret)]
     pub password: String,
