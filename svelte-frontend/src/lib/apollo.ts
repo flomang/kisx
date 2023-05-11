@@ -11,6 +11,7 @@ if (typeof localStorage !== 'undefined') {
   }
 }
 
+// TODO move to env config
 const link = new HttpLink({
   uri: 'http://localhost:9000',
   headers,
