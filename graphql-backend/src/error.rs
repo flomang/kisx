@@ -6,9 +6,16 @@ use diesel::{
 };
 use jwt::errors::{Error as JwtError, ErrorKind as JwtErrorKind};
 use libreauth::pass::ErrorCode as PassErrorCode;
+use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
-use std::{collections::HashMap, convert::From};
+use std::convert::From;
 use validator::ValidationErrors;
+
+#[derive(Serialize, Deserialize, Debug, async_graphql::SimpleObject)]
+struct ValidationError {
+    message: String,
+    key: String,
+}
 
 #[derive(Fail, Debug)]
 pub enum Error {
@@ -29,7 +36,7 @@ pub enum Error {
     UnprocessableEntity(JsonValue),
 
     #[fail(display = "Validation Errors")]
-    ValidationErrors(HashMap<String, String>),
+    ValidationErrors(Vec<ValidationError>),
 
     // 500
     #[fail(display = "Internal Server Error")]
@@ -102,51 +109,49 @@ impl From<PassErrorCode> for Error {
 
 impl From<ValidationErrors> for Error {
     fn from(errors: ValidationErrors) -> Self {
-        let mut errs_map: HashMap<String, String> = HashMap::new();
+        let mut errs: Vec<ValidationError> = Vec::new();
 
         for (field, errors) in errors.field_errors().iter() {
-
             let error_messages: Vec<String> = errors
                 .iter()
                 .filter_map(|error| error.message.clone().map(|message| message.into_owned()))
                 .collect();
-            errs_map.insert(field.to_string(), error_messages.join(", "));
+            errs.push(ValidationError {
+                message: error_messages.join(", "),
+                key: field.to_string(),
+            });
         }
 
-        Error::ValidationErrors(errs_map)
+        Error::ValidationErrors(errs)
     }
 }
 
 // converts validation errors to Error
 pub fn validation_errors_to_error(errors: ValidationErrors) -> Error {
-    let mut errs_map: HashMap<String, String> = HashMap::new();
+    let mut errs: Vec<ValidationError> = Vec::new();
 
-    // transforms errors into objects that err_map can take
     for (field, errors) in errors.field_errors().iter() {
         let error_messages: Vec<String> = errors
             .iter()
-            //json!(error.message)
             .filter_map(|error| error.message.clone().map(|message| message.into_owned()))
             .collect();
-        errs_map.insert(field.to_string(), error_messages.join(", "));
+        errs.push(ValidationError {
+            message: error_messages.join(", "),
+            key: field.to_string(),
+        });
     }
 
-    Error::ValidationErrors(errs_map)
+    Error::ValidationErrors(errs)
 }
 
 impl async_graphql::ErrorExtensions for Error {
-    // lets define our base extensions
     fn extend(&self) -> async_graphql::FieldError {
         self.extend_with(|err, e| match err {
             Error::ValidationErrors(errs) => {
-                println!("extensions: {:?}", errs);
-                errs.iter().for_each(|(k, v)| {
-                    e.set(k, v.to_string());
-                });
+                let json_errors = async_graphql::Value::from_json(json!(errs)).unwrap();
+                e.set("errors", json_errors);
             }
             _ => e.set("code", "NOT_FOUND"),
-            // MyError::ServerError(reason) => e.set("reason", reason.to_string()),
-            // MyError::ErrorWithoutExtensions => {}
         })
     }
 }
