@@ -8,6 +8,9 @@
     import { ApolloError, gql } from "@apollo/client/core";
     import client, { addToken, removeToken } from "../../lib/apollo";
     import { goto } from "$app/navigation";
+    import Textfield from "@smui/textfield";
+    import Button, { Label } from "@smui/button";
+    import { Icon as CommonIcon } from "@smui/common";
 
     const form = useForm();
     let email = "";
@@ -34,9 +37,20 @@
         }
     `;
 
-    const handleInput = (event: Event) => {
-        message = "";
+    function is_valid(email: string, password: string): boolean {
+        const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isEmailValid: boolean = emailRegex.test(email);
+        const isPasswordValid: boolean = password.length >= 10;
+
+        return isEmailValid && isPasswordValid;
     }
+
+    const handleEmail = (event: Event) => {
+        message = "";
+    };
+    const handlePassword = (event: Event) => {
+        message = "";
+    };
 
     const handleSignin = async () => {
         try {
@@ -52,50 +66,86 @@
                 goto("/home");
             }
         } catch (error: any) {
-            if (
-                error instanceof ApolloError &&
-                error.message.includes("Unauthorized")
-            ) {
-                message = "invalid email / password";
-            } else {
-                console.error(
-                    "encountered unexpected error from signin request:",
-                    error
-                );
-                alert(error.message);
-            }
+            message = error.message;
         }
     };
 </script>
 
-<form use:form on:submit|preventDefault={handleSignin}>
-    <h1>Login</h1>
-
-    <input
-        type="email"
-        name="email"
-        use:validators={[required, emailFunc]}
-        bind:value={email}
-        on:input={handleInput}
-        required
-    />
-
-    <input
-        type="password"
-        name="password"
-        use:validators={[required]}
-        bind:value={password}
-        on:input={handleInput}
-        required
-    />
-
-    <button disabled={!$form.valid}>Login</button>
-</form>
-<div>{message}</div>
+<div class="container">
+    <form>
+        <h1>Login</h1>
+        <div>
+            <Textfield
+                variant="outlined"
+                bind:value={email}
+                on:input={handleEmail}
+            >
+                <svelte:fragment slot="label">
+                    <CommonIcon
+                        class="material-icons"
+                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                        >email</CommonIcon
+                    > Email
+                </svelte:fragment>
+            </Textfield>
+        </div>
+        <div>
+            <Textfield
+                variant="outlined"
+                bind:value={password}
+                on:input={handlePassword}
+                type="password"
+            >
+                <svelte:fragment slot="label">
+                    <CommonIcon
+                        class="material-icons"
+                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                        >lock</CommonIcon
+                    > Password
+                </svelte:fragment>
+            </Textfield>
+        </div>
+        <div class="button-container">
+            <Button on:click={handleSignin} variant="raised" disabled='{!is_valid(email, password)}'>
+                <Label>Login</Label>
+            </Button>
+        </div>
+        <div class="message-container">
+            {message}
+        </div>
+    </form>
+</div>
 
 <style>
     :global(.touched:invalid) {
         border-color: red;
         outline-color: red;
+    }
+
+    div {
+        padding: 10px;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .message-container {
+        display: flex;
+        justify-content: center;
+        color: red;
+        height: 0px; /* Adjust the height as needed */
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
     }
 </style>
