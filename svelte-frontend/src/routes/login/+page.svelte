@@ -1,21 +1,17 @@
 <script lang="ts">
-    import {
-        useForm,
-        validators,
-        email as emailFunc,
-        required,
-    } from "svelte-use-form";
     import { ApolloError, gql } from "@apollo/client/core";
-    import client, { addToken, removeToken } from "../../lib/apollo";
+    import client, { addToken } from "../../lib/apollo";
     import { goto } from "$app/navigation";
     import Textfield from "@smui/textfield";
     import Button, { Label } from "@smui/button";
+    import FormField from "@smui/form-field";
+    import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
 
-    const form = useForm();
     let email = "";
     let password = "";
     let message = "";
+    let remember = false;
 
     interface SigninResult {
         signin: {
@@ -37,6 +33,7 @@
         }
     `;
 
+    // determine if the email and password are valid
     function is_valid(email: string, password: string): boolean {
         const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isEmailValid: boolean = emailRegex.test(email);
@@ -45,10 +42,7 @@
         return isEmailValid && isPasswordValid;
     }
 
-    const handleEmail = (event: Event) => {
-        message = "";
-    };
-    const handlePassword = (event: Event) => {
+    const handleInput = (event: Event) => {
         message = "";
     };
 
@@ -72,80 +66,124 @@
 </script>
 
 <div class="container">
-    <form>
-        <h1>Login</h1>
-        <div>
-            <Textfield
-                variant="outlined"
-                bind:value={email}
-                on:input={handleEmail}
-            >
-                <svelte:fragment slot="label">
-                    <CommonIcon
-                        class="material-icons"
-                        style="font-size: 1em; line-height: normal; vertical-align: top;"
-                        >email</CommonIcon
-                    > Email
-                </svelte:fragment>
-            </Textfield>
+    <h1>Login</h1>
+    <div class="input-container">
+        <Textfield
+            variant="outlined"
+            style="width: 100%;"
+            class="input-container"
+            bind:value={email}
+            on:input={handleInput}
+        >
+            <svelte:fragment slot="label">
+                <CommonIcon
+                    class="material-icons"
+                    style="font-size: 1em; line-height: normal; vertical-align: top;"
+                    >email</CommonIcon
+                > Email
+            </svelte:fragment>
+        </Textfield>
+    </div>
+    <div class="input-container">
+        <Textfield
+            variant="outlined"
+            style="width: 100%;"
+            bind:value={password}
+            on:input={handleInput}
+            type="password"
+        >
+            <svelte:fragment slot="label">
+                <CommonIcon
+                    class="material-icons"
+                    style="font-size: 1em; line-height: normal; vertical-align: top;"
+                    >lock</CommonIcon
+                > Password
+            </svelte:fragment>
+        </Textfield>
+    </div>
+    <div class="remember-container">
+        <FormField>
+            <Checkbox bind:checked={remember} />
+            Remember me
+        </FormField>
+    </div>
+    <div class="button-container">
+        <Button
+            on:click={handleSignin}
+            variant="raised"
+            style="width: 100%;"
+            disabled={!is_valid(email, password)}
+        >
+            <Label>Login</Label>
+        </Button>
+    </div>
+    <div class="links-container">
+        <div class="left">
+            <a href="/forgot">Forgot Password</a>
         </div>
-        <div>
-            <Textfield
-                variant="outlined"
-                bind:value={password}
-                on:input={handlePassword}
-                type="password"
-            >
-                <svelte:fragment slot="label">
-                    <CommonIcon
-                        class="material-icons"
-                        style="font-size: 1em; line-height: normal; vertical-align: top;"
-                        >lock</CommonIcon
-                    > Password
-                </svelte:fragment>
-            </Textfield>
+        <div class="right">
+            <a href="/signup">Sign Up</a>
         </div>
-        <div class="button-container">
-            <Button on:click={handleSignin} variant="raised" disabled='{!is_valid(email, password)}'>
-                <Label>Login</Label>
-            </Button>
-        </div>
-        <div class="message-container">
-            {message}
-        </div>
-    </form>
+    </div>
+    <div class="message-container">
+        {message}
+    </div>
 </div>
 
 <style>
-    :global(.touched:invalid) {
-        border-color: red;
-        outline-color: red;
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        margin: auto;
+        width: 300px;
     }
 
-    div {
-        padding: 10px;
+    .input-container {
+        width: 100%;
+        padding-block: 10px; /* Adjust the value as needed */
     }
 
-    h1 {
-        text-align: center;
+    .remember-container {
+        width: 100%;
+        align-items: center;
+        margin-left: -20px;
     }
 
     .button-container {
         display: flex;
         justify-content: center;
+        width: 100%;
+        padding-block: 10px; 
     }
 
+    .links-container {
+        width: 100%;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .links-container .left {
+        align-self: flex-start;
+    }
+
+    .links-container .right {
+        align-self: flex-end;
+    }
+    
     .message-container {
         display: flex;
         justify-content: center;
         color: red;
-        height: 0px; /* Adjust the height as needed */
+        height: 0px; 
     }
 
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+    a {
+        font-size: 0.9em;
+        color: #40b3ff;
+        text-decoration: none;
     }
 </style>
