@@ -20,7 +20,7 @@ struct ValidationError {
 #[derive(Fail, Debug)]
 pub enum Error {
     // 401
-    #[fail(display = "Unauthorized: {}", _0)]
+    #[fail(display = "{}", _0)]
     Unauthorized(String),
 
     // 403

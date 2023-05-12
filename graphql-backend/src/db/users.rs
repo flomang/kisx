@@ -7,6 +7,26 @@ use crate::app::users::{FindUser, LoginUser, RegisterUser, UpdateUserOuter, User
 use crate::models::{NewUser, User, UserChange};
 use crate::prelude::*;
 use crate::utils::{HASHER, PWD_SCHEME_VERSION};
+use lazy_static::lazy_static;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
+lazy_static! {
+    static ref MESSAGES: Vec<&'static str> = vec![
+        "Invalid credentials. Please try again.",
+        "Login failed. Please check your email and password.",
+        "Nope, that's not it. Try again.",
+        "Access Denied!",
+        "Hmmm...did you mistype something?",
+        // Add more messages as needed
+    ];
+}
+
+fn get_random_message() -> String {
+    let mut rng = thread_rng();
+    MESSAGES.choose(&mut rng).unwrap().to_string()
+}
+
 
 // message handler implementations ↓
 
@@ -55,13 +75,13 @@ impl Handler<LoginUser> for DbExecutor {
         let stored_user: User = users
             .filter(email.eq(msg.email))
             .first(conn)
-            .map_err(|_| Error::Unauthorized("invalid email/password".to_string()))?;
+            .map_err(|_| Error::Unauthorized(get_random_message()))?;
 
         let checker = HashBuilder::from_phc(&stored_user.password)?;
         let provided_password_raw = &msg.password;
 
         if !checker.is_valid(provided_password_raw) {
-            return Err(Error::Unauthorized("invalid email/password".to_string()));
+            return Err(Error::Unauthorized(get_random_message()));
         }
 
         if checker.needs_update(Some(PWD_SCHEME_VERSION)) {
