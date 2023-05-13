@@ -37,7 +37,13 @@ pub struct RegisterUser {
         )
     )]
     pub email: String,
-    #[validate(length(min = 8, max = 72, message = "must be 8-72 characters"))]
+    #[validate(
+        length(min = 8, max = 72, message = "must be 8-72 characters"),
+        custom(
+            function = "validate_password",
+            message = "must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
+        )
+    )]
     #[graphql(secret)]
     pub password: String,
 }
@@ -65,6 +71,19 @@ fn validate_unique_email(email: &str, state: &AppState) -> Result<(), Validation
         // if the username is already taken, return an error
         Ok(_) => Err(ValidationError::new("invalid_username")),
         Err(_) => Ok(()),
+    }
+}
+
+fn validate_password(password: &str) -> Result<(), ValidationError> {
+    // and special characters
+    if password.chars().any(char::is_uppercase)
+        && password.chars().any(char::is_lowercase)
+        && password.chars().any(char::is_numeric)
+        && password.chars().any(|c| !c.is_alphanumeric())
+    {
+        Ok(())
+    } else {
+        Err(ValidationError::new("invalid_password"))
     }
 }
 
