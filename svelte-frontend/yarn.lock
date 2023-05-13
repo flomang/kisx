@@ -491,6 +491,19 @@
     "@smui/floating-label" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
+"@smui/paper@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/paper/-/paper-7.0.0-beta.8.tgz"
+  integrity sha512-NoOrlU67YUnI19V685MbSzoBV+0AQj2Swj5U6VQIYqW7JRVOk09BQAj45pPXAYWGQUCzzkeXzwD+V5O9J8+PVQ==
+  dependencies:
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
 "@smui/radio@^7.0.0-beta.8":
   version "7.0.0-beta.8"
   resolved "https://registry.npmjs.org/@smui/radio/-/radio-7.0.0-beta.8.tgz"
