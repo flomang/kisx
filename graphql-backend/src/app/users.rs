@@ -21,16 +21,23 @@ lazy_static! {
 pub struct RegisterUser {
     #[validate(
         length(min = 3, message = "must be at least 3 characters"),
-        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "already taken")
+        custom(
+            function = "validate_unique_username",
+            arg = "&'v_a AppState",
+            message = "already taken"
+        )
     )]
     pub username: String,
-    #[validate(email(message = "not a valid email address"))]
+    #[validate(
+        email(message = "not a valid email address"),
+        custom(
+            function = "validate_unique_email",
+            arg = "&'v_a AppState",
+            message = "already registered"
+        )
+    )]
     pub email: String,
-    #[validate(length(
-        min = 8,
-        max = 72,
-        message = "must be 8-72 characters"
-    ))]
+    #[validate(length(min = 8, max = 72, message = "must be 8-72 characters"))]
     #[graphql(secret)]
     pub password: String,
 }
@@ -38,6 +45,19 @@ pub struct RegisterUser {
 fn validate_unique_username(username: &str, state: &AppState) -> Result<(), ValidationError> {
     let result = async_std::task::block_on(state.db.send(FindUser {
         username: username.trim().to_string(),
+    }))
+    .unwrap();
+
+    match result {
+        // if the username is already taken, return an error
+        Ok(_) => Err(ValidationError::new("invalid_username")),
+        Err(_) => Ok(()),
+    }
+}
+
+fn validate_unique_email(email: &str, state: &AppState) -> Result<(), ValidationError> {
+    let result = async_std::task::block_on(state.db.send(FindEmail {
+        email: email.trim().to_string(),
     }))
     .unwrap();
 
@@ -59,20 +79,24 @@ pub struct FindUser {
     pub username: String,
 }
 
+pub struct FindEmail {
+    pub email: String,
+}
+
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 pub struct UpdateUser {
     #[validate(
         length(min = 3, message = "must be at least 3 characters long"),
-        custom(function = "validate_unique_username", arg = "&'v_a AppState", message = "already taken")
+        custom(
+            function = "validate_unique_username",
+            arg = "&'v_a AppState",
+            message = "already taken"
+        )
     )]
     pub username: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
-    #[validate(length(
-        min = 8,
-        max = 72,
-        message = "must be 8-72 characters long"
-    ))]
+    #[validate(length(min = 8, max = 72, message = "must be 8-72 characters long"))]
     pub password: Option<String>,
     #[validate(length(min = 1, message = "cannot be empty"))]
     pub bio: Option<String>,

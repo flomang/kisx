@@ -32,7 +32,7 @@ impl MutationRoot {
         let state = ctx.data_unchecked::<AppState>();
 
         params
-            .validate_args(state)
+            .validate_args((state, state))
             .map_err(|e| validation_errors_to_error(e).extend())?;
 
         let res = state.db.send(params).await??;
