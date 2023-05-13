@@ -37,7 +37,7 @@
     function is_valid(email: string, password: string): boolean {
         const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isEmailValid: boolean = emailRegex.test(email);
-        const isPasswordValid: boolean = password.length >= 10;
+        const isPasswordValid: boolean = password.length >= 6;
 
         return isEmailValid && isPasswordValid;
     }
@@ -69,7 +69,7 @@
     <h1>Login</h1>
     <div class="input-container">
         <Textfield
-            variant="outlined"
+            variant="filled"
             style="width: 100%;"
             class="input-container"
             bind:value={email}
@@ -86,7 +86,7 @@
     </div>
     <div class="input-container">
         <Textfield
-            variant="outlined"
+            variant="filled"
             style="width: 100%;"
             bind:value={password}
             on:input={handleInput}

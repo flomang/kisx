@@ -169,7 +169,7 @@
                 >
                 <span>Password</span>
             </svelte:fragment>
-            <HelperText slot="helper">{passwordError}</HelperText>
+            <HelperText slot="helper" persistent={passwordError != ""}>{passwordError}</HelperText>
         </Textfield>
     </div>
     <div class="remember-container">
@@ -207,12 +207,14 @@
 
     .input-container {
         width: 100%;
+        padding-bottom: 5px;
     }
 
     .remember-container {
         width: 100%;
         align-items: center;
         margin-left: -20px;
+        margin-top: -10px;
     }
 
     .button-container {

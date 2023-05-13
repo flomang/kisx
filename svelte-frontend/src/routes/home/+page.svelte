@@ -8,7 +8,7 @@
     const handleSignout = async () => {
         client.cache.reset();
         removeToken();
-        goto("/signin");
+        goto("/login");
     };
 </script>
 
