@@ -24,7 +24,7 @@ pub struct RegisterUser {
         custom(
             function = "validate_unique_username",
             arg = "&'v_a AppState",
-            message = "already taken"
+            message = "username already taken"
         )
     )]
     pub username: String,
@@ -33,7 +33,7 @@ pub struct RegisterUser {
         custom(
             function = "validate_unique_email",
             arg = "&'v_a AppState",
-            message = "already registered"
+            message = "email already registered"
         )
     )]
     pub email: String,
@@ -41,7 +41,7 @@ pub struct RegisterUser {
         length(min = 8, max = 72, message = "must be 8-72 characters"),
         custom(
             function = "validate_password",
-            message = "must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
+            message = "password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
         )
     )]
     #[graphql(secret)]
