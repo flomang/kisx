@@ -111,7 +111,7 @@
         <Button
             on:click={handleSignin}
             variant="raised"
-            style="width: 100%;"
+            style="width: 100%; height: 100%;"
             disabled={!is_valid(email, password)}
         >
             <Label>Login</Label>
@@ -144,6 +144,7 @@
     .input-container {
         width: 100%;
         padding-block: 10px; /* Adjust the value as needed */
+        
     }
 
     .remember-container {
@@ -157,6 +158,7 @@
         justify-content: center;
         width: 100%;
         padding-block: 10px; 
+        height: 45px;
     }
 
     .links-container {

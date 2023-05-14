@@ -182,7 +182,7 @@
         <Button
             on:click={handleSignup}
             variant="raised"
-            style="width: 100%;"
+            style="width: 100%; height: 100%;"
             disabled={!is_valid(email, password, username, agree)}
         >
             <Label>Submit</Label>
@@ -222,6 +222,7 @@
         justify-content: center;
         width: 100%;
         padding-block: 10px;
+        height: 45px;
     }
 
     .links-container {
