@@ -69,7 +69,7 @@
 </script>
 
 <div class="container">
-    <Paper color="secondary" variant="outlined">
+    <Paper color="secondary" variant="clear" style="width: 100%;">
         <Title><b>Forgot Password</b></Title>
         <Subtitle
             >Enter your email address you registered with and we will send you a
@@ -144,12 +144,11 @@
         justify-content: center;
         width: 100%;
         height: 45px;
-        padding-block: 10px;
+        padding-bottom: 15px;
     }
 
     .links-container {
         width: 100%;
-        padding: 10px;
         display: flex;
         justify-content: space-between;
     }

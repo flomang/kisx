@@ -7,6 +7,7 @@
     import FormField from "@smui/form-field";
     import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
+    import Paper, { Title, Subtitle, Content } from "@smui/paper";
 
     let email = "";
     let password = "";
@@ -66,68 +67,72 @@
 </script>
 
 <div class="container">
-    <h1>Login</h1>
-    <div class="input-container">
-        <Textfield
-            variant="filled"
-            style="width: 100%;"
-            class="input-container"
-            bind:value={email}
-            on:input={handleInput}
-        >
-            <svelte:fragment slot="label">
-                <CommonIcon
-                    class="material-icons"
-                    style="font-size: 1em; line-height: normal; vertical-align: top;"
-                    >email</CommonIcon
-                > Email
-            </svelte:fragment>
-        </Textfield>
-    </div>
-    <div class="input-container">
-        <Textfield
-            variant="filled"
-            style="width: 100%;"
-            bind:value={password}
-            on:input={handleInput}
-            type="password"
-        >
-            <svelte:fragment slot="label">
-                <CommonIcon
-                    class="material-icons"
-                    style="font-size: 1em; line-height: normal; vertical-align: top;"
-                    >lock</CommonIcon
-                > Password
-            </svelte:fragment>
-        </Textfield>
-    </div>
-    <div class="remember-container">
-        <FormField>
-            <Checkbox bind:checked={remember} />
-            Remember me
-        </FormField>
-    </div>
-    <div class="button-container">
-        <Button
-            on:click={handleSignin}
-            variant="raised"
-            style="width: 100%; height: 100%;"
-            disabled={!is_valid(email, password)}
-        >
-            <Label>Login</Label>
-        </Button>
-    </div>
-    <div class="links-container">
-        <div class="left">
-            <a href="/forgot">Forgot Password</a>
-        </div>
-        <div class="right">
-            <a href="/signup">Sign Up</a>
-        </div>
-    </div>
-    <div class="message-container">
-        {message}
-    </div>
+    <Paper color="secondary" variant="clear" style="width: 100%;">
+        <Title><b>Login</b></Title>
+        <Content>
+            <div class="input-container">
+                <Textfield
+                    variant="filled"
+                    style="width: 100%;"
+                    class="input-container"
+                    bind:value={email}
+                    on:input={handleInput}
+                >
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >email</CommonIcon
+                        > Email
+                    </svelte:fragment>
+                </Textfield>
+            </div>
+            <div class="input-container">
+                <Textfield
+                    variant="filled"
+                    style="width: 100%;"
+                    bind:value={password}
+                    on:input={handleInput}
+                    type="password"
+                >
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >lock</CommonIcon
+                        > Password
+                    </svelte:fragment>
+                </Textfield>
+            </div>
+            <div class="remember-container">
+                <FormField>
+                    <Checkbox bind:checked={remember} />
+                    Remember me
+                </FormField>
+            </div>
+            <div class="button-container">
+                <Button
+                    on:click={handleSignin}
+                    variant="raised"
+                    style="width: 100%; height: 100%;"
+                    disabled={!is_valid(email, password)}
+                >
+                    <Label>Login</Label>
+                </Button>
+            </div>
+            <div class="links-container">
+                <div class="left">
+                    <a href="/forgot">Forgot Password</a>
+                </div>
+                <div class="right">
+                    <a href="/signup">Sign Up</a>
+                </div>
+            </div>
+            <div class="message-container">
+                {message}
+            </div>
+        </Content>
+    </Paper>
 </div>
 
 <style>
@@ -143,27 +148,26 @@
 
     .input-container {
         width: 100%;
-        padding-block: 10px; /* Adjust the value as needed */
-        
+        padding-bottom: 12px; /* Adjust the value as needed */
     }
 
     .remember-container {
         width: 100%;
         align-items: center;
-        margin-left: -20px;
+        margin-left: -10px;
     }
 
     .button-container {
         display: flex;
         justify-content: center;
         width: 100%;
-        padding-block: 10px; 
+        padding-block: 10px;
         height: 45px;
     }
 
     .links-container {
         width: 100%;
-        padding: 10px;
+        padding: 0px;
         display: flex;
         justify-content: space-between;
     }
@@ -175,12 +179,12 @@
     .links-container .right {
         align-self: flex-end;
     }
-    
+
     .message-container {
         display: flex;
         justify-content: center;
         color: red;
-        height: 0px; 
+        height: 0px;
     }
 
     a {

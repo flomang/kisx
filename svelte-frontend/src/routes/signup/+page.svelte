@@ -8,6 +8,7 @@
     import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
     import HelperText from "@smui/textfield/helper-text";
+    import Paper, { Title, Subtitle, Content } from "@smui/paper";
 
     let username = "";
     let email = "";
@@ -49,7 +50,12 @@
     `;
 
     // determine if the email and password are valid
-    function is_valid(email: string, password: string, username: string, agree: boolean): boolean {
+    function is_valid(
+        email: string,
+        password: string,
+        username: string,
+        agree: boolean
+    ): boolean {
         const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isEmailValid: boolean = emailRegex.test(email);
         const isPasswordValid: boolean = password.length >= 8;
@@ -107,90 +113,98 @@
 </script>
 
 <div class="container">
-    <h1>Sign Up</h1>
-    <div class="input-container">
-        <Textfield
-            variant="filled"
-            style="width: 100%;"
-            class="input-container"
-            bind:value={username}
-            on:input={handleInputUsername}
-            invalid={usernameError != ""}
-        >
-            <svelte:fragment slot="label">
-                <CommonIcon
-                    class="material-icons"
-                    style="font-size: 1em; line-height: normal; vertical-align: top;"
-                    >face</CommonIcon
+    <Paper color="secondary" variant="clear" style="width: 100%;">
+        <Title class="title"><b>Sign Up</b></Title>
+        <Content>
+            <div class="input-container">
+                <Textfield
+                    variant="filled"
+                    style="width: 100%;"
+                    class="input-container"
+                    bind:value={username}
+                    on:input={handleInputUsername}
+                    invalid={usernameError != ""}
                 >
-                <span>Username</span>
-            </svelte:fragment>
-            <HelperText persistent={usernameError != ""} slot="helper"
-                >{usernameError}</HelperText
-            >
-        </Textfield>
-    </div>
-    <div class="input-container">
-        <Textfield
-            variant="filled"
-            style="width: 100%;"
-            class="input-container"
-            bind:value={email}
-            on:input={handleInputEmail}
-            invalid={emailError != ""}
-        >
-            <svelte:fragment slot="label">
-                <CommonIcon
-                    class="material-icons"
-                    style="font-size: 1em; line-height: normal; vertical-align: top;"
-                    >email</CommonIcon
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >face</CommonIcon
+                        >
+                        <span>Username</span>
+                    </svelte:fragment>
+                    <HelperText persistent={usernameError != ""} slot="helper"
+                        >{usernameError}</HelperText
+                    >
+                </Textfield>
+            </div>
+            <div class="input-container">
+                <Textfield
+                    variant="filled"
+                    style="width: 100%;"
+                    class="input-container"
+                    bind:value={email}
+                    on:input={handleInputEmail}
+                    invalid={emailError != ""}
                 >
-                <span>Email</span>
-            </svelte:fragment>
-            <HelperText class="helper-text" persistent={emailError != ""} slot="helper"
-                >{emailError}</HelperText
-            >
-        </Textfield>
-    </div>
-    <div class="input-container">
-        <Textfield
-            variant="filled"
-            style="width: 100%;"
-            bind:value={password}
-            on:input={handleInputPassword}
-            type="password"
-            invalid={passwordError != ""}
-        >
-            <svelte:fragment slot="label">
-                <CommonIcon
-                    class="material-icons"
-                    style="font-size: 1em; line-height: normal; vertical-align: top;"
-                    >lock</CommonIcon
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >email</CommonIcon
+                        >
+                        <span>Email</span>
+                    </svelte:fragment>
+                    <HelperText
+                        class="helper-text"
+                        persistent={emailError != ""}
+                        slot="helper">{emailError}</HelperText
+                    >
+                </Textfield>
+            </div>
+            <div class="input-container">
+                <Textfield
+                    variant="filled"
+                    style="width: 100%;"
+                    bind:value={password}
+                    on:input={handleInputPassword}
+                    type="password"
+                    invalid={passwordError != ""}
                 >
-                <span>Password</span>
-            </svelte:fragment>
-            <HelperText slot="helper" persistent={passwordError != ""}>{passwordError}</HelperText>
-        </Textfield>
-    </div>
-    <div class="remember-container">
-        <FormField>
-            <Checkbox bind:checked={agree} />
-            Agree to terms and conditions
-        </FormField>
-    </div>
-    <div class="button-container">
-        <Button
-            on:click={handleSignup}
-            variant="raised"
-            style="width: 100%; height: 100%;"
-            disabled={!is_valid(email, password, username, agree)}
-        >
-            <Label>Submit</Label>
-        </Button>
-    </div>
-    <div class="links-container">
-        <a href="/login">Already have an account?</a>
-    </div>
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >lock</CommonIcon
+                        >
+                        <span>Password</span>
+                    </svelte:fragment>
+                    <HelperText slot="helper" persistent={passwordError != ""}
+                        >{passwordError}</HelperText
+                    >
+                </Textfield>
+            </div>
+            <div class="remember-container">
+                <FormField>
+                    <Checkbox bind:checked={agree} />
+                    Agree to terms and conditions
+                </FormField>
+            </div>
+            <div class="button-container">
+                <Button
+                    on:click={handleSignup}
+                    variant="raised"
+                    style="width: 100%; height: 100%;"
+                    disabled={!is_valid(email, password, username, agree)}
+                >
+                    <Label>Submit</Label>
+                </Button>
+            </div>
+            <div class="links-container">
+                <a href="/login">Already have an account?</a>
+            </div>
+        </Content>
+    </Paper>
 </div>
 
 <style>
@@ -205,15 +219,21 @@
         width: 300px;
     }
 
+    .title {
+        align-items: center;
+        justify-content: center;
+        padding-block: 10px; /* Adjust the value as needed */
+    }
+
     .input-container {
         width: 100%;
-        padding-bottom: 5px;
+        padding-top: 5px;
     }
 
     .remember-container {
         width: 100%;
         align-items: center;
-        margin-left: -20px;
+        margin-left: -10px;
         margin-top: -10px;
     }
 
@@ -227,7 +247,6 @@
 
     .links-container {
         width: 100%;
-        padding: 10px;
         display: flex;
         justify-content: space-between;
     }
