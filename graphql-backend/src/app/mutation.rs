@@ -17,7 +17,7 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
+    profiles::{FollowProfile, ProfileResponse, UnfollowProfile}, users::ForgotPassword,
 };
 pub struct MutationRoot;
 
@@ -37,6 +37,18 @@ impl MutationRoot {
 
         let res = state.db.send(params).await??;
         Ok(res)
+    }
+
+    // forgot password 
+    async fn forgot_password<'ctx>(&self, ctx: &Context<'ctx>, params: ForgotPassword) -> Result<bool> {
+        let state = ctx.data_unchecked::<AppState>();
+
+        params
+            .validate_args(state)
+            .map_err(|e| validation_errors_to_error(e).extend())?;
+
+        // TODO send email with reset link
+        Ok(true)
     }
 
     // login a user

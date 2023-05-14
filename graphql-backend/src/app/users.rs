@@ -48,6 +48,7 @@ pub struct RegisterUser {
     pub password: String,
 }
 
+// Validate unique username
 fn validate_unique_username(username: &str, state: &AppState) -> Result<(), ValidationError> {
     let result = async_std::task::block_on(state.db.send(FindUser {
         username: username.trim().to_string(),
@@ -55,12 +56,12 @@ fn validate_unique_username(username: &str, state: &AppState) -> Result<(), Vali
     .unwrap();
 
     match result {
-        // if the username is already taken, return an error
         Ok(_) => Err(ValidationError::new("invalid_username")),
         Err(_) => Ok(()),
     }
 }
 
+// Validate unique email
 fn validate_unique_email(email: &str, state: &AppState) -> Result<(), ValidationError> {
     let result = async_std::task::block_on(state.db.send(FindEmail {
         email: email.trim().to_string(),
@@ -68,12 +69,26 @@ fn validate_unique_email(email: &str, state: &AppState) -> Result<(), Validation
     .unwrap();
 
     match result {
-        // if the username is already taken, return an error
         Ok(_) => Err(ValidationError::new("invalid_username")),
         Err(_) => Ok(()),
     }
 }
 
+// Validate an email address
+fn validate_email_exists(email: &str, state: &AppState) -> Result<(), ValidationError> {
+    let result = async_std::task::block_on(state.db.send(FindEmail {
+        email: email.trim().to_string(),
+    }))
+    .unwrap();
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(_) => Err(ValidationError::new("invalid_username")),
+    }
+}
+
+// Validate password strength. Must contain at least one uppercase letter, one lowercase letter, one number, 
+// one special character
 fn validate_password(password: &str) -> Result<(), ValidationError> {
     // and special characters
     if password.chars().any(char::is_uppercase)
@@ -99,6 +114,19 @@ pub struct FindUser {
 }
 
 pub struct FindEmail {
+    pub email: String,
+}
+
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
+pub struct ForgotPassword {
+    #[validate(
+        email(message = "not a valid email address"),
+        custom(
+            function = "validate_email_exists",
+            arg = "&'v_a AppState",
+            message = "no account matches this email address"
+        )
+    )]
     pub email: String,
 }
 
