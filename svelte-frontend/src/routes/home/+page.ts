@@ -47,18 +47,19 @@ export const load = (async ({ }) => {
             };
 
         } catch (error: any) {
-            if (
-                error instanceof ApolloError &&
-                error.message.includes("Unauthorized")
-            ) {
-                throw redirect(307, '/signin');
-            } else {
-                console.error(
-                    "encountered unexpected error from signin request:",
-                    error
-                );
-                alert(error.message);
-            }
+            throw redirect(307, '/login');
+            //if (
+            //    error instanceof ApolloError &&
+            //    error.message.includes("Unauthorized")
+            //) {
+            //    throw redirect(307, '/signin');
+            //} else {
+            //    console.error(
+            //        "encountered unexpected error from signin request:",
+            //        error
+            //    );
+            //    alert(error.message);
+            //}
         }
     }
 }) satisfies PageLoad;
