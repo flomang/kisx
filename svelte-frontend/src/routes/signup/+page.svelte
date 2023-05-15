@@ -116,7 +116,7 @@
     <Paper color="secondary" variant="clear" style="width: 100%;">
         <Title class="title"><b>Sign Up</b></Title>
         <Content>
-            <div class="input-container">
+            <div class="username-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -138,7 +138,7 @@
                     >
                 </Textfield>
             </div>
-            <div class="input-container">
+            <div class="email-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -162,7 +162,7 @@
                     >
                 </Textfield>
             </div>
-            <div class="input-container">
+            <div class="password-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -184,7 +184,7 @@
                     >
                 </Textfield>
             </div>
-            <div class="remember-container">
+            <div class="agree-container">
                 <FormField>
                     <Checkbox bind:checked={agree} />
                     Agree to terms and conditions
@@ -219,30 +219,33 @@
         width: 300px;
     }
 
-    .title {
-        align-items: center;
-        justify-content: center;
-        padding-block: 10px; /* Adjust the value as needed */
-    }
-
-    .input-container {
+    .username-container {
         width: 100%;
-        padding-top: 5px;
+        padding-bottom: 6px;
+    }
+    .email-container {
+        width: 100%;
+        padding-bottom: 6px;
+    }
+    .password-container {
+        width: 100%;
+        padding-bottom: 6px;
     }
 
-    .remember-container {
+    .agree-container {
         width: 100%;
         align-items: center;
         margin-left: -10px;
         margin-top: -10px;
+        padding-bottom: 8px;
     }
 
     .button-container {
         display: flex;
         justify-content: center;
         width: 100%;
-        padding-block: 10px;
         height: 45px;
+        padding-bottom: 16px;
     }
 
     .links-container {

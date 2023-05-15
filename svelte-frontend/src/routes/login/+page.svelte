@@ -70,7 +70,7 @@
     <Paper color="secondary" variant="clear" style="width: 100%;">
         <Title><b>Login</b></Title>
         <Content>
-            <div class="input-container">
+            <div class="email-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -87,7 +87,7 @@
                     </svelte:fragment>
                 </Textfield>
             </div>
-            <div class="input-container">
+            <div class="password-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -146,22 +146,27 @@
         width: 300px;
     }
 
-    .input-container {
+    .email-container {
         width: 100%;
-        padding-bottom: 12px; /* Adjust the value as needed */
+        padding-bottom: 16px;
+    }
+
+    .password-container {
+        width: 100%;
     }
 
     .remember-container {
         width: 100%;
         align-items: center;
         margin-left: -10px;
+        padding-block: 8px;
     }
 
     .button-container {
         display: flex;
         justify-content: center;
         width: 100%;
-        padding-block: 10px;
+        padding-bottom: 16px;
         height: 45px;
     }
 

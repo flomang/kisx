@@ -76,7 +76,7 @@
             link to reset your password.</Subtitle
         >
         <Content>
-            <div class="input-container">
+            <div class="email-container">
                 <Textfield
                     variant="filled"
                     style="width: 100%;"
@@ -134,9 +134,9 @@
         width: 300px;
     }
 
-    .input-container {
+    .email-container {
         width: 100%;
-        padding-top: 15px;
+        padding-block: 8px;
     }
 
     .button-container {
@@ -144,7 +144,7 @@
         justify-content: center;
         width: 100%;
         height: 45px;
-        padding-bottom: 15px;
+        padding-bottom: 16px;
     }
 
     .links-container {
