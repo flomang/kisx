@@ -54,6 +54,7 @@ table! {
         id -> Uuid,
         username -> Text,
         email -> Varchar,
+        email_verified -> Bool,
         password -> Text,
         bio -> Nullable<Text>,
         image -> Nullable<Text>,

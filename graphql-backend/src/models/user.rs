@@ -8,6 +8,7 @@ pub struct User {
     pub id: Uuid,
     pub username: String,
     pub email: String,
+    pub email_verified: bool,
     pub password: String,
     pub bio: Option<String>,
     pub image: Option<String>,
@@ -30,6 +31,7 @@ pub struct NewUser {
 pub struct UserChange {
     pub username: Option<String>,
     pub email: Option<String>,
+    pub email_verified: Option<bool>,
     pub password: Option<String>,
     pub bio: Option<String>,
     pub image: Option<String>,

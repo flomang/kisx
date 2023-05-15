@@ -143,6 +143,7 @@ pub struct UpdateUser {
     pub username: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
+    pub email_verified: Option<bool>,
     #[validate(length(min = 8, max = 72, message = "must be 8-72 characters long"))]
     pub password: Option<String>,
     #[validate(length(min = 1, message = "cannot be empty"))]

@@ -74,6 +74,7 @@ impl Handler<LoginUser> for DbExecutor {
 
         let stored_user: User = users
             .filter(email.eq(msg.email))
+            .filter(email_verified.eq(true))
             .first(conn)
             .map_err(|_| Error::Unauthorized(get_random_message()))?;
 
@@ -154,6 +155,7 @@ impl Handler<UpdateUserOuter> for DbExecutor {
         let updated_user = UserChange {
             username: update_user.username,
             email: update_user.email,
+            email_verified: update_user.email_verified,
             password: updated_password,
             bio: update_user.bio,
             image: update_user.image,

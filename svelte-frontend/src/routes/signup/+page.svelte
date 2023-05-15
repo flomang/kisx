@@ -19,7 +19,7 @@
     let usernameError = "";
     let emailError = "";
     let passwordError = "";
-    let success = true;
+    let success = false;
 
     interface SignupResult {
         signup: {
