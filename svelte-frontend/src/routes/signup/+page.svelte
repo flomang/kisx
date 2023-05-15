@@ -1,7 +1,6 @@
 <script lang="ts">
     import { ApolloError, gql } from "@apollo/client/core";
     import client, { addToken } from "../../lib/apollo";
-    import { goto } from "$app/navigation";
     import Textfield from "@smui/textfield";
     import Button, { Label } from "@smui/button";
     import FormField from "@smui/form-field";
@@ -99,7 +98,7 @@
             if (error.message === "Validation Errors" && error.graphQLErrors) {
                 const validationErrors =
                     error.graphQLErrors[0].extensions.errors;
-                validationErrors.forEach((e) => {
+                validationErrors.forEach((e: any) => {
                     const { key, message } = e;
                     console.log(key, message);
                     if (key == "username") {
@@ -117,7 +116,7 @@
 
 <div class="container">
     {#if !success}
-        <Paper color="secondary" variant="clear" style="width: 100%;">
+        <Paper style="width: 100%;">
             <Title class="title"><b>Sign Up</b></Title>
             <Content>
                 <div class="username-container">
@@ -213,7 +212,7 @@
             </Content>
         </Paper>
     {:else}
-        <Paper color="secondary" variant="clear" style="width: 100%;">
+        <Paper style="width: 100%;">
             <Title class="title"><b> Thanks for signing up!</b></Title>
             <Content>
                 <div class="content-container">

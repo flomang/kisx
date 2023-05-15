@@ -7,7 +7,7 @@
     import FormField from "@smui/form-field";
     import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
-    import Paper, { Title, Subtitle, Content } from "@smui/paper";
+    import Paper, { Title, Content } from "@smui/paper";
 
     let email = "";
     let password = "";
@@ -67,7 +67,7 @@
 </script>
 
 <div class="container">
-    <Paper color="secondary" variant="clear" style="width: 100%;">
+    <Paper style="width: 100%;">
         <Title><b>Login</b></Title>
         <Content>
             <div class="email-container">

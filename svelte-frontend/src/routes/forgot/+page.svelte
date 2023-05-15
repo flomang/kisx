@@ -56,7 +56,7 @@
             if (error.message === "Validation Errors" && error.graphQLErrors) {
                 const validationErrors =
                     error.graphQLErrors[0].extensions.errors;
-                validationErrors.forEach((e) => {
+                validationErrors.forEach((e: any) => {
                     const { key, message } = e;
                     console.log(key, message);
                     if (key == "email") {
@@ -69,7 +69,7 @@
 </script>
 
 <div class="container">
-    <Paper color="secondary" variant="clear" style="width: 100%;">
+    <Paper style="width: 100%;">
         <Title><b>Forgot Password</b></Title>
         <Subtitle
             >Enter your email address you registered with and we will send you a
