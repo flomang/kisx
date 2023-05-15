@@ -74,7 +74,6 @@ impl Handler<LoginUser> for DbExecutor {
 
         let stored_user: User = users
             .filter(email.eq(msg.email))
-            .filter(email_verified.eq(true))
             .first(conn)
             .map_err(|_| Error::Unauthorized(get_random_message()))?;
 
@@ -83,6 +82,10 @@ impl Handler<LoginUser> for DbExecutor {
 
         if !checker.is_valid(provided_password_raw) {
             return Err(Error::Unauthorized(get_random_message()));
+        }
+
+        if stored_user.email_verified == false {
+            return Err(Error::Unauthorized("email not verified".to_string()));
         }
 
         if checker.needs_update(Some(PWD_SCHEME_VERSION)) {
