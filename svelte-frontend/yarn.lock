@@ -230,6 +230,52 @@
     "@material/theme" "^14.0.0"
     tslib "^2.1.0"
 
+"@material/list@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/list/-/list-14.0.0.tgz"
+  integrity sha512-AFaBGV9vQyfnG8BT2R3UGVdF5w2SigQqBH+qbOSxQhk4BgVvhDfJUIKT415poLNMdnaDtcuYz+ZWvVNoRDaL7w==
+  dependencies:
+    "@material/base" "^14.0.0"
+    "@material/density" "^14.0.0"
+    "@material/dom" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    tslib "^2.1.0"
+
+"@material/menu-surface@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/menu-surface/-/menu-surface-14.0.0.tgz"
+  integrity sha512-wRz3UCrhJ4kRrijJEbvIPRa0mqA5qkQmKXjBH4Xu1ApedZruP+OM3Qb2Bj4XugCA3eCXpiohg+gdyTAX3dVQyw==
+  dependencies:
+    "@material/animation" "^14.0.0"
+    "@material/base" "^14.0.0"
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    tslib "^2.1.0"
+
+"@material/menu@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/menu/-/menu-14.0.0.tgz"
+  integrity sha512-oU6GjbYnkG6a5nX9HUSege5OQByf6yUteEij8fpf0ci3f5BWf/gr39dnQ+rfl+q119cW0WIEmVK2YJ/BFxMzEQ==
+  dependencies:
+    "@material/base" "^14.0.0"
+    "@material/dom" "^14.0.0"
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/list" "^14.0.0"
+    "@material/menu-surface" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    tslib "^2.1.0"
+
 "@material/notched-outline@^14.0.0":
   version "14.0.0"
   resolved "https://registry.npmjs.org/@material/notched-outline/-/notched-outline-14.0.0.tgz"
@@ -285,6 +331,31 @@
   integrity sha512-xl6OZYyRjuiW2hmbjV2omMV8sQtfmKAjeWnD1RMiAPLCTyOW9Lh/PYYnXjxUrNa0cRwIIbOn5J7OYXokja8puA==
   dependencies:
     "@material/theme" "^14.0.0"
+    tslib "^2.1.0"
+
+"@material/select@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/select/-/select-14.0.0.tgz"
+  integrity sha512-4aY1kUHEnbOCRG3Tkuuk8yFfyNYSvOstBbjiYE/Z1ZGF3P1z+ON35iLatP84LvNteX4F1EMO2QAta2QbLRMAkw==
+  dependencies:
+    "@material/animation" "^14.0.0"
+    "@material/base" "^14.0.0"
+    "@material/density" "^14.0.0"
+    "@material/dom" "^14.0.0"
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/floating-label" "^14.0.0"
+    "@material/line-ripple" "^14.0.0"
+    "@material/list" "^14.0.0"
+    "@material/menu" "^14.0.0"
+    "@material/menu-surface" "^14.0.0"
+    "@material/notched-outline" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/tokens" "^14.0.0"
+    "@material/typography" "^14.0.0"
     tslib "^2.1.0"
 
 "@material/shape@^14.0.0":
@@ -481,6 +552,40 @@
     "@smui/common" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
+"@smui/list@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/list/-/list-7.0.0-beta.8.tgz"
+  integrity sha512-Rh2rpKDgaxzCdqcWZkkrRP+kPyu7Owwbkk8waG06BG9bFyCfov8i1Ai2MQkz6QFG/CVX6fi+rapvWhQaafSsOg==
+  dependencies:
+    "@material/dom" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/list" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    "@smui/ripple" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/menu-surface@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/menu-surface/-/menu-surface-7.0.0-beta.8.tgz"
+  integrity sha512-VrdxJD1OyXVrho/BYfykc5pwENkPjpFS3nhTuYZLnPQiAPVKzI2JXMfDOCcB5yKwS5DcBnz36ICWngZ93wCXjQ==
+  dependencies:
+    "@material/animation" "^14.0.0"
+    "@material/menu-surface" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/menu@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/menu/-/menu-7.0.0-beta.8.tgz"
+  integrity sha512-n3yRf/F5pc2Rpu73OufoFDlv/IX4pWM7Espn1uUfVSXsWIG52Or7+br1piJHooeK8zxz22mko0eYisjhQosdSQ==
+  dependencies:
+    "@material/dom" "^14.0.0"
+    "@material/menu" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    "@smui/list" "^7.0.0-beta.8"
+    "@smui/menu-surface" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
 "@smui/notched-outline@^7.0.0-beta.8":
   version "7.0.0-beta.8"
   resolved "https://registry.npmjs.org/@smui/notched-outline/-/notched-outline-7.0.0-beta.8.tgz"
@@ -522,6 +627,26 @@
     "@material/dom" "^14.0.0"
     "@material/ripple" "^14.0.0"
     "@smui/common" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/select@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/select/-/select-7.0.0-beta.8.tgz"
+  integrity sha512-3RigAea8A4k3LnDWVBJN6GQQnJsGVraB5FrpW6n4b7CBbVLuia4PBR1ks3YJrKp5UtSJ4eqhWGs4RZuJosKPVw==
+  dependencies:
+    "@material/feature-targeting" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/select" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    "@smui/floating-label" "^7.0.0-beta.8"
+    "@smui/line-ripple" "^7.0.0-beta.8"
+    "@smui/list" "^7.0.0-beta.8"
+    "@smui/menu" "^7.0.0-beta.8"
+    "@smui/menu-surface" "^7.0.0-beta.8"
+    "@smui/notched-outline" "^7.0.0-beta.8"
+    "@smui/ripple" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
 "@smui/textfield@^7.0.0-beta.8":
