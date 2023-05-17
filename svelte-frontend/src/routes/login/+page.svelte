@@ -8,6 +8,7 @@
     import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
     import Paper, { Title, Content } from "@smui/paper";
+    import HelperText from "@smui/textfield/helper-text";
 
     let email = "";
     let password = "";
@@ -77,6 +78,7 @@
                     class="input-container"
                     bind:value={email}
                     on:input={handleInput}
+                    invalid={message != ""}
                 >
                     <svelte:fragment slot="label">
                         <CommonIcon
@@ -94,6 +96,7 @@
                     bind:value={password}
                     on:input={handleInput}
                     type="password"
+                    invalid={message != ""}
                 >
                     <svelte:fragment slot="label">
                         <CommonIcon
@@ -102,6 +105,9 @@
                             >lock</CommonIcon
                         > Password
                     </svelte:fragment>
+                    <HelperText slot="helper" persistent={message != ""}
+                        >{message}</HelperText
+                    >
                 </Textfield>
             </div>
             <div class="remember-container">
@@ -127,9 +133,6 @@
                 <div class="right">
                     <a href="/signup">Sign Up</a>
                 </div>
-            </div>
-            <div class="message-container">
-                {message}
             </div>
         </Content>
     </Paper>
@@ -159,7 +162,7 @@
         width: 100%;
         align-items: center;
         margin-left: -10px;
-        padding-block: 8px;
+        padding-bottom: 16px;
     }
 
     .button-container {

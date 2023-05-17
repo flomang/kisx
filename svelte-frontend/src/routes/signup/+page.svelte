@@ -7,7 +7,7 @@
     import Checkbox from "@smui/checkbox";
     import { Icon as CommonIcon } from "@smui/common";
     import HelperText from "@smui/textfield/helper-text";
-    import Paper, { Title, Subtitle, Content } from "@smui/paper";
+    import Paper, { Title, Content } from "@smui/paper";
     import { Icon } from "@smui/icon-button";
 
     let username = "";
