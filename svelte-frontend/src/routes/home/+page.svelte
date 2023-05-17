@@ -17,6 +17,7 @@
     let lotType = "";
     let condition = "";
     let description = "";
+    let quantity = 1;
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
 
@@ -25,6 +26,15 @@
         removeToken();
         goto("/login");
     };
+
+    function handleQuantityInput(event: any) {
+        const newValue = parseInt(event.target.value, 10);
+        if (newValue < 1) {
+            quantity = 1; // Set minimum value as 1
+        } else {
+            quantity = newValue;
+        }
+    }
 </script>
 
 <LayoutGrid>
@@ -89,7 +99,7 @@
                         > Lot Tag
                     </svelte:fragment>
                     <HelperText slot="helper" persistent={true}
-                        >title, part name, set numer, etc</HelperText
+                        >title, part name, set number, etc</HelperText
                     >
                 </Textfield>
             </div>
@@ -112,6 +122,14 @@
                         >0 / 100</CharacterCounter
                     >
                 </Textfield>
+            </div>
+            <div>
+                <Textfield
+                    bind:value={quantity}
+                    label="Quantity"
+                    type="number"
+                    on:input={handleQuantityInput}
+                />
             </div>
             <div class="button-container">
                 <Button variant="raised" style="width: 100%; height: 100%;">
