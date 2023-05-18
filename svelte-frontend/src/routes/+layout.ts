@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { redirect } from '@sveltejs/kit';
 import client from "../lib/apollo";
 import { gql } from "@apollo/client/core";
 
@@ -33,8 +34,8 @@ export async function load({route }) {
             return data?.getCurrentUser.user ?? {};
             
         } catch (error: any) {
-            // TODO handle error more cleanly
-            console.log(error);
+            // user is not logged in 
+            throw redirect(307, '/login');
         }
     }
 }

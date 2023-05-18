@@ -7,8 +7,13 @@
     import HelperText from "@smui/textfield/helper-text";
     import Icon from "@smui/textfield/icon";
     import { page } from "$app/stores";
+    import MenuSurface from "@smui/menu-surface";
+    import { Item } from "@smui/list";
+    import Button, { Label } from "@smui/button";
 
     export let data: PageData;
+    let surface: MenuSurface;
+
     let search = "";
 
     const handleSignout = async () => {
@@ -33,81 +38,75 @@
 <nav>
     <!-- only show if logged in -->
     {#if $page.route.id != "/login"}
-        <LayoutGrid>
-            <Cell span={4}>
-                <div class="left-menu">
-                    <a href="/home">Home</a>
-                </div>
-            </Cell>
+        <div class="left-menu">
+            <a href="/home">Home</a>
+        </div>
 
-            <Cell span={4}>
-                <div class="search-container">
-                    <Textfield
-                        withTrailingIcon={search.length > 0}
-                        bind:value={search}
-                        on:keydown={handleKeyDown}
-                        style="width: 100%;"
-                        label="Search"
-                        class="shaped-outlined"
-                        variant="outlined"
-                    >
-                        <Icon class="material-icons" slot="leadingIcon"
-                            >search</Icon
+        <div class="search-container">
+            <Textfield
+                withTrailingIcon={search.length > 0}
+                bind:value={search}
+                on:keydown={handleKeyDown}
+                label="Search"
+                class="shaped-outlined"
+                variant="outlined"
+            >
+                <Icon class="material-icons" slot="leadingIcon">search</Icon>
+                <svelte:fragment slot="trailingIcon">
+                    {#if search.length > 0}
+                        <Icon class="material-icons" slot="trailingIcon"
+                            >keyboard_return</Icon
                         >
-                        <svelte:fragment slot="trailingIcon">
-                            {#if search.length > 0}
-                                <Icon class="material-icons" slot="trailingIcon"
-                                    >keyboard_return</Icon
-                                >
-                            {/if}
-                        </svelte:fragment>
-
-                        <HelperText slot="helper"
-                            >Set Number, Minifigure, Name, Description</HelperText
-                        >
-                    </Textfield>
-                </div>
-            </Cell>
-            <Cell span={4}>
-                <div class="right-menu">
-                    {#if data.username}
-                        <div class="username">{data.username}</div>
-                        <form on:submit|preventDefault={handleSignout}>
-                            <button type="submit">Signout</button>
-                        </form>
-                    {:else}
-                        <a href="/login">Login</a>
                     {/if}
+                </svelte:fragment>
+
+                <HelperText slot="helper"
+                    >Set Number, Minifigure, Name, Description</HelperText
+                >
+            </Textfield>
+        </div>
+
+        <div class="right-menu">
+            <Button variant="raised" on:click={() => surface.setOpen(true)}
+                >{data.username}</Button
+            >
+            <MenuSurface bind:this={surface} anchorCorner="BOTTOM_LEFT">
+                <div class="profile-menu">
+                    <Item on:SMUI:action={handleSignout}>Logout</Item>
                 </div>
-            </Cell>
-        </LayoutGrid>
+            </MenuSurface>
+        </div>
     {/if}
 </nav>
 
 <slot />
 
 <style>
+    nav {
+        height: 60px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .right-menu,
     .left-menu {
         display: flex;
         align-items: center;
-        height: 20px;
+        margin: 0 10px;
     }
 
-    .right-menu {
-        height: 20px;
+    .profile-menu {
         display: flex;
-        align-items: center;
-        float: right;
-    }
-
-    .username {
-        padding-inline: 10px;
-        padding-block: 2px;
+        flex-direction: column;
+        align-items: flex-end;
     }
 
     .search-container {
-        width: 100%;
-        margin-top: -10px;
+        height: 70%;
+        flex: 1;
+        margin: 10px 10px;
     }
 
     a {
@@ -116,10 +115,11 @@
         text-decoration: none;
     }
 
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__leading
-        ) {
+    * :global(.shaped-outlined) {
+        height: 100%;
+        width: 70%;
+    }
+    * :global(.mdc-notched-outline .mdc-notched-outline__leading) {
         border-radius: 28px 0 0 28px;
         width: 28px;
     }
