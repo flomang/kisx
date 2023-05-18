@@ -27,39 +27,39 @@ const CURRENT_USER = gql`
 `;
 
 
-export const load = (async ({ }) => {
-    let currentUser = "";
+// export const load = (async ({ }) => {
+//     let currentUser = "";
 
-    if (browser) {
-        try {
-            const { data } = await client.query<GetCurrentUserResult>({
-                query: CURRENT_USER,
-            });
+//     if (browser) {
+//         try {
+//             const { data } = await client.query<GetCurrentUserResult>({
+//                 query: CURRENT_USER,
+//             });
 
-            const { token, username } = data?.getCurrentUser.user ?? {};
-            if (token) {
-                localStorage.setItem("token", token);
-                currentUser = username ?? currentUser;
-            }
+//             const { token, username } = data?.getCurrentUser.user ?? {};
+//             if (token) {
+//                 localStorage.setItem("token", token);
+//                 currentUser = username ?? currentUser;
+//             }
 
-            return {
-                username: currentUser,
-            };
+//             return {
+//                 username: currentUser,
+//             };
 
-        } catch (error: any) {
-            throw redirect(307, '/login');
-            //if (
-            //    error instanceof ApolloError &&
-            //    error.message.includes("Unauthorized")
-            //) {
-            //    throw redirect(307, '/signin');
-            //} else {
-            //    console.error(
-            //        "encountered unexpected error from signin request:",
-            //        error
-            //    );
-            //    alert(error.message);
-            //}
-        }
-    }
-}) satisfies PageLoad;
+//         } catch (error: any) {
+//             //throw redirect(307, '/login');
+//             //if (
+//             //    error instanceof ApolloError &&
+//             //    error.message.includes("Unauthorized")
+//             //) {
+//             //    throw redirect(307, '/signin');
+//             //} else {
+//             //    console.error(
+//             //        "encountered unexpected error from signin request:",
+//             //        error
+//             //    );
+//             //    alert(error.message);
+//             //}
+//         }
+//     }
+// }) satisfies PageLoad;

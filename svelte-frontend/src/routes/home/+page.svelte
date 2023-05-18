@@ -1,19 +1,12 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import client, { removeToken } from "../../lib/apollo";
-    import type { PageData } from "./$types";
     import LayoutGrid, { Cell } from "@smui/layout-grid";
-    import Textfield, { Input } from "@smui/textfield";
-    import FormField from "@smui/form-field";
-    import Checkbox from "@smui/checkbox";
+    import Textfield from "@smui/textfield";
     import { Icon as CommonIcon } from "@smui/common";
     import HelperText from "@smui/textfield/helper-text";
     import Select, { Option } from "@smui/select";
-    import Icon from "@smui/textfield/icon";
     import CharacterCounter from "@smui/textfield/character-counter";
     import Button, { Label } from "@smui/button";
 
-    export let data: PageData;
     let name = "";
     let lotType = "";
     let condition = "";
@@ -21,13 +14,6 @@
     let quantity = 1;
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
-    let search = "";
-
-    const handleSignout = async () => {
-        client.cache.reset();
-        removeToken();
-        goto("/login");
-    };
 
     function handleQuantityInput(event: any) {
         const newValue = parseInt(event.target.value, 10);
@@ -37,63 +23,12 @@
             quantity = newValue;
         }
     }
-
-    function doSearch() {
-        alert("Search for " + search);
-    }
-
-    function handleKeyDown(event: CustomEvent | KeyboardEvent) {
-        event = event as KeyboardEvent;
-        if (event.key === "Enter") {
-            doSearch();
-        }
-    }
 </script>
 
 <LayoutGrid>
-    <Cell span={4}>
-        <div class="left-menu">
-            <h1>Welcome Home</h1>
-        </div>
-    </Cell>
-
-    <Cell span={4}>
-        <div class="search-container">
-            <Textfield
-                withTrailingIcon={search.length > 0}
-                bind:value={search}
-                on:keydown={handleKeyDown}
-                style="width: 100%;"
-                label="Search"
-                class="shaped-outlined"
-                variant="outlined"
-            >
-                <Icon class="material-icons" slot="leadingIcon">search</Icon>
-                <svelte:fragment slot="trailingIcon">
-                    {#if search.length > 0}
-                        <Icon class="material-icons" slot="trailingIcon"
-                            >keyboard_return</Icon
-                        >
-                    {/if}
-                </svelte:fragment>
-
-                <HelperText slot="helper"
-                    >Set Number, Minifigure, Name, Description</HelperText
-                >
-            </Textfield>
-        </div>
-    </Cell>
-    <Cell span={4}>
-        <div class="right-menu">
-            <div class="username">{data.username}</div>
-            <form on:submit|preventDefault={handleSignout}>
-                <button type="submit">Signout</button>
-            </form>
-        </div>
-    </Cell>
     <Cell span={12}>
         <div class="sell-it">
-            <h1>Mint Something</h1>
+            <h1>Add Something</h1>
             <div class="select-container">
                 <div class="input-type">
                     <Select style="width: 100%;" bind:value={lotType}>
@@ -181,22 +116,6 @@
 </LayoutGrid>
 
 <style>
-    .left-menu {
-        display: flex;
-        align-items: center;
-        height: 20px;
-        justify-content: left;
-    }
-    .right-menu {
-        height: 20px;
-        display: flex;
-        justify-content: right;
-    }
-    .username {
-        padding-inline: 10px;
-        padding-block: 2px;
-    }
-
     .select-container {
         display: flex;
         padding-block: 10px;
@@ -225,46 +144,7 @@
 
     .sell-it {
         height: 100px;
-        width: 500px;
-        margin: auto;
-        /* background-color: green; */
-    }
-
-    .search-container {
-        width: 100%;
-        margin-top: -10px;
-    }
-
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__leading
-        ) {
-        border-radius: 28px 0 0 28px;
-        width: 28px;
-    }
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__trailing
-        ) {
-        border-radius: 0 28px 28px 0;
-    }
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__notch
-        ) {
-        max-width: calc(100% - 28px * 2);
-    }
-    *
-        :global(
-            .shaped-outlined.mdc-text-field--with-leading-icon:not(
-                    .mdc-text-field--label-floating
-                )
-                .mdc-floating-label
-        ) {
-        left: 16px;
-    }
-    * :global(.shaped-outlined + .mdc-text-field-helper-line) {
-        padding-left: 32px;
-        padding-right: 28px;
+        width: 350px;
+        float: right;
     }
 </style>
