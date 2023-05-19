@@ -2,7 +2,6 @@
     import { goto } from "$app/navigation";
     import client, { removeToken } from "../lib/apollo";
     import type { PageData } from "./$types";
-    import LayoutGrid, { Cell } from "@smui/layout-grid";
     import Textfield from "@smui/textfield";
     import HelperText from "@smui/textfield/helper-text";
     import Icon from "@smui/textfield/icon";
@@ -35,11 +34,36 @@
     }
 </script>
 
-<nav>
+<nav class="{($page.route.id != '/login') ? 'mdc-theme--primary-bg' : ''}">
     <!-- only show if logged in -->
     {#if $page.route.id != "/login"}
         <div class="left-menu">
-            <a href="/home">Home</a>
+            <a
+                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/home') ? 'selected' : ''}"
+                class:mdc-elevation--z4={$page.route.id == "/home"}
+                href="/home">kisx</a
+            >
+        </div>
+        <div class="left-menu">
+            <a
+                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/about') ? 'selected' : ''}"
+                class:mdc-elevation--z4={$page.route.id == "/about"}
+                href="/about">about</a
+            >
+        </div>
+        <div class="left-menu">
+            <a
+                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/dashboard') ? 'selected' : ''}"
+                class:mdc-elevation--z4={$page.route.id == "/dashboard"}
+                href="/dashboard">dashboard</a
+            >
+        </div>
+        <div class="left-menu">
+            <a
+                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/news') ? 'selected' : ''}"
+                class:mdc-elevation--z4={$page.route.id == "/news"}
+                href="/news">news</a
+            >
         </div>
 
         <div class="search-container">
@@ -48,8 +72,8 @@
                 bind:value={search}
                 on:keydown={handleKeyDown}
                 label="Search"
-                class="shaped-outlined"
                 variant="outlined"
+                class="search"
             >
                 <Icon class="material-icons" slot="leadingIcon">search</Icon>
                 <svelte:fragment slot="trailingIcon">
@@ -104,18 +128,19 @@
     }
 
     .search-container {
-        height: 70%;
+        height: 100%;
         flex: 1;
-        margin: 10px 10px;
+        margin: auto;
     }
 
     a {
         font-size: 1.3em;
-        color: #40b3ff;
+        /* color: #40b3ff; */
+        color: #fff;
         text-decoration: none;
     }
 
-    * :global(.shaped-outlined) {
+    /* * :global(.shaped-outlined) {
         height: 100%;
         width: 70%;
     }
@@ -147,5 +172,19 @@
     * :global(.shaped-outlined + .mdc-text-field-helper-line) {
         padding-left: 32px;
         padding-right: 28px;
+    } */
+
+    .selected {
+        background-color: #FA8072;
+    }
+    .flexy-boy {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .rounded {
+        border-radius: 4px;
     }
 </style>

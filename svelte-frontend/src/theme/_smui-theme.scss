@@ -2,24 +2,30 @@
 
 @use '@material/theme/color-palette';
 
+$background: #fff;
+
 // Svelte Colors!
-@use '@material/theme/index' as theme with (
+@use "@material/theme" as theme with (
   $primary: #ff3e00,
-  $secondary: #676778,
+  $secondary: color-palette.$teal-600,
   $surface: #fff,
-  $background: #fff,
+  $background: $background,
   $error: color-palette.$red-900
 );
 
+@use '@material/theme/styles';
+@use '@material/elevation/mdc-elevation';
+
 html,
 body {
-  background-color: theme.$surface;
-  color: theme.$on-surface;
+  background-color: $background;
+  color: theme.$surface;
 }
 
 a {
   color: #40b3ff;
 }
+
 a:visited {
   color: color.scale(#40b3ff, $lightness: -35%);
 }

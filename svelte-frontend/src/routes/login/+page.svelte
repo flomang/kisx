@@ -59,7 +59,7 @@
             if (token) {
                 addToken(token);
                 message = username ?? message;
-                goto("/home");
+                goto("/dashboard");
             }
         } catch (error: any) {
             message = error.message;
