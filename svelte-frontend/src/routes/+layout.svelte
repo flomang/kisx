@@ -71,9 +71,10 @@
                 withTrailingIcon={search.length > 0}
                 bind:value={search}
                 on:keydown={handleKeyDown}
-                label="Search"
+                label="Set Number, Minifigure, Name, Description"
+                class="search-text-field"
                 variant="outlined"
-                class="search"
+
             >
                 <Icon class="material-icons" slot="leadingIcon">search</Icon>
                 <svelte:fragment slot="trailingIcon">
@@ -83,10 +84,6 @@
                         >
                     {/if}
                 </svelte:fragment>
-
-                <HelperText slot="helper"
-                    >Set Number, Minifigure, Name, Description</HelperText
-                >
             </Textfield>
         </div>
 
@@ -110,8 +107,8 @@
         height: 60px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        /* justify-content: space-between; */
     }
 
     .right-menu,
@@ -128,14 +125,12 @@
     }
 
     .search-container {
-        height: 100%;
         flex: 1;
-        margin: auto;
+        height: 65%;
     }
 
     a {
         font-size: 1.3em;
-        /* color: #40b3ff; */
         color: #fff;
         text-decoration: none;
     }

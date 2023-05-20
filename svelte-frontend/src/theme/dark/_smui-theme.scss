@@ -1,5 +1,4 @@
 @use 'sass:color';
-
 @use '@material/theme/color-palette';
 
 $background: #fff;
@@ -14,9 +13,12 @@ $background: #fff;
 );
 
 @use '@material/theme/styles';
-// MDC Elevation Classes
-@use '@material/elevation/mdc-elevation';
-@use '@material/elevation/mixins' as elevation;
+@use 'TransitionsAndColor';
+@use "@material/textfield";
+// @use "@material/floating-label";
+// @use "@material/line-ripple/mdc-line-ripple";
+// @use "@material/notched-outline/mdc-notched-outline";
+
 
 html,
 body {
@@ -30,21 +32,15 @@ a {
 a:visited {
   color: color.scale(#40b3ff, $lightness: -35%);
 }
- 
-.my-primary {
-  // Set the font color.
-  @include theme.property(color, primary);
- 
-  &.elevated {
-    // And the elevation color.
-    @include elevation.elevation(4, primary);
-  }
+
+// search field focused
+.search-text-field.mdc-text-field--focused {
+  @include textfield.ink-color(#000);
+  @include textfield.label-color(#000);
+  @include textfield.focused-outline-color(#000);
 }
- 
-.my-secondary {
-  @include theme.property(color, secondary);
- 
-  &.elevated {
-    @include elevation.elevation(4, secondary);
-  }
+
+.search-text-field.mdc-text-field {
+  width: 100%;
+  height: 100%;
 }
