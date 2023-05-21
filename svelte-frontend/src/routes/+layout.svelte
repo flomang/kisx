@@ -79,24 +79,23 @@
         </div>
 
         <div class="search-container">
-                <Textfield
-                    withTrailingIcon={search.length > 0}
-                    bind:value={search}
-                    on:keydown={handleKeyDown}
-                    label="Set Number, Minifigure, Name, Description"
-                    class="search-text-field"
-                    variant="outlined"
-                >
-                    <Icon class="material-icons" slot="leadingIcon">search</Icon
-                    >
-                    <svelte:fragment slot="trailingIcon">
-                        {#if search.length > 0}
-                            <Icon class="material-icons" slot="trailingIcon"
-                                >keyboard_return</Icon
-                            >
-                        {/if}
-                    </svelte:fragment>
-                </Textfield>
+            <Textfield
+                withTrailingIcon={search.length > 0}
+                bind:value={search}
+                on:keydown={handleKeyDown}
+                label="Set Number, Minifigure, Name, Description"
+                class="search-text-field"
+                variant="outlined"
+            >
+                <Icon class="material-icons" slot="leadingIcon">search</Icon>
+                <svelte:fragment slot="trailingIcon">
+                    {#if search.length > 0}
+                        <Icon class="material-icons" slot="trailingIcon"
+                            >keyboard_return</Icon
+                        >
+                    {/if}
+                </svelte:fragment>
+            </Textfield>
         </div>
 
         <div class="right-menu">
@@ -139,7 +138,6 @@
     .search-container {
         flex: 1;
         height: 65%;
-        display: flex;
     }
 
     a {
