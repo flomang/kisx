@@ -24,8 +24,10 @@ const CURRENT_USER = gql`
 `;
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({route }) {
-    if (browser && route.id !== '/login') {
+export async function load({ route }) {
+    let ignore = ['/login', '/signup', '/forgot'];
+
+    if (browser && !ignore.includes(route.id)) {
         try {
             let {data} =  await client.query<GetCurrentUserResult>({
                     query: CURRENT_USER,

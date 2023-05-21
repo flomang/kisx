@@ -11,6 +11,7 @@
     import Button, { Label } from "@smui/button";
 
     export let data: PageData;
+    let ignore = ["/login", "/signup", "/forgot"];
     let surface: MenuSurface;
 
     let search = "";
@@ -34,42 +35,38 @@
     }
 </script>
 
-<nav class={$page.route.id != "/login" ? "mdc-theme--primary-bg" : ""}>
+<nav class={!ignore.includes($page.route.id) ? "mdc-theme--primary-bg" : ""}>
     <!-- only show if logged in -->
     {#if $page.route.id != "/login"}
         <div class="left-menu">
             <a
-                class="{$page
-                    .route.id === '/home'
-                    ? 'selected mdc-elevation--z12'
-                    : 'selectable'}"
+                class={$page.route.id === "/home"
+                    ? "selected mdc-elevation--z12"
+                    : "selectable"}
                 href="/home">KISX</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="{$page
-                    .route.id === '/about'
-                    ? 'selected mdc-elevation--z12'
-                    : 'selectable'}"
+                class={$page.route.id === "/about"
+                    ? "selected mdc-elevation--z12"
+                    : "selectable"}
                 href="/about">ABOUT</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="{$page
-                    .route.id === '/dashboard'
-                    ? 'selected mdc-elevation--z12'
-                    : 'selectable'}"
+                class={$page.route.id === "/dashboard"
+                    ? "selected mdc-elevation--z12"
+                    : "selectable"}
                 href="/dashboard">DASHBOARD</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="{$page
-                    .route.id === '/news'
-                    ? 'selected mdc-elevation--z12'
-                    : 'selectable'}"
+                class={$page.route.id === "/news"
+                    ? "selected mdc-elevation--z12"
+                    : "selectable"}
                 href="/news">NEWS</a
             >
         </div>
@@ -83,7 +80,11 @@
                 class="search-text-field"
                 variant="outlined"
             >
-                <Icon color="secondary" class="material-icons" slot="leadingIcon">search</Icon>
+                <Icon
+                    color="secondary"
+                    class="material-icons"
+                    slot="leadingIcon">search</Icon
+                >
                 <svelte:fragment slot="trailingIcon">
                     {#if search.length > 0}
                         <Icon class="material-icons" slot="trailingIcon"
@@ -94,16 +95,18 @@
             </Textfield>
         </div>
 
-        <div class="right-menu">
-            <Button variant="raised" on:click={() => surface.setOpen(true)}
-                >{data.username}</Button
-            >
-            <MenuSurface bind:this={surface} anchorCorner="BOTTOM_LEFT">
-                <div class="profile-menu">
-                    <Item on:SMUI:action={handleSignout}>Logout</Item>
-                </div>
-            </MenuSurface>
-        </div>
+        {#if data.username}
+            <div class="right-menu">
+                <Button variant="raised" on:click={() => surface.setOpen(true)}
+                    >{data.username}</Button
+                >
+                <MenuSurface bind:this={surface} anchorCorner="BOTTOM_LEFT">
+                    <div class="profile-menu">
+                        <Item on:SMUI:action={handleSignout}>Logout</Item>
+                    </div>
+                </MenuSurface>
+            </div>
+        {/if}
     {/if}
 </nav>
 
@@ -143,7 +146,7 @@
     }
 
     .selected {
-        background-color: #DA291C;
+        background-color: #da291c;
         color: #fff;
     }
 
@@ -151,7 +154,8 @@
         color: #000;
     }
 
-    .selected, .selectable {
+    .selected,
+    .selectable {
         border-radius: 4px;
         display: flex;
         justify-content: center;
