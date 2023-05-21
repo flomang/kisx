@@ -34,57 +34,69 @@
     }
 </script>
 
-<nav class="{($page.route.id != '/login') ? 'mdc-theme--primary-bg' : ''}">
+<nav class={$page.route.id != "/login" ? "mdc-theme--primary-bg" : ""}>
     <!-- only show if logged in -->
     {#if $page.route.id != "/login"}
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/home') ? 'selected' : ''}"
+                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                    .route.id === '/home'
+                    ? 'selected'
+                    : ''}"
                 class:mdc-elevation--z4={$page.route.id == "/home"}
                 href="/home">kisx</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/about') ? 'selected' : ''}"
+                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                    .route.id === '/about'
+                    ? 'selected'
+                    : ''}"
                 class:mdc-elevation--z4={$page.route.id == "/about"}
                 href="/about">about</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/dashboard') ? 'selected' : ''}"
+                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                    .route.id === '/dashboard'
+                    ? 'selected'
+                    : ''}"
                 class:mdc-elevation--z4={$page.route.id == "/dashboard"}
                 href="/dashboard">dashboard</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {($page.route.id === '/news') ? 'selected' : ''}"
+                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                    .route.id === '/news'
+                    ? 'selected'
+                    : ''}"
                 class:mdc-elevation--z4={$page.route.id == "/news"}
                 href="/news">news</a
             >
         </div>
 
         <div class="search-container">
-            <Textfield
-                withTrailingIcon={search.length > 0}
-                bind:value={search}
-                on:keydown={handleKeyDown}
-                label="Set Number, Minifigure, Name, Description"
-                class="search-text-field"
-                variant="outlined"
-
-            >
-                <Icon class="material-icons" slot="leadingIcon">search</Icon>
-                <svelte:fragment slot="trailingIcon">
-                    {#if search.length > 0}
-                        <Icon class="material-icons" slot="trailingIcon"
-                            >keyboard_return</Icon
-                        >
-                    {/if}
-                </svelte:fragment>
-            </Textfield>
+                <Textfield
+                    withTrailingIcon={search.length > 0}
+                    bind:value={search}
+                    on:keydown={handleKeyDown}
+                    label="Set Number, Minifigure, Name, Description"
+                    class="search-text-field"
+                    variant="outlined"
+                >
+                    <Icon class="material-icons" slot="leadingIcon">search</Icon
+                    >
+                    <svelte:fragment slot="trailingIcon">
+                        {#if search.length > 0}
+                            <Icon class="material-icons" slot="trailingIcon"
+                                >keyboard_return</Icon
+                            >
+                        {/if}
+                    </svelte:fragment>
+                </Textfield>
         </div>
 
         <div class="right-menu">
@@ -127,6 +139,7 @@
     .search-container {
         flex: 1;
         height: 65%;
+        display: flex;
     }
 
     a {
@@ -170,7 +183,7 @@
     } */
 
     .selected {
-        background-color: #FA8072;
+        background-color: #fa8072;
     }
     .flexy-boy {
         display: flex;

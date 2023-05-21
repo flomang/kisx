@@ -17,7 +17,7 @@ $background: #fff;
 @use "@material/textfield";
 // @use "@material/floating-label";
 // @use "@material/line-ripple/mdc-line-ripple";
-// @use "@material/notched-outline/mdc-notched-outline";
+// @use "@material/notched-outline";
 
 
 html,
@@ -40,7 +40,15 @@ a:visited {
   @include textfield.focused-outline-color(#000);
 }
 
+.search-text-field.mdc-text-field .mdc-floating-label {
+  // this hack is needed to align the label with the center of the search field because
+  // of the increased font size below 
+  transform: translateY(-100%);
+}
+
 .search-text-field.mdc-text-field {
+  // this hack is needed to align the label with the outline
+  font-size: 2em;
   width: 100%;
   height: 100%;
 }
