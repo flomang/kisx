@@ -4,6 +4,7 @@
 // Elevation and theme mixins.
 @use '@material/elevation/mixins' as elevation;
 @use '@material/theme/index' as theme;
+@use '@material/elevation/mdc-elevation';
 
 .my-primary {
   // Set the font color.
@@ -12,6 +13,7 @@
   &.elevated {
     // And the elevation color.
     @include elevation.elevation(4, primary);
+    @include theme.property(color, primary);
   }
 }
 

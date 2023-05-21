@@ -5,8 +5,10 @@ $background: #fff;
 
 // Svelte Colors! (Dark Theme)
 @use '@material/theme' as theme with (
-  $primary: color.scale(#DA291C, $whiteness: -10%),
-  $secondary: color.scale(#D9D9D9, $whiteness: -10%),
+  //$primary: color.scale(#DA291C, $whiteness: -10%),
+  $primary: color.scale(#ffcf04, $whiteness: -10%),
+  //$secondary: color.scale(#D9D9D9, $whiteness: -10%),
+  // $secondary: color.scale(#DA291C, $whiteness: -10%),
   $surface: color.adjust(color-palette.$grey-900, $blue: +4),
   $background: $background,
   $error: color-palette.$red-700
@@ -40,9 +42,22 @@ a:visited {
   @include textfield.focused-outline-color(#000);
 }
 
+// search field not in focus
+.search-text-field:not(mdc-text-field--focused) {
+  @include textfield.label-color(#000);
+  @include textfield.outline-color(#000);
+}
+
+// search text floating label above
 // this is a better version of the font-size: 2em hack from the previous commit 
 .search-text-field.mdc-text-field .mdc-notched-outline__notch .mdc-floating-label.mdc-floating-label--float-above {
   transform: translateY(-25px) translateX(-32px) scale(0.75);
+}
+
+// leading and trailing icons of search
+.search-text-field.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__icon--leading,
+.search-text-field.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__icon--trailing {
+  color: #000;
 }
 
 .search-text-field.mdc-text-field {

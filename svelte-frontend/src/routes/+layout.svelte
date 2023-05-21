@@ -39,42 +39,38 @@
     {#if $page.route.id != "/login"}
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                class="{$page
                     .route.id === '/home'
-                    ? 'selected'
-                    : ''}"
-                class:mdc-elevation--z4={$page.route.id == "/home"}
-                href="/home">kisx</a
+                    ? 'selected mdc-elevation--z12'
+                    : 'selectable'}"
+                href="/home">KISX</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                class="{$page
                     .route.id === '/about'
-                    ? 'selected'
-                    : ''}"
-                class:mdc-elevation--z4={$page.route.id == "/about"}
-                href="/about">about</a
+                    ? 'selected mdc-elevation--z12'
+                    : 'selectable'}"
+                href="/about">ABOUT</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                class="{$page
                     .route.id === '/dashboard'
-                    ? 'selected'
-                    : ''}"
-                class:mdc-elevation--z4={$page.route.id == "/dashboard"}
-                href="/dashboard">dashboard</a
+                    ? 'selected mdc-elevation--z12'
+                    : 'selectable'}"
+                href="/dashboard">DASHBOARD</a
             >
         </div>
         <div class="left-menu">
             <a
-                class="my-primary mdc-elevation-transition rounded flexy-boy {$page
+                class="{$page
                     .route.id === '/news'
-                    ? 'selected'
-                    : ''}"
-                class:mdc-elevation--z4={$page.route.id == "/news"}
-                href="/news">news</a
+                    ? 'selected mdc-elevation--z12'
+                    : 'selectable'}"
+                href="/news">NEWS</a
             >
         </div>
 
@@ -87,7 +83,7 @@
                 class="search-text-field"
                 variant="outlined"
             >
-                <Icon class="material-icons" slot="leadingIcon">search</Icon>
+                <Icon color="secondary" class="material-icons" slot="leadingIcon">search</Icon>
                 <svelte:fragment slot="trailingIcon">
                     {#if search.length > 0}
                         <Icon class="material-icons" slot="trailingIcon"
@@ -146,51 +142,22 @@
         text-decoration: none;
     }
 
-    /* * :global(.shaped-outlined) {
-        height: 100%;
-        width: 70%;
-    }
-    * :global(.mdc-notched-outline .mdc-notched-outline__leading) {
-        border-radius: 28px 0 0 28px;
-        width: 28px;
-    }
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__trailing
-        ) {
-        border-radius: 0 28px 28px 0;
-    }
-    *
-        :global(
-            .shaped-outlined .mdc-notched-outline .mdc-notched-outline__notch
-        ) {
-        max-width: calc(100% - 28px * 2);
-    }
-    *
-        :global(
-            .shaped-outlined.mdc-text-field--with-leading-icon:not(
-                    .mdc-text-field--label-floating
-                )
-                .mdc-floating-label
-        ) {
-        left: 16px;
-    }
-    * :global(.shaped-outlined + .mdc-text-field-helper-line) {
-        padding-left: 32px;
-        padding-right: 28px;
-    } */
-
     .selected {
-        background-color: #fa8072;
+        background-color: #DA291C;
+        color: #fff;
     }
-    .flexy-boy {
+
+    .selectable {
+        color: #000;
+    }
+
+    .selected, .selectable {
+        border-radius: 4px;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 10px;
-    }
-
-    .rounded {
-        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: bold;
     }
 </style>
