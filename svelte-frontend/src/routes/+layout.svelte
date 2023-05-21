@@ -35,7 +35,7 @@
     }
 </script>
 
-<nav class={!ignore.includes($page.route.id) ? "mdc-theme--primary-bg" : ""}>
+<nav class={$page.route.id && !ignore.includes($page.route.id) ? "mdc-theme--primary-bg" : ""}>
     <!-- only show if logged in -->
     {#if $page.route.id != "/login"}
         <div class="left-menu">
