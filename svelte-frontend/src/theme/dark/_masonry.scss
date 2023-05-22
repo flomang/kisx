@@ -1,0 +1,32 @@
+@use '@material/image-list/mixins' as image-list;
+
+.my-image-list-masonry {
+    @include image-list.masonry-columns(5);
+    // border-top-left-radius: 6px;
+    // border-top-right-radius: 6px;
+    //@include image-list.shape-radius(6px);
+}
+
+.my-image-list-masonry .mdc-image-list__item {
+    background-color: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.my-image-list-masonry .mdc-image-list__label {
+    padding-left: 10px;
+    padding-right: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+.my-image-list-masonry .mdc-image-list__item:hover {
+    opacity: 1;
+    transform: scale(1.04);
+}
+
+.my-image-list-masonry .mdc-image-list__supporting {
+    background-color: #fff;
+    padding: 0;
+}

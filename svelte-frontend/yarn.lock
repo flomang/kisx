@@ -231,6 +231,17 @@
     "@material/touch-target" "^14.0.0"
     tslib "^2.1.0"
 
+"@material/image-list@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/image-list/-/image-list-14.0.0.tgz"
+  integrity sha512-vx/7WCMbiZoy/R+DmO7r0N3jWzFjlvvDMeBpXt0btglWP3EYbVnDqzseW4u1TtY+IBbJldW/DsiCN1oLnlEVxw==
+  dependencies:
+    "@material/feature-targeting" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    tslib "^2.1.0"
+
 "@material/layout-grid@^14.0.0":
   version "14.0.0"
   resolved "https://registry.npmjs.org/@material/layout-grid/-/layout-grid-14.0.0.tgz"
@@ -562,6 +573,15 @@
     "@material/icon-button" "^14.0.0"
     "@smui/common" "^7.0.0-beta.8"
     "@smui/ripple" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/image-list@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/image-list/-/image-list-7.0.0-beta.8.tgz"
+  integrity sha512-2k227Cnq4pfDYYm4g9EMpKoaIqNz3mePTeoWRnwqi92Y3EoJ8k7+ZY86QE1dc3W8ATTt8s9pTGXJZrPCPQK6mQ==
+  dependencies:
+    "@material/image-list" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
 "@smui/layout-grid@^7.0.0-beta.8":
