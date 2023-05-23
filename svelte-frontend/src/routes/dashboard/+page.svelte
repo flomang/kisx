@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { ApolloError, gql } from "@apollo/client/core";
+    import client from "../../lib/apollo";
     import { onMount } from "svelte";
     import LayoutGrid, { Cell } from "@smui/layout-grid";
     import Textfield from "@smui/textfield";
@@ -14,21 +16,109 @@
         Label as ImageLabel,
     } from "@smui/image-list";
     import IconButton, { Icon } from "@smui/icon-button";
+    import Dialog, { Header, Title, Content, Actions } from "@smui/dialog";
 
-    let name = "";
-    let lotType = "";
+    let tag = "";
+    let category = "";
     let condition = "";
     let description = "";
-    let quantity = 1;
+    let images = { thumb: ""};
+    let additional_data = { quantity: 1 };
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+
+    interface LotResult {
+        lot: {
+            id: string;
+            category: string;
+            condition: string;
+            tag: string;
+            description: string;
+            images: string;
+            data: string;
+        };
+    }
+
+    const CREATE_LOT_MUTATION = gql`
+        mutation CreateLot(
+            $category: String!
+            $condition: String!
+            $tag: String!
+            $description: String!
+            $images: JSON!
+            $data: JSON!
+        ) {
+            createLot(
+                params: {
+                    category: $category
+                    condition: $condition
+                    tag: $tag
+                    description: $description
+                    images: $images
+                    data: $data
+                }
+            ) {
+                lot {
+                    id
+                    category
+                    condition
+                    tag
+                    description
+                    images
+                    data
+                }
+            }
+        }
+    `;
+
+    const handleAddLot = async () => {
+        try {
+            const { data } = await client.mutate<LotResult>({
+                mutation: CREATE_LOT_MUTATION,
+                variables: {
+                    category,
+                    condition,
+                    tag,
+                    description,
+                    images,
+                    data: additional_data,
+                },
+            });
+
+            console.log(data);
+            // const { data } = data?.lot ?? {};
+            // if (token) {
+            //     success = true;
+            //     //    addToken(token);
+            //     //    goto("/home");
+            // }
+        } catch (error: any) {
+            //message = error.message;
+            console.log(JSON.stringify(error));
+            // if (error.message === "Validation Errors" && error.graphQLErrors) {
+            //     const validationErrors =
+            //         error.graphQLErrors[0].extensions.errors;
+            //     validationErrors.forEach((e: any) => {
+            //         const { key, message } = e;
+            //         console.log(key, message);
+            //         if (key == "username") {
+            //             usernameError = message;
+            //         } else if (key == "email") {
+            //             emailError = message;
+            //         } else if (key == "password") {
+            //             passwordError = message;
+            //         }
+            //     });
+            // }
+        }
+    };
 
     function handleQuantityInput(event: any) {
         const newValue = parseInt(event.target.value, 10);
         if (newValue < 1) {
-            quantity = 1; // Set minimum value as 1
+            additional_data.quantity = 1; // Set minimum value as 1
         } else {
-            quantity = newValue;
+            additional_data.quantity = newValue;
         }
     }
 
@@ -89,15 +179,50 @@
             title: "Blacktron Message Intercept Base",
             setID: "6987",
         },
+        {
+            id: 12,
+            imageUrl: "bonsai-moc.png",
+            title: "Master Ogway's Bonsai Tree",
+        },
         // Add more pin objects as needed
     ];
+    let response;
+    let open = false;
 </script>
+
+<Dialog
+    bind:open
+    scrimClickAction=""
+    escapeKeyAction=""
+    aria-labelledby="mandatory-title"
+    aria-describedby="mandatory-content"
+    fullscreen
+>
+    <!-- <Title id="mandatory-title">Webpage Troll</Title> -->
+    <Header>
+        <Title id="over-fullscreen-title">Item Info</Title>
+        <IconButton action="close" class="material-icons">close</IconButton>
+    </Header>
+    <Content id="mandatory-content">
+        Before you continue on this page, you must answer my riddle of age. When
+        Alice was six her brother was half, now Alice is 90, you do the math.
+        <br /><br />
+        How old is Alice's brother now?
+    </Content>
+    <Actions>
+        <Button
+            on:click={() => (response = "Wrong answer. Thrown in the lake.")}
+        >
+            <Label>Sell it!</Label>
+        </Button>
+    </Actions>
+</Dialog>
 
 <LayoutGrid>
     <Cell span={9}>
         <ImageList class="my-image-list-masonry" masonry>
             {#each pins as pin (pin.id)}
-                <Item>
+                <Item on:click={() => (open = true)}>
                     <Image src={pin.imageUrl} alt="Image {pin.id}" />
                     <Supporting>
                         <ImageLabel>
@@ -129,7 +254,7 @@
             <h1>Add Something</h1>
             <div class="select-container">
                 <div class="input-type">
-                    <Select style="width: 100%;" bind:value={lotType}>
+                    <Select style="width: 100%;" bind:value={category}>
                         <svelte:fragment slot="label">
                             <CommonIcon
                                 class="material-icons"
@@ -162,7 +287,7 @@
                     variant="outlined"
                     style="width: 100%;"
                     class="input-container"
-                    bind:value={name}
+                    bind:value={tag}
                 >
                     <svelte:fragment slot="label">
                         <CommonIcon
@@ -196,16 +321,37 @@
                     >
                 </Textfield>
             </div>
+            <div class="input-container">
+                <Textfield
+                    variant="outlined"
+                    style="width: 100%;"
+                    class="input-container"
+                    bind:value={images.thumb}
+                >
+                    <svelte:fragment slot="label">
+                        <CommonIcon
+                            class="material-icons"
+                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                            >image</CommonIcon
+                        > thumb url 
+                    </svelte:fragment>
+                </Textfield>
+            </div>
             <div>
                 <Textfield
-                    bind:value={quantity}
+                    bind:value={additional_data.quantity}
                     label="Quantity"
                     type="number"
                     on:input={handleQuantityInput}
                 />
             </div>
+         
             <div class="button-container">
-                <Button variant="raised" style="width: 100%; height: 100%;">
+                <Button
+                    variant="raised"
+                    style="width: 100%; height: 100%;"
+                    on:click={handleAddLot}
+                >
                     <Label>Mint it!</Label>
                 </Button>
             </div>

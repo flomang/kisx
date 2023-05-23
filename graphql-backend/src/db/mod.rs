@@ -4,6 +4,7 @@ mod comments;
 mod profiles;
 mod tags;
 mod users;
+mod lots;
 
 use crate::prelude::*;
 use actix::prelude::{Actor, SyncContext};

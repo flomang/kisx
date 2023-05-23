@@ -50,6 +50,21 @@ table! {
 }
 
 table! {
+    lots (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        category -> Text,
+        condition -> Text,
+        tag -> Nullable<Text>,
+        description -> Nullable<Text>,
+        images -> Nullable<Jsonb>,
+        data -> Nullable<Jsonb>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     users (id) {
         id -> Uuid,
         username -> Text,
@@ -69,6 +84,7 @@ joinable!(comments -> articles (article_id));
 joinable!(comments -> users (user_id));
 joinable!(favorite_articles -> articles (article_id));
 joinable!(favorite_articles -> users (user_id));
+joinable!(lots -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     article_tags,
@@ -76,5 +92,6 @@ allow_tables_to_appear_in_same_query!(
     comments,
     favorite_articles,
     followers,
+    lots,
     users,
 );

@@ -4,6 +4,7 @@ pub mod profiles;
 mod query;
 pub mod tags;
 pub mod users;
+pub mod lots;
 
 use crate::{
     db::{new_pool, DbExecutor},

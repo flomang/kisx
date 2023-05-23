@@ -17,7 +17,7 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    profiles::{FollowProfile, ProfileResponse, UnfollowProfile}, users::ForgotPassword,
+    profiles::{FollowProfile, ProfileResponse, UnfollowProfile}, users::ForgotPassword, lots::{CreateLot, LotResponse, CreateLotOuter},
 };
 pub struct MutationRoot;
 
@@ -126,6 +126,29 @@ impl MutationRoot {
             .send(CreateArticleOuter {
                 auth,
                 article: params,
+            })
+            .await??;
+
+        Ok(res)
+    }
+
+    // create lot
+    async fn create_lot<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: CreateLot,
+    ) -> Result<LotResponse> {
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(CreateLotOuter {
+                auth,
+                lot: params,
             })
             .await??;
 
