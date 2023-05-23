@@ -22,8 +22,8 @@
     let category = "";
     let condition = "";
     let description = "";
-    let images = { thumb: ""};
-    let additional_data = { quantity: 1 };
+    let images = [{ imageUrl: "", isThumbnail: true}];
+    let meta_data = { quantity: 1 };
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
 
@@ -34,9 +34,15 @@
             condition: string;
             tag: string;
             description: string;
-            images: string;
-            data: string;
-        };
+            meta_data: string;
+        },
+        images: {
+            id: string;
+            imageUrl: string;
+            isThumbnail: boolean;
+            createdAt: string;
+            updatedAt: string;
+        }
     }
 
     const CREATE_LOT_MUTATION = gql`
@@ -46,7 +52,7 @@
             $tag: String!
             $description: String!
             $images: JSON!
-            $data: JSON!
+            $meta_data: JSON!
         ) {
             createLot(
                 params: {
@@ -55,7 +61,7 @@
                     tag: $tag
                     description: $description
                     images: $images
-                    data: $data
+                    metaData: $meta_data
                 }
             ) {
                 lot {
@@ -64,8 +70,14 @@
                     condition
                     tag
                     description
-                    images
-                    data
+                    metaData
+                }
+                images {
+                    id
+                    imageUrl
+                    isThumbnail
+                    createdAt
+                    updatedAt
                 }
             }
         }
@@ -81,7 +93,7 @@
                     tag,
                     description,
                     images,
-                    data: additional_data,
+                    meta_data,
                 },
             });
 
@@ -116,9 +128,9 @@
     function handleQuantityInput(event: any) {
         const newValue = parseInt(event.target.value, 10);
         if (newValue < 1) {
-            additional_data.quantity = 1; // Set minimum value as 1
+            meta_data.quantity = 1; // Set minimum value as 1
         } else {
-            additional_data.quantity = newValue;
+            meta_data.quantity = newValue;
         }
     }
 
@@ -326,7 +338,7 @@
                     variant="outlined"
                     style="width: 100%;"
                     class="input-container"
-                    bind:value={images.thumb}
+                    bind:value={images[0].imageUrl}
                 >
                     <svelte:fragment slot="label">
                         <CommonIcon
@@ -339,7 +351,7 @@
             </div>
             <div>
                 <Textfield
-                    bind:value={additional_data.quantity}
+                    bind:value={meta_data.quantity}
                     label="Quantity"
                     type="number"
                     on:input={handleQuantityInput}

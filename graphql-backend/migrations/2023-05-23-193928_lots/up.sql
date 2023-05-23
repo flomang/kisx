@@ -6,8 +6,16 @@ CREATE TABLE lots (
     condition TEXT NOT NULL,
     tag TEXT,
     description TEXT,
-    images JSONB, 
-    data JSONB,
+    meta_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE lot_images (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    lot_id UUID NOT NULL REFERENCES lots (id),
+    image_url TEXT NOT NULL,
+    is_thumbnail BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

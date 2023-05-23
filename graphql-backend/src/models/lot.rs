@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-use crate::schema::lots::{self};
+use crate::schema::{lots::{self}, lot_images};
 
 #[derive(Debug, Queryable, Identifiable)]
 pub struct Lot {
@@ -11,8 +11,18 @@ pub struct Lot {
     pub condition: String,
     pub tag: Option<String>,
     pub description: Option<String>,
-    pub images: Option<serde_json::Value>,
-    pub data: Option<serde_json::Value>,
+    pub meta_data: Option<serde_json::Value>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, Queryable, Identifiable)]
+#[diesel(belongs_to(Lot))]
+pub struct LotImage {
+    pub id: Uuid,
+    pub lot_id: Uuid,
+    pub image_url: String,
+    pub is_thumbnail: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -26,6 +36,14 @@ pub struct NewLot {
     pub condition: String,
     pub tag: Option<String>,
     pub description: Option<String>,
-    pub images: serde_json::Value,
-    pub data: serde_json::Value,
+    pub meta_data: serde_json::Value,
+}
+
+
+#[derive(Debug, Insertable)]
+#[diesel(table_name = lot_images)]
+pub struct NewLotImage {
+    pub lot_id: Uuid,
+    pub image_url: String,
+    pub is_thumbnail: bool,
 }
