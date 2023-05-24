@@ -8,7 +8,7 @@ use crate::{
         AppState,
     },
     error::validation_errors_to_error,
-    utils::auth::authenticate_token,
+    utils::auth::authenticate_token, models::LotWithImages,
 };
 
 use super::{
@@ -17,7 +17,9 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    profiles::{FollowProfile, ProfileResponse, UnfollowProfile}, users::ForgotPassword, lots::{CreateLot, LotResponse, CreateLotOuter},
+    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots},
+    profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
+    users::ForgotPassword,
 };
 pub struct MutationRoot;
 
@@ -39,8 +41,12 @@ impl MutationRoot {
         Ok(res)
     }
 
-    // forgot password 
-    async fn forgot_password<'ctx>(&self, ctx: &Context<'ctx>, params: ForgotPassword) -> Result<bool> {
+    // forgot password
+    async fn forgot_password<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: ForgotPassword,
+    ) -> Result<bool> {
         let state = ctx.data_unchecked::<AppState>();
 
         params
@@ -146,10 +152,7 @@ impl MutationRoot {
         let auth = authenticate_token(state, ctx).await?;
         let res = state
             .db
-            .send(CreateLotOuter {
-                auth,
-                lot: params,
-            })
+            .send(CreateLotAuthenticated { auth, lot: params })
             .await??;
 
         Ok(res)

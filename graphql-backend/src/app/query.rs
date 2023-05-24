@@ -1,13 +1,17 @@
 use crate::{
     app::{users::UserResponse, AppState},
-    utils::auth::authenticate_token,
+    utils::auth::authenticate_token, models::LotWithImages,
 };
 use async_graphql::*;
 
 use super::{
-    articles::{ArticleListResponse, ArticleResponse, ArticlesParams, GetArticle, GetArticles, FeedParams, GetFeed, comments::{GetComments, CommentListResponse}},
+    articles::{
+        comments::{CommentListResponse, GetComments},
+        ArticleListResponse, ArticleResponse, ArticlesParams, FeedParams, GetArticle, GetArticles,
+        GetFeed,
+    },
     profiles::{GetProfile, ProfileResponse},
-    tags::{GetTags, TagsResponse},
+    tags::{GetTags, TagsResponse}, lots::{FilterLots, FilterLotsAuthenticated},
 };
 
 pub struct QueryRoot;
@@ -87,13 +91,7 @@ impl QueryRoot {
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;
 
-        let res = state
-            .db
-            .send(GetFeed {
-                auth,
-                params
-            })
-            .await??;
+        let res = state.db.send(GetFeed { auth, params }).await??;
 
         Ok(res)
     }
@@ -118,7 +116,23 @@ impl QueryRoot {
     // get tags
     async fn get_tags<'ctx>(&self, ctx: &Context<'ctx>) -> Result<TagsResponse> {
         let state = ctx.data_unchecked::<AppState>();
-        let res = state.db.send(GetTags {} ).await??;
+        let res = state.db.send(GetTags {}).await??;
+
+        Ok(res)
+    }
+
+    // get lots
+    async fn get_lots<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: FilterLots,
+    ) -> Result<Vec<LotWithImages>> {
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(FilterLotsAuthenticated { auth, params })
+            .await??;
 
         Ok(res)
     }

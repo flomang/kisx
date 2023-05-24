@@ -24,6 +24,12 @@ pub struct CreateLot {
     pub meta_data: serde_json::Value,
 }
 
+#[derive(Debug)]
+pub struct CreateLotAuthenticated {
+    pub auth: Auth,
+    pub lot: CreateLot,
+}
+
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateLotImage {
@@ -31,11 +37,24 @@ pub struct CreateLotImage {
     pub is_thumbnail: bool,
 }
 
-#[derive(Debug)]
-pub struct CreateLotOuter {
-    pub auth: Auth,
-    pub lot: CreateLot,
+
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FilterLots {
+    pub category: Option<String>,
+    pub condition: Option<String>,
+    pub term: Option<String>,
+    pub page: Option<i32>,
+    pub limit: Option<i32>,
 }
+
+#[derive(Debug)]
+pub struct FilterLotsAuthenticated {
+    pub auth: Auth,
+    pub params: FilterLots,
+}
+
+
 
 // Server Responses ↓
 

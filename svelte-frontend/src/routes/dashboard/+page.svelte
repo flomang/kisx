@@ -22,10 +22,16 @@
     let category = "";
     let condition = "";
     let description = "";
-    let images = [{ imageUrl: "", isThumbnail: true}];
+    let images = [{ imageUrl: "", isThumbnail: true }];
     let meta_data = { quantity: 1 };
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+
+    let searchCategory = "something"
+    let searchCondition = "something"
+    let term = "term";
+    let page = 1;
+    let limit = 10;
 
     interface LotResult {
         lot: {
@@ -35,15 +41,34 @@
             tag: string;
             description: string;
             meta_data: string;
-        },
+        };
         images: {
             id: string;
             imageUrl: string;
             isThumbnail: boolean;
             createdAt: string;
             updatedAt: string;
-        }
+        };
     }
+
+    onMount(async () => {
+        try {
+            const { data } = await client.query<LotResult[]>({
+                query: QUERY_LOTS,
+                variables: {
+                    category: searchCategory,
+                    condition: searchCondition,
+                    term,
+                    page,
+                    limit,
+                },
+            });
+
+            console.log(data);
+        } catch (error: any) {
+            console.log(JSON.stringify(error));
+        }
+    });
 
     const CREATE_LOT_MUTATION = gql`
         mutation CreateLot(
@@ -83,6 +108,45 @@
         }
     `;
 
+    const QUERY_LOTS = gql`
+        query GetLots(
+            $category: String!
+            $condition: String!
+            $term: String!
+            $page: Int!
+            $limit: Int!
+        ) {
+            getLots(
+                params: {
+                    category: $category
+                    condition: $condition
+                    term: $term
+                    page: $page
+                    limit: $limit
+                }
+            ) {
+                lot {
+                    id
+                    category
+                    condition
+                    tag
+                    description
+                    metaData
+                    createdAt
+                    updatedAt
+                }
+                images {
+                    id
+                    lotId
+                    imageUrl
+                    isThumbnail
+                    createdAt
+                    updatedAt
+                }
+            }
+        }
+    `;
+
     const handleAddLot = async () => {
         try {
             const { data } = await client.mutate<LotResult>({
@@ -98,30 +162,9 @@
             });
 
             console.log(data);
-            // const { data } = data?.lot ?? {};
-            // if (token) {
-            //     success = true;
-            //     //    addToken(token);
-            //     //    goto("/home");
-            // }
+         
         } catch (error: any) {
-            //message = error.message;
             console.log(JSON.stringify(error));
-            // if (error.message === "Validation Errors" && error.graphQLErrors) {
-            //     const validationErrors =
-            //         error.graphQLErrors[0].extensions.errors;
-            //     validationErrors.forEach((e: any) => {
-            //         const { key, message } = e;
-            //         console.log(key, message);
-            //         if (key == "username") {
-            //             usernameError = message;
-            //         } else if (key == "email") {
-            //             emailError = message;
-            //         } else if (key == "password") {
-            //             passwordError = message;
-            //         }
-            //     });
-            // }
         }
     };
 
@@ -345,7 +388,7 @@
                             class="material-icons"
                             style="font-size: 1em; line-height: normal; vertical-align: top;"
                             >image</CommonIcon
-                        > thumb url 
+                        > thumb url
                     </svelte:fragment>
                 </Textfield>
             </div>
@@ -357,7 +400,7 @@
                     on:input={handleQuantityInput}
                 />
             </div>
-         
+
             <div class="button-container">
                 <Button
                     variant="raised"
