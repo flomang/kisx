@@ -13,7 +13,7 @@ CREATE TABLE lots (
 
 CREATE TABLE lot_images (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    lot_id UUID NOT NULL REFERENCES lots (id),
+    lot_id UUID NOT NULL REFERENCES lots (id) ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     is_thumbnail BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

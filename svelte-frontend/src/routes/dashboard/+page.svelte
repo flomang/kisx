@@ -27,11 +27,19 @@
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
 
-    let searchCategory = "something"
-    let searchCondition = "something"
+    let searchCategory = "something";
+    let searchCondition = "something";
     let term = "term";
     let page = 1;
     let limit = 10;
+
+    interface LotImage {
+        id: string;
+        imageUrl: string;
+        isThumbnail: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }
 
     interface LotResult {
         lot: {
@@ -42,18 +50,23 @@
             description: string;
             meta_data: string;
         };
-        images: {
-            id: string;
-            imageUrl: string;
-            isThumbnail: boolean;
-            createdAt: string;
-            updatedAt: string;
-        };
+        images: LotImage[]; 
+    }
+
+    interface LotSearchResult {
+        getLots: LotResult[];
+    }
+
+    interface Card {
+        id: number;
+        imageUrl: string;
+        title: string;
+        setID: string;
     }
 
     onMount(async () => {
         try {
-            const { data } = await client.query<LotResult[]>({
+            const { data } = await client.query<LotSearchResult>({
                 query: QUERY_LOTS,
                 variables: {
                     category: searchCategory,
@@ -64,7 +77,23 @@
                 },
             });
 
-            console.log(data);
+            let user_lots = data.getLots;
+            // for each lot create a card
+            let cards = user_lots.map((lot) => {
+                let image = lot.images.find((image: { isThumbnail: any }) => {
+                    if (image.isThumbnail) {
+                        return true;
+                    }
+                });
+
+                return {
+                    id: lot.lot.id,
+                    imageUrl: image ? image.imageUrl : "stock-image.png",
+                    title: lot.lot.description,
+                    setID: lot.lot.tag,
+                };
+            });
+            // pins = cards;
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
@@ -160,9 +189,13 @@
                     meta_data,
                 },
             });
-
             console.log(data);
-         
+            category = "";
+            condition = "";
+            tag = "";
+            description = "";
+            images = [{ imageUrl: "", isThumbnail: true }];
+            meta_data = { quantity: 1 };
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
@@ -460,41 +493,5 @@
 
     .right {
         float: right;
-    }
-
-    /* :global(img) {
-        opacity: 0.9;
-        transition: all 0.2s;
-    } */
-    /* :global(img):hover {
-        opacity: 1;
-        transform: scale(1.04);
-    } */
-
-    .pin-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-    }
-
-    .pin {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 8px;
-        background-color: white;
-        overflow: hidden;
-        transition: all 0.2s;
-    }
-
-    .pin:hover {
-        opacity: 1;
-        transform: scale(1.04);
-    }
-
-    .pin img {
-        width: 100%;
-        height: 100%;
-        object-fit: scale-down;
     }
 </style>
