@@ -26,12 +26,16 @@
     let meta_data = { quantity: 1 };
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+    let pins: Card[] = [];
 
     let searchCategory = "something";
     let searchCondition = "something";
     let term = "term";
     let page = 1;
     let limit = 10;
+
+    let response;
+    let open = false;
 
     interface LotImage {
         id: string;
@@ -50,7 +54,11 @@
             description: string;
             meta_data: string;
         };
-        images: LotImage[]; 
+        images: LotImage[];
+    }
+
+    interface LotCreateResult {
+        createLot: LotResult;
     }
 
     interface LotSearchResult {
@@ -58,7 +66,7 @@
     }
 
     interface Card {
-        id: number;
+        id: string;
         imageUrl: string;
         title: string;
         setID: string;
@@ -93,7 +101,7 @@
                     setID: lot.lot.tag,
                 };
             });
-            // pins = cards;
+            pins = cards;
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
@@ -178,7 +186,7 @@
 
     const handleAddLot = async () => {
         try {
-            const { data } = await client.mutate<LotResult>({
+            const { data } = await client.mutate<LotCreateResult>({
                 mutation: CREATE_LOT_MUTATION,
                 variables: {
                     category,
@@ -189,13 +197,34 @@
                     meta_data,
                 },
             });
-            console.log(data);
-            category = "";
-            condition = "";
-            tag = "";
-            description = "";
-            images = [{ imageUrl: "", isThumbnail: true }];
-            meta_data = { quantity: 1 };
+
+            let lot = data?.createLot.lot;
+            let image = data?.createLot.images.find(
+                (image: { isThumbnail: any }) => {
+                    if (image.isThumbnail) {
+                        return true;
+                    }
+                }
+            );
+
+            if (lot != null) {
+                let card = {
+                    id: lot.id,
+                    imageUrl: image ? image.imageUrl : "stock-image.png",
+                    title: lot.description,
+                    setID: lot.tag,
+                };
+                // append card to end of pins
+                pins = [...pins, card];
+
+                // clear values
+                category = "";
+                condition = "";
+                tag = "";
+                description = "";
+                images = [{ imageUrl: "", isThumbnail: true }];
+                meta_data = { quantity: 1 };
+            }
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
@@ -209,73 +238,7 @@
             meta_data.quantity = newValue;
         }
     }
-
-    let pins = [
-        {
-            id: 1,
-            imageUrl: "75192.webp",
-            title: "Millennium Falcon",
-            setID: "75192",
-        },
-        {
-            id: 4,
-            imageUrl: "75345.webp",
-            title: "501st Clone Troopers Battle Pack",
-            setID: "75345",
-        },
-        {
-            id: 2,
-            imageUrl: "75337.webp",
-            title: "AT-TE™ Walker",
-            setID: "75337",
-        },
-        {
-            id: 3,
-            imageUrl: "40557.webp",
-            title: "Defense of Hoth",
-            setID: "40557",
-        },
-        {
-            id: 5,
-            imageUrl: "10305.webp",
-            title: "Lion Knight's Castle",
-            setID: "10305",
-        },
-        {
-            id: 6,
-            imageUrl: "21325.webp",
-            title: "Medieval Blacksmith",
-            setID: "21325",
-        },
-        {
-            id: 7,
-            imageUrl: "6086.png",
-            title: "Black Knight's Castle",
-            setID: "6086",
-        },
-        {
-            id: 8,
-            imageUrl: "castle-forest.jpeg",
-            title: "Castle in the Forest",
-            setID: "910001-1",
-        },
-        { id: 9, imageUrl: "fig1.jpeg", title: "Space Police" },
-        { id: 10, imageUrl: "fig2.jpeg", title: "Bee Keeper" },
-        {
-            id: 11,
-            imageUrl: "6987.webp",
-            title: "Blacktron Message Intercept Base",
-            setID: "6987",
-        },
-        {
-            id: 12,
-            imageUrl: "bonsai-moc.png",
-            title: "Master Ogway's Bonsai Tree",
-        },
-        // Add more pin objects as needed
-    ];
-    let response;
-    let open = false;
+   
 </script>
 
 <Dialog
