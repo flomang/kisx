@@ -15,11 +15,9 @@ pub struct CreateLot {
     pub category: String,
     #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
     pub condition: String,
-    #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
     pub tag: String,
     #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
     pub description: String,
-    // pub images: serde_json::Value,
     pub images: Vec<CreateLotImage>,
     pub meta_data: serde_json::Value,
 }
