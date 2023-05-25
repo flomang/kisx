@@ -40,7 +40,8 @@
                     id
                     category
                     condition
-                    tag
+                    title
+                    externalId
                     description
                     metaData
                     createdAt
@@ -84,7 +85,7 @@
                 return {
                     id: lot.lot.id,
                     imageUrl: image ? image.imageUrl : "stock-image.png",
-                    title: lot.lot.description,
+                    title: lot.lot.title,
                     setID: lot.lot.externalId,
                     category: lot.lot.category,
                     condition: lot.lot.condition,
