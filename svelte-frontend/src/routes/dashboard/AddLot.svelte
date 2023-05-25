@@ -11,7 +11,8 @@
 
     export let cards: Card[] = [];
 
-    let tag = "";
+    let title = "";
+    let setNumber = "";
     let category = "";
     let condition = "";
     let description = "";
@@ -28,7 +29,8 @@
         mutation CreateLot(
             $category: String!
             $condition: String!
-            $tag: String!
+            $title: String!
+            $externalId: String!
             $description: String!
             $images: JSON!
             $meta_data: JSON!
@@ -37,7 +39,8 @@
                 params: {
                     category: $category
                     condition: $condition
-                    tag: $tag
+                    title: $title
+                    externalId: $externalId
                     description: $description
                     images: $images
                     metaData: $meta_data
@@ -47,7 +50,8 @@
                     id
                     category
                     condition
-                    tag
+                    title
+                    externalId
                     description
                     metaData
                 }
@@ -69,7 +73,8 @@
                 variables: {
                     category,
                     condition,
-                    tag,
+                    title,
+                    externalId: setNumber,
                     description,
                     images,
                     meta_data,
@@ -89,11 +94,10 @@
                 let card = {
                     id: lot.id,
                     imageUrl: image ? image.imageUrl : "stock-image.png",
-                    title: lot.description,
-                    setID: lot.tag,
+                    title: lot.title,
+                    setID: lot.externalId,
                     category: lot.category,
                     condition: lot.condition,
-                    tag: lot.tag,
                     description: lot.description,
                     meta_data: lot.meta_data,
                 };
@@ -101,9 +105,10 @@
                 cards = [...cards, card];
 
                 // clear values
+                title = "";
                 category = "";
                 condition = "";
-                tag = "";
+                setNumber = "";
                 description = "";
                 images = [{ imageUrl: "", isThumbnail: true }];
                 meta_data = { quantity: 1 };
@@ -160,21 +165,39 @@
             variant="outlined"
             style="width: 100%;"
             class="input-container"
-            bind:value={tag}
+            bind:value={title}
+        >
+            <svelte:fragment slot="label">
+                <CommonIcon
+                    class="material-icons"
+                    style="font-size: 1em; line-height: normal; vertical-align: top;"
+                    >title</CommonIcon
+                > Title 
+            </svelte:fragment>
+            <HelperText slot="helper" persistent={true}
+                >title of set or part</HelperText
+            >
+        </Textfield>
+    </div>
+    <div class="input-container">
+        <Textfield
+            variant="outlined"
+            style="width: 100%;"
+            class="input-container"
+            bind:value={setNumber}
         >
             <svelte:fragment slot="label">
                 <CommonIcon
                     class="material-icons"
                     style="font-size: 1em; line-height: normal; vertical-align: top;"
                     >numbers</CommonIcon
-                > Lot Tag
+                > Set Number
             </svelte:fragment>
             <HelperText slot="helper" persistent={true}
-                >title, part name, set number, etc</HelperText
+                >set number or custom tag</HelperText
             >
         </Textfield>
     </div>
-
     <div class="input-container">
         <Textfield
             textarea
@@ -192,6 +215,7 @@
             <CharacterCounter slot="internalCounter">0 / 100</CharacterCounter>
         </Textfield>
     </div>
+    
     <div class="input-container">
         <Textfield
             variant="outlined"

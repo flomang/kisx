@@ -85,10 +85,9 @@
                     id: lot.lot.id,
                     imageUrl: image ? image.imageUrl : "stock-image.png",
                     title: lot.lot.description,
-                    setID: lot.lot.tag,
+                    setID: lot.lot.externalId,
                     category: lot.lot.category,
                     condition: lot.lot.condition,
-                    tag: lot.lot.tag,
                     description: lot.lot.description,
                     meta_data: lot.lot.meta_data,
                 };

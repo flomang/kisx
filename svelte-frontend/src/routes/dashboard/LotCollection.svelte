@@ -6,7 +6,6 @@
         setID: string;
         category: string;
         condition: string;
-        tag: string;
         description: string;
         meta_data: string;
     }
@@ -24,7 +23,8 @@
             id: string;
             category: string;
             condition: string;
-            tag: string;
+            title: string;
+            externalId: string;
             description: string;
             meta_data: string;
         };
@@ -84,31 +84,18 @@
                             <b>Set ID:</b>
                             {selectedLot.setID}
                         </div>
-                        <div>
-                            <b>Category:</b>
-                            {selectedLot.category}
-                        </div>
-                        <div>
-                            <b>Condition:</b>
-                            {selectedLot.condition}
-                        </div>
-                        <div>
-                            <b>Tag:</b>
-                            {selectedLot.tag}
-                        </div>
-
                     {/if}
                     <div>
-                        <b>Description:</b>
+                        <b>Category:</b>
+                        {selectedLot.category}
+                    </div>
+                    <div>
+                        <b>Condition:</b>
+                        {selectedLot.condition}
+                    </div>
+                    <div class="description">
                         {selectedLot.description}
                     </div>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                    in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                    nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                    sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </Cell>
             </LayoutGrid>
         </Content>
@@ -168,5 +155,9 @@
         width: 100%;
         height: 100%;
         background-color: #fff;
+    }
+
+    .description {
+        margin-top: 10px;
     }
 </style>

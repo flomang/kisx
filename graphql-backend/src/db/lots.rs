@@ -23,8 +23,9 @@ impl Handler<CreateLotAuthenticated> for DbExecutor {
             user_id: msg.auth.user.id,
             category: msg.lot.category.clone(),
             condition: msg.lot.condition.clone(),
-            tag: Some(msg.lot.tag),
-            description: Some(msg.lot.description),
+            title: msg.lot.title.clone(),
+            external_id: msg.lot.external_id.clone(),
+            description: msg.lot.description,
             meta_data: serde_json::to_value(msg.lot.meta_data).unwrap(),
         };
 

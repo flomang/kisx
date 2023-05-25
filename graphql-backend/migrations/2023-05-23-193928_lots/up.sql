@@ -4,8 +4,9 @@ CREATE TABLE lots (
     user_id UUID NOT NULL REFERENCES users (id),
     category TEXT NOT NULL,
     condition TEXT NOT NULL,
-    tag TEXT,
-    description TEXT,
+    title TEXT NOT NULL,
+    external_id TEXT,
+    description TEXT NOT NULL,
     meta_data JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL

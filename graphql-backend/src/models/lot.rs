@@ -13,8 +13,9 @@ pub struct Lot {
     pub user_id: Uuid,
     pub category: String,
     pub condition: String,
-    pub tag: Option<String>,
-    pub description: Option<String>,
+    pub title: String,
+    pub external_id: Option<String>,
+    pub description: String,
     pub meta_data: Option<serde_json::Value>,
     #[graphql(skip)]
     pub created_at: NaiveDateTime,
@@ -85,8 +86,9 @@ pub struct NewLot {
     pub user_id: Uuid,
     pub category: String,
     pub condition: String,
-    pub tag: Option<String>,
-    pub description: Option<String>,
+    pub title: String,
+    pub external_id: Option<String>,
+    pub description: String,
     pub meta_data: serde_json::Value,
 }
 

@@ -15,7 +15,9 @@ pub struct CreateLot {
     pub category: String,
     #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
     pub condition: String,
-    pub tag: String,
+    #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
+    pub title: String,
+    pub external_id: Option<String>,
     #[validate(length(min = 1, message = "fails validation - cannot be empty"))]
     pub description: String,
     pub images: Vec<CreateLotImage>,
@@ -63,8 +65,9 @@ pub struct LotInner {
     pub user_id: String,
     pub category: String,
     pub condition: String,
-    pub tag: Option<String>,
-    pub description: Option<String>,
+    pub title: String,
+    pub external_id: Option<String>,
+    pub description: String,
     pub meta_data: Option<serde_json::Value>,
     //pub images: Vec<LotImageInner>,
     pub created_at: CustomDateTime,
@@ -106,7 +109,8 @@ impl From<Lot> for LotInner {
             user_id: lot.user_id.to_string(),
             category: lot.category,
             condition: lot.condition,
-            tag: lot.tag,
+            title: lot.title,
+            external_id: lot.external_id,
             description: lot.description,
             meta_data: lot.meta_data,
             created_at: CustomDateTime(lot.created_at),
