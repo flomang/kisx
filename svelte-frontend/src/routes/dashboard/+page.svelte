@@ -9,14 +9,8 @@
     import Select, { Option } from "@smui/select";
     import CharacterCounter from "@smui/textfield/character-counter";
     import Button, { Label } from "@smui/button";
-    import ImageList, {
-        Item,
-        Image,
-        Supporting,
-        Label as ImageLabel,
-    } from "@smui/image-list";
-    import IconButton, { Icon } from "@smui/icon-button";
-    import Dialog, { Header, Title, Content, Actions } from "@smui/dialog";
+    import LotCollection from './LotCollection.svelte'
+    import type { Card } from './LotCollection.svelte'
 
     let tag = "";
     let category = "";
@@ -63,13 +57,6 @@
 
     interface LotSearchResult {
         getLots: LotResult[];
-    }
-
-    interface Card {
-        id: string;
-        imageUrl: string;
-        title: string;
-        setID: string;
     }
 
     onMount(async () => {
@@ -241,67 +228,16 @@
    
 </script>
 
-<Dialog
-    bind:open
-    scrimClickAction=""
-    escapeKeyAction=""
-    aria-labelledby="mandatory-title"
-    aria-describedby="mandatory-content"
-    fullscreen
->
-    <!-- <Title id="mandatory-title">Webpage Troll</Title> -->
-    <Header>
-        <Title id="over-fullscreen-title">Item Info</Title>
-        <IconButton action="close" class="material-icons">close</IconButton>
-    </Header>
-    <Content id="mandatory-content">
-        Before you continue on this page, you must answer my riddle of age. When
-        Alice was six her brother was half, now Alice is 90, you do the math.
-        <br /><br />
-        How old is Alice's brother now?
-    </Content>
-    <Actions>
-        <Button
-            on:click={() => (response = "Wrong answer. Thrown in the lake.")}
-        >
-            <Label>Sell it!</Label>
-        </Button>
-    </Actions>
-</Dialog>
-
 <LayoutGrid>
     <Cell span={9}>
-        <ImageList class="my-image-list-masonry" masonry>
-            {#each pins as pin (pin.id)}
-                <Item on:click={() => (open = true)}>
-                    <Image src={pin.imageUrl} alt="Image {pin.id}" />
-                    <Supporting>
-                        <ImageLabel>
-                            <b>{pin.title}</b>
-                            {#if pin.setID}
-                                <div class="label">
-                                    {pin.setID}
-                                </div>
-                            {/if}
-                            <div class="actions">
-                                <div class="right">
-                                    <Icon class="material-icons"
-                                        >favorite_border</Icon
-                                    >
-                                    <Icon class="material-icons">share</Icon>
-                                    <Icon class="material-icons">more_vert</Icon
-                                    >
-                                </div>
-                            </div>
-                        </ImageLabel>
-                    </Supporting>
-                </Item>
-            {/each}
-        </ImageList>
+        <LotCollection lots={pins} />
     </Cell>
 
     <Cell span={3}>
         <div class="sell-it">
+            <Button on:click={() => (open = !open)}
+                ><Label>Toggle Drawer</Label></Button
+              >
             <h1>Add Something</h1>
             <div class="select-container">
                 <div class="input-type">
