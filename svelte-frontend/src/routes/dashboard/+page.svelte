@@ -122,7 +122,7 @@
                     </IconButton>
                 </Header>
                 <Content>
-                    <CollectionStats />
+                    <CollectionStats total_lots={cards.length}/>
                 </Content>
             </Panel>
             <Panel bind:open={filterPanelOpen}>
