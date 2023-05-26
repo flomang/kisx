@@ -7,6 +7,7 @@
     import AddLot from "./AddLot.svelte";
     import type { Card, LotResult } from "./LotCollection.svelte";
     import LotFilter from "./LotFilter.svelte";
+    import CollectionStats from "./CollectionStats.svelte";
     import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
     import IconButton, { Icon } from "@smui/icon-button";
 
@@ -16,6 +17,7 @@
     let term = "term";
     let page = 1;
     let limit = 10;
+    let collectionStats = true;
     let filterPanelOpen = false;
     let addPanelOpen = false;
 
@@ -111,6 +113,18 @@
 
     <Cell span={3}>
         <Accordion multiple>
+            <Panel bind:open={collectionStats}>
+                <Header
+                    ><b>Collection Stats</b>
+                    <IconButton slot="icon" toggle pressed={collectionStats}>
+                        <Icon class="material-icons" on>expand_less</Icon>
+                        <Icon class="material-icons">expand_more</Icon>
+                    </IconButton>
+                </Header>
+                <Content>
+                    <CollectionStats />
+                </Content>
+            </Panel>
             <Panel bind:open={filterPanelOpen}>
                 <Header
                     ><b>Filter Collection</b>
