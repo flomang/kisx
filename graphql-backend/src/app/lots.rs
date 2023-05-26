@@ -30,6 +30,12 @@ pub struct CreateLotAuthenticated {
     pub lot: CreateLot,
 }
 
+#[derive(Debug)]
+pub struct DeleteLotAuthenticated {
+    pub auth: Auth,
+    pub lot_id: Uuid,
+}
+
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateLotImage {

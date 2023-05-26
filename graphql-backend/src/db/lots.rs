@@ -1,5 +1,5 @@
 use crate::{
-    app::lots::FilterLotsAuthenticated,
+    app::lots::{DeleteLotAuthenticated, FilterLotsAuthenticated},
     models::{Lot, LotImage, LotWithImages, NewLot, NewLotImage},
     prelude::*,
 };
@@ -62,6 +62,27 @@ impl Handler<CreateLotAuthenticated> for DbExecutor {
     }
 }
 
+impl Message for DeleteLotAuthenticated {
+    type Result = Result<usize>;
+}
+
+impl Handler<DeleteLotAuthenticated> for DbExecutor {
+    type Result = Result<usize>;
+
+    fn handle(&mut self, msg: DeleteLotAuthenticated, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::lots::dsl::*;
+
+        // delete lot where user_id = msg.auth.user.id and lot_id = msg.lot.id
+        let conn = &mut self.0.get()?;
+        let deleted = diesel::delete(
+            lots.filter(user_id.eq(msg.auth.user.id))
+                .filter(id.eq(msg.lot_id)),
+        )
+        .execute(conn)?;
+        Ok(deleted)
+    }
+}
+
 impl Message for FilterLotsAuthenticated {
     type Result = Result<Vec<LotWithImages>>;
 }
@@ -70,7 +91,7 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
     type Result = Result<Vec<LotWithImages>>;
 
     fn handle(&mut self, msg: FilterLotsAuthenticated, _: &mut Self::Context) -> Self::Result {
-        use crate::schema::{lots::dsl::*};
+        use crate::schema::lots::dsl::*;
 
         let conn = &mut self.0.get()?;
 

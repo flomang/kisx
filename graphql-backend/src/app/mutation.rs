@@ -1,4 +1,5 @@
 use async_graphql::*;
+use uuid::Uuid;
 use validator::{Validate, ValidateArgs};
 //use super::MyResult as Result;
 
@@ -8,7 +9,7 @@ use crate::{
         AppState,
     },
     error::validation_errors_to_error,
-    utils::auth::authenticate_token, models::LotWithImages,
+    utils::auth::authenticate_token, models::{LotWithImages, Lot},
 };
 
 use super::{
@@ -17,7 +18,7 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots},
+    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots, DeleteLotAuthenticated},
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     users::ForgotPassword,
 };
@@ -153,6 +154,23 @@ impl MutationRoot {
         let res = state
             .db
             .send(CreateLotAuthenticated { auth, lot: params })
+            .await??;
+
+        Ok(res)
+    }
+
+    async fn delete_lot<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        lot_id: String,
+    ) -> Result<usize> {
+
+        let lot_id = lot_id.parse::<Uuid>()?;
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(DeleteLotAuthenticated { auth, lot_id })
             .await??;
 
         Ok(res)

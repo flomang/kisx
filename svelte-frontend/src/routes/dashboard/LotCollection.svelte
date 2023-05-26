@@ -1,4 +1,7 @@
 <script lang="ts" context="module">
+    import { gql } from "@apollo/client/core";
+    import client from "../../lib/apollo";
+
     export interface Card {
         id: string;
         imageUrl: string;
@@ -46,8 +49,37 @@
 
     export let lots: Card[] = [];
     let open = false;
-    let response = "";
+    let confirm = false;
     let selectedLot: Card;
+
+    interface DeleteLotResult {
+        deleteLot: number;
+    }
+
+    const DELETE_LOT_MUTATION = gql`
+        mutation RemoveLot($lotID: String!) {
+            deleteLot(lotId: $lotID)
+        }
+    `;
+
+    const handleDeleteLot = async (lot_id: string) => {
+        try {
+            const { data } = await client.mutate<DeleteLotResult>({
+                mutation: DELETE_LOT_MUTATION,
+                variables: {
+                    lotID: lot_id,
+                },
+            });
+        
+            if (data?.deleteLot == 1) {
+                lots = lots.filter((lot) => lot.id != lot_id);
+                confirm = false;
+                open = false;
+            }
+        } catch (error: any) {
+            console.log(JSON.stringify(error));
+        }
+    };
 
     function handleOpen(lot: Card) {
         selectedLot = lot;
@@ -55,20 +87,18 @@
     }
 </script>
 
-<Dialog
-    bind:open
-    scrimClickAction=""
-    escapeKeyAction=""
-    aria-labelledby="mandatory-title"
-    aria-describedby="mandatory-content"
-    fullscreen
->
-    {#if selectedLot != null}
+{#if selectedLot != null}
+    <Dialog
+        bind:open
+        aria-labelledby="over-fullscreen-title"
+        aria-describedby="over-fullscreen-content"
+        fullscreen
+    >
         <Header>
             <Title id="over-fullscreen-title">{selectedLot.title}</Title>
             <IconButton action="close" class="material-icons">close</IconButton>
         </Header>
-        <Content id="mandatory-content">
+        <Content id="over-fullscreen-content">
             <LayoutGrid>
                 <Cell span={9}>
                     <img
@@ -96,19 +126,42 @@
                     <div class="description">
                         {selectedLot.description}
                     </div>
+                    <Button variant="raised" on:click={() => (confirm = true)}>
+                        <Label>Delete</Label>
+                    </Button>
                 </Cell>
             </LayoutGrid>
         </Content>
+
         <Actions>
-            <Button
-                on:click={() =>
-                    (response = "Wrong answer. Thrown in the lake.")}
-            >
+            <Button>
                 <Label>Sell it!</Label>
             </Button>
         </Actions>
-    {/if}
-</Dialog>
+    </Dialog>
+
+    <Dialog
+        bind:open={confirm}
+        aria-labelledby="over-fullscreen-confirmation-title"
+        aria-describedby="over-fullscreen-confirmation-content"
+    >
+        <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+        <Header>
+            <Title id="over-fullscreen-confirmation-title">Confirm</Title>
+        </Header>
+        <Content id="over-fullscreen-confirmation-content">
+            Are you sure you want to delete this?
+        </Content>
+        <Actions>
+            <Button>
+                <Label>No</Label>
+            </Button>
+            <Button on:click={() => handleDeleteLot(selectedLot.id)}>
+                <Label>Yes</Label>
+            </Button>
+        </Actions>
+    </Dialog>
+{/if}
 
 <ImageList class="my-image-list-masonry" masonry>
     {#each lots as lot (lot.id)}
@@ -139,12 +192,6 @@
     .label {
         margin-top: -10px;
         font-size: 0.8em;
-    }
-
-    .actions {
-        display: flex;
-        justify-content: right;
-        width: 100%;
     }
 
     .right {
