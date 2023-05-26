@@ -21,6 +21,8 @@
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
 
+    $: enabled = title != "" && category != undefined && condition != undefined && description != ""; 
+
     interface CreateLotResult {
         createLot: LotResult;
     }
@@ -129,7 +131,6 @@
 </script>
 
 <div class="content">
-    <h1>Add Something</h1>
     <div class="select-container">
         <div class="input-type">
             <Select style="width: 100%;" bind:value={category}>
@@ -245,18 +246,18 @@
         <Button
             variant="raised"
             style="width: 100%; height: 100%;"
+            disabled={!enabled}
             on:click={handleAddLot}
         >
-            <Label>Mint it!</Label>
+            <Label>Add it!</Label>
         </Button>
     </div>
 </div>
 
 <style>
     .content {
-        height: 100px;
-        width: 350px;
-        float: right;
+        width: 100%;
+        height: 100%;
     }
     .select-container {
         display: flex;

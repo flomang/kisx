@@ -3,9 +3,12 @@
     import client from "../../lib/apollo";
     import { onMount } from "svelte";
     import LayoutGrid, { Cell } from "@smui/layout-grid";
-    import LotCollection from './LotCollection.svelte'
+    import LotCollection from "./LotCollection.svelte";
     import AddLot from "./AddLot.svelte";
-    import type { Card, LotResult } from './LotCollection.svelte'
+    import type { Card, LotResult } from "./LotCollection.svelte";
+    import LotFilter from "./LotFilter.svelte";
+    import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
+    import IconButton, { Icon } from "@smui/icon-button";
 
     let cards: Card[] = [];
     let searchCategory = "something";
@@ -13,6 +16,8 @@
     let term = "term";
     let page = 1;
     let limit = 10;
+    let filterPanelOpen = false;
+    let addPanelOpen = false;
 
     interface SearchResult {
         // array of lot results
@@ -74,7 +79,7 @@
 
             let user_lots = data.getLots;
 
-            // map lots to cards 
+            // map lots to cards
             cards = user_lots.map((lot) => {
                 let image = lot.images.find((image: { isThumbnail: any }) => {
                     if (image.isThumbnail) {
@@ -105,7 +110,32 @@
     </Cell>
 
     <Cell span={3}>
-        <AddLot bind:cards={cards} /> 
+        <Accordion multiple>
+            <Panel bind:open={filterPanelOpen}>
+                <Header
+                    ><b>Filter Collection</b>
+                    <IconButton slot="icon" toggle pressed={filterPanelOpen}>
+                        <Icon class="material-icons" on>expand_less</Icon>
+                        <Icon class="material-icons">expand_more</Icon>
+                    </IconButton>
+                </Header>
+                <Content>
+                    <LotFilter />
+                </Content>
+            </Panel>
+            <Panel bind:open={addPanelOpen}>
+                <Header
+                    ><b>Add Something</b>
+                    <IconButton slot="icon" toggle pressed={addPanelOpen}>
+                        <Icon class="material-icons" on>expand_less</Icon>
+                        <Icon class="material-icons">expand_more</Icon>
+                    </IconButton>
+                </Header>
+                <Content>
+                    <AddLot bind:cards />
+                </Content>
+            </Panel>
+        </Accordion>
     </Cell>
 </LayoutGrid>
 
