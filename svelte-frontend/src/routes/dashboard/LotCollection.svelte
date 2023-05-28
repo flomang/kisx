@@ -36,16 +36,32 @@
 </script>
 
 <script lang="ts">
-    import Button, { Label } from "@smui/button";
+    import Button from "@smui/button";
     import ImageList, {
         Item,
         Image,
         Supporting,
         Label as ImageLabel,
     } from "@smui/image-list";
-    import IconButton, { Icon } from "@smui/icon-button";
+    import IconButton, { Icon as ButtonIcon } from "@smui/icon-button";
     import Dialog, { Header, Title, Content, Actions } from "@smui/dialog";
     import LayoutGrid, { Cell } from "@smui/layout-grid";
+    import SegmentedButton, {
+        Segment,
+        Icon,
+        Label,
+    } from "@smui/segmented-button";
+
+    import { Svg } from '@smui/common';
+    import {
+        mdiDelete,
+        mdiTextBoxEdit,
+    } from "@mdi/js";
+
+    let actions = [
+        { name: "Delete", icon: mdiDelete, action: handleConfirm },
+        { name: "Edit", icon: mdiTextBoxEdit, action: handleEdit },
+    ];
 
     export let lots: Card[] = [];
     let open = false;
@@ -70,7 +86,7 @@
                     lotID: lot_id,
                 },
             });
-        
+
             if (data?.deleteLot == 1) {
                 lots = lots.filter((lot) => lot.id != lot_id);
                 confirm = false;
@@ -80,6 +96,14 @@
             console.log(JSON.stringify(error));
         }
     };
+
+    function handleEdit() {
+        alert("edit");
+    }
+
+    function handleConfirm() {
+        confirm = true;
+    }
 
     function handleOpen(lot: Card) {
         selectedLot = lot;
@@ -109,6 +133,28 @@
                 </Cell>
 
                 <Cell span={3}>
+                    <div class="action-bar">
+                        <SegmentedButton segments={actions} let:segment>
+                            <Segment
+                                {segment}
+                                on:click$preventDefault={() => {
+                                    segment.action();
+                                }}
+                            >
+                                <Icon
+                                    component={Svg}
+                                    style="width: 1em; height: auto;"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        fill="currentColor"
+                                        d={segment.icon}
+                                    />
+                                </Icon>
+                                <Label>{segment.name}</Label>
+                            </Segment>
+                        </SegmentedButton>
+                    </div>
                     {#if selectedLot.setID}
                         <div>
                             <b>Set ID:</b>
@@ -126,17 +172,12 @@
                     <div class="description">
                         {selectedLot.description}
                     </div>
-                    <Button variant="raised" on:click={() => (confirm = true)}>
-                        <Label>Delete</Label>
-                    </Button>
+               
                 </Cell>
             </LayoutGrid>
         </Content>
 
         <Actions>
-            <Button>
-                <Label>Sell it!</Label>
-            </Button>
         </Actions>
     </Dialog>
 
@@ -177,9 +218,9 @@
                     {/if}
                     <div class="actions">
                         <div class="right">
-                            <Icon class="material-icons">favorite_border</Icon>
-                            <Icon class="material-icons">share</Icon>
-                            <Icon class="material-icons">more_vert</Icon>
+                            <ButtonIcon class="material-icons">favorite_border</ButtonIcon>
+                            <ButtonIcon class="material-icons">share</ButtonIcon>
+                            <ButtonIcon class="material-icons">more_vert</ButtonIcon>
                         </div>
                     </div>
                 </ImageLabel>
@@ -206,5 +247,19 @@
 
     .description {
         margin-top: 10px;
+    }
+
+    .action-bar {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .action-bar > :global(*) {
+        margin-right: 18px;
+        margin-bottom: 18px;
+    }
+
+    .action-bar :global(svg:focus) {
+        outline: 0;
     }
 </style>

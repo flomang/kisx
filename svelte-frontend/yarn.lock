@@ -402,6 +402,20 @@
     "@material/theme" "^14.0.0"
     tslib "^2.1.0"
 
+"@material/segmented-button@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/segmented-button/-/segmented-button-14.0.0.tgz"
+  integrity sha512-6es7PPNX3T3h7bOLyb8L38hMoTXqBs5XX8XCKycKZG2Dm4stac/yYMKKO/q3MOn36t37s+JAVTjyRB8HnJu5Gg==
+  dependencies:
+    "@material/base" "^14.0.0"
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/touch-target" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    tslib "^2.1.0"
+
 "@material/select@^14.0.0":
   version "14.0.0"
   resolved "https://registry.npmjs.org/@material/select/-/select-14.0.0.tgz"
@@ -491,6 +505,11 @@
     "@material/feature-targeting" "^14.0.0"
     "@material/theme" "^14.0.0"
     tslib "^2.1.0"
+
+"@mdi/js@^7.2.96":
+  version "7.2.96"
+  resolved "https://registry.npmjs.org/@mdi/js/-/js-7.2.96.tgz"
+  integrity sha512-paR9M9ZT7rKbh2boksNUynuSZMHhqRYnEZOm/KrZTjQ4/FzyhjLHuvw/8XYzP+E7fS4+/Ms/82EN1pl/OFsiIA==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -753,6 +772,16 @@
     "@material/dom" "^14.0.0"
     "@material/ripple" "^14.0.0"
     "@smui/common" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/segmented-button@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/segmented-button/-/segmented-button-7.0.0-beta.8.tgz"
+  integrity sha512-hQEaWQpA6ExhSXjFxTOJ0ZpO222cm/CqgzOIep3W9mtvhN6vKfD57fS82gq09va2V/7ucjevOZym+YYrGWWTNw==
+  dependencies:
+    "@material/segmented-button" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    "@smui/ripple" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
 "@smui/select@^7.0.0-beta.8":
