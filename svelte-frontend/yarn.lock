@@ -112,6 +112,28 @@
     "@material/touch-target" "^14.0.0"
     tslib "^2.1.0"
 
+"@material/chips@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.npmjs.org/@material/chips/-/chips-14.0.0.tgz"
+  integrity sha512-SfZX/Ovdq4NgjdtIr/N1O3fEHisZC+t8G8629OV/NrniSS6rKOa+q1mImzna8R4pfuYO+7nT5nZewQpL/JSYaQ==
+  dependencies:
+    "@material/animation" "^14.0.0"
+    "@material/base" "^14.0.0"
+    "@material/checkbox" "^14.0.0"
+    "@material/density" "^14.0.0"
+    "@material/dom" "^14.0.0"
+    "@material/elevation" "^14.0.0"
+    "@material/feature-targeting" "^14.0.0"
+    "@material/focus-ring" "^14.0.0"
+    "@material/ripple" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/tokens" "^14.0.0"
+    "@material/touch-target" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    tslib "^2.1.0"
+
 "@material/circular-progress@^14.0.0":
   version "14.0.0"
   resolved "https://registry.npmjs.org/@material/circular-progress/-/circular-progress-14.0.0.tgz"
@@ -586,6 +608,18 @@
   integrity sha512-ODu1VpH3fgle7AmM1BSNHy3nViwAm4ljDhyM64PYPpyCc19dKUsiKDd5uW4PgG02Pe8RmepyQjysLaTPFO326g==
   dependencies:
     "@material/checkbox" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    "@smui/ripple" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
+"@smui/chips@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui/chips/-/chips-7.0.0-beta.8.tgz"
+  integrity sha512-RpXT7Y9b2ELQoXt3ha5MjImMBUG1JPaekUgyV++AyotkfQ5LEqDTJQJONhsVdbROGi1F1HX3of0DtwNdnLZIhg==
+  dependencies:
+    "@material/chips" "^14.0.0"
+    "@material/dom" "^14.0.0"
+    "@material/rtl" "^14.0.0"
     "@smui/common" "^7.0.0-beta.8"
     "@smui/ripple" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"

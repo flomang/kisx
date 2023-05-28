@@ -46,27 +46,35 @@
     import IconButton, { Icon as ButtonIcon } from "@smui/icon-button";
     import Dialog, { Header, Title, Content, Actions } from "@smui/dialog";
     import LayoutGrid, { Cell } from "@smui/layout-grid";
+    import Textfield from "@smui/textfield";
     import SegmentedButton, {
         Segment,
         Icon,
         Label,
     } from "@smui/segmented-button";
-
-    import { Svg } from '@smui/common';
-    import {
-        mdiDelete,
-        mdiTextBoxEdit,
-    } from "@mdi/js";
+    import { Svg } from "@smui/common";
+    import { mdiDelete, mdiTextBoxEdit } from "@mdi/js";
 
     let actions = [
-        { name: "Delete", icon: mdiDelete, action: handleConfirm },
-        { name: "Edit", icon: mdiTextBoxEdit, action: handleEdit },
+        {
+            name: "Delete",
+            selected: false,
+            icon: mdiDelete,
+            action: handleConfirm,
+        },
+        {
+            name: "Edit",
+            selected: false,
+            icon: mdiTextBoxEdit,
+            action: handleToggleEdit,
+        },
     ];
 
     export let lots: Card[] = [];
     let open = false;
     let confirm = false;
     let selectedLot: Card;
+    let editable = false;
 
     interface DeleteLotResult {
         deleteLot: number;
@@ -77,6 +85,13 @@
             deleteLot(lotId: $lotID)
         }
     `;
+
+    function blurAllElements(): void {
+        const activeElement = document.activeElement as HTMLElement;
+        if (activeElement !== null) {
+            activeElement.blur();
+        }
+    }
 
     const handleDeleteLot = async (lot_id: string) => {
         try {
@@ -97,12 +112,28 @@
         }
     };
 
-    function handleEdit() {
-        alert("edit");
+    function handleToggleEdit() {
+        editable = !editable;
+    }
+
+    function handleCancelEdit() {
+        actions[1].selected = false;
+        actions = actions;
+        editable = false;
+    }
+
+    function handleSaveEdit() {
+        actions[1].selected = false;
+        actions = actions;
+        editable = false;
     }
 
     function handleConfirm() {
         confirm = true;
+    }
+
+    function handleConfirmNo() {
+        confirm = false;
     }
 
     function handleOpen(lot: Card) {
@@ -134,11 +165,21 @@
 
                 <Cell span={3}>
                     <div class="action-bar">
-                        <SegmentedButton segments={actions} let:segment>
+                        <SegmentedButton
+                            segments={actions}
+                            let:segment
+                            key={(segment) => segment.name}
+                        >
                             <Segment
                                 {segment}
-                                on:click$preventDefault={() => {
+                                selected={segment.selected}
+                                on:click$preventDefault={(event) => {
+                                    actions = actions;
+                                    if (segment.name != "Delete") {
+                                        segment.selected = !segment.selected;
+                                    }
                                     segment.action();
+                                    blurAllElements();
                                 }}
                             >
                                 <Icon
@@ -156,29 +197,56 @@
                         </SegmentedButton>
                     </div>
                     {#if selectedLot.setID}
-                        <div>
-                            <b>Set ID:</b>
-                            {selectedLot.setID}
+                        <div class="lot-input">
+                            <Textfield
+                                variant="outlined"
+                                style="width: 100%;"
+                                disabled={!editable}
+                                bind:value={selectedLot.setID}
+                                label="Set ID"
+                            />
                         </div>
                     {/if}
-                    <div>
-                        <b>Category:</b>
-                        {selectedLot.category}
+                    <div class="lot-input">
+                        <Textfield
+                            disabled={!editable}
+                            variant="outlined"
+                            style="width: 100%;"
+                            bind:value={selectedLot.category}
+                            label="Category"
+                        />
                     </div>
-                    <div>
-                        <b>Condition:</b>
-                        {selectedLot.condition}
+                    <div class="lot-input">
+                        <Textfield
+                            disabled={!editable}
+                            variant="outlined"
+                            style="width: 100%;"
+                            bind:value={selectedLot.condition}
+                            label="Condition"
+                        />
                     </div>
-                    <div class="description">
-                        {selectedLot.description}
+                    <div class="lot-input">
+                        <Textfield
+                            textarea
+                            disabled={!editable}
+                            style="width: 100%;"
+                            bind:value={selectedLot.description}
+                            label="Description"
+                        />
                     </div>
-               
+                    {#if editable}
+                        <Button on:click={handleCancelEdit}>
+                            <Label>Cancel</Label>
+                        </Button>
+                        <Button on:click={handleSaveEdit}>
+                            <Label>Save</Label>
+                        </Button>
+                    {/if}
                 </Cell>
             </LayoutGrid>
         </Content>
 
-        <Actions>
-        </Actions>
+        <Actions />
     </Dialog>
 
     <Dialog
@@ -194,7 +262,7 @@
             Are you sure you want to delete this?
         </Content>
         <Actions>
-            <Button>
+            <Button on:click={handleConfirmNo}>
                 <Label>No</Label>
             </Button>
             <Button on:click={() => handleDeleteLot(selectedLot.id)}>
@@ -216,12 +284,8 @@
                             {lot.setID}
                         </div>
                     {/if}
-                    <div class="actions">
-                        <div class="right">
-                            <ButtonIcon class="material-icons">favorite_border</ButtonIcon>
-                            <ButtonIcon class="material-icons">share</ButtonIcon>
-                            <ButtonIcon class="material-icons">more_vert</ButtonIcon>
-                        </div>
+                    <div class="value">
+                        <img src="eth-symbol-virgil.svg" alt="" />3000.0
                     </div>
                 </ImageLabel>
             </Supporting>
@@ -235,18 +299,15 @@
         font-size: 0.8em;
     }
 
-    .right {
-        float: right;
-    }
-
     .image {
         width: 100%;
         height: 100%;
         background-color: #fff;
     }
 
-    .description {
+    .lot-input {
         margin-top: 10px;
+        width: 100%;
     }
 
     .action-bar {
@@ -261,5 +322,27 @@
 
     .action-bar :global(svg:focus) {
         outline: 0;
+    }
+
+    .value {
+        display: flex;
+        background-color: green;
+        float: right;
+        padding-inline: 5px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: bold;
+
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+            0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .value img {
+        margin-top: 5px;
+        margin-right: 5px;
+        width: 17px;
+        height: 17px;
+        filter: invert(100%);
     }
 </style>
