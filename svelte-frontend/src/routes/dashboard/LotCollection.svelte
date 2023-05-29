@@ -146,6 +146,12 @@
         confirm = false;
     }
 
+    function handleClose() {
+        actions[1].selected = false;
+        open = false;
+        editable = false;
+    }
+
     function handleOpen(lot: Card) {
         selectedLot = { ...lot };
         // shallow copy lot
@@ -161,6 +167,7 @@
         aria-labelledby="over-fullscreen-title"
         aria-describedby="over-fullscreen-content"
         fullscreen
+        on:SMUIDialog:closed={handleClose}
     >
         <Header>
             <Title id="over-fullscreen-title">
