@@ -54,6 +54,8 @@
     } from "@smui/segmented-button";
     import { Svg } from "@smui/common";
     import { mdiDelete, mdiTextBoxEdit } from "@mdi/js";
+    import Select, { Option } from "@smui/select";
+    import { Icon as CommonIcon } from "@smui/common";
 
     let actions = [
         {
@@ -74,7 +76,11 @@
     let open = false;
     let confirm = false;
     let selectedLot: Card;
+    let editableLot: Card;
     let editable = false;
+
+    let types = ["box", "set", "instructions", "minifig", "part", "custom"];
+    let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
 
     interface DeleteLotResult {
         deleteLot: number;
@@ -114,12 +120,16 @@
 
     function handleToggleEdit() {
         editable = !editable;
+        if (!editable) {
+            editableLot = { ...selectedLot };
+        }
     }
 
     function handleCancelEdit() {
         actions[1].selected = false;
         actions = actions;
         editable = false;
+        editableLot = { ...selectedLot };
     }
 
     function handleSaveEdit() {
@@ -137,12 +147,15 @@
     }
 
     function handleOpen(lot: Card) {
-        selectedLot = lot;
+        selectedLot = { ...lot };
+        // shallow copy lot
+        editableLot = { ...lot };
+        // editableLot = lot;
         open = true;
     }
 </script>
 
-{#if selectedLot != null}
+{#if editableLot != null}
     <Dialog
         bind:open
         aria-labelledby="over-fullscreen-title"
@@ -150,7 +163,9 @@
         fullscreen
     >
         <Header>
-            <Title id="over-fullscreen-title">{selectedLot.title}</Title>
+            <Title id="over-fullscreen-title">
+                {editableLot.title}
+            </Title>
             <IconButton action="close" class="material-icons">close</IconButton>
         </Header>
         <Content id="over-fullscreen-content">
@@ -158,90 +173,143 @@
                 <Cell span={9}>
                     <img
                         class="image"
-                        src={selectedLot.imageUrl}
-                        alt="Image {selectedLot.id}"
+                        src={editableLot.imageUrl}
+                        alt="Image {editableLot.id}"
                     />
                 </Cell>
 
                 <Cell span={3}>
-                    <div class="action-bar">
-                        <SegmentedButton
-                            segments={actions}
-                            let:segment
-                            key={(segment) => segment.name}
-                        >
-                            <Segment
-                                {segment}
-                                selected={segment.selected}
-                                on:click$preventDefault={(event) => {
-                                    actions = actions;
-                                    if (segment.name != "Delete") {
-                                        segment.selected = !segment.selected;
-                                    }
-                                    segment.action();
-                                    blurAllElements();
-                                }}
+                    <div class="detail">
+                        <div class="action-bar">
+                            <SegmentedButton
+                                segments={actions}
+                                let:segment
+                                key={(segment) => segment.name}
                             >
-                                <Icon
-                                    component={Svg}
-                                    style="width: 1em; height: auto;"
-                                    viewBox="0 0 24 24"
+                                <Segment
+                                    {segment}
+                                    selected={segment.selected}
+                                    on:click$preventDefault={(event) => {
+                                        actions = actions;
+                                        if (segment.name != "Delete") {
+                                            segment.selected =
+                                                !segment.selected;
+                                        }
+                                        segment.action();
+                                        blurAllElements();
+                                    }}
                                 >
-                                    <path
-                                        fill="currentColor"
-                                        d={segment.icon}
-                                    />
-                                </Icon>
-                                <Label>{segment.name}</Label>
-                            </Segment>
-                        </SegmentedButton>
-                    </div>
-                    {#if selectedLot.setID}
+                                    <Icon
+                                        component={Svg}
+                                        style="width: 1em; height: auto;"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d={segment.icon}
+                                        />
+                                    </Icon>
+                                    <Label>{segment.name}</Label>
+                                </Segment>
+                            </SegmentedButton>
+                        </div>
                         <div class="lot-input">
                             <Textfield
                                 variant="outlined"
                                 style="width: 100%;"
                                 disabled={!editable}
-                                bind:value={selectedLot.setID}
-                                label="Set ID"
-                            />
+                                bind:value={editableLot.title}
+                                ><svelte:fragment slot="label">
+                                    <CommonIcon
+                                        class="material-icons"
+                                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                        >title</CommonIcon
+                                    > Title
+                                </svelte:fragment>
+                            </Textfield>
                         </div>
-                    {/if}
-                    <div class="lot-input">
-                        <Textfield
-                            disabled={!editable}
-                            variant="outlined"
-                            style="width: 100%;"
-                            bind:value={selectedLot.category}
-                            label="Category"
-                        />
+                        {#if editableLot.setID}
+                            <div class="lot-input">
+                                <Textfield
+                                    variant="outlined"
+                                    style="width: 100%;"
+                                    disabled={!editable}
+                                    bind:value={editableLot.setID}
+                                    ><svelte:fragment slot="label">
+                                        <CommonIcon
+                                            class="material-icons"
+                                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                            >numbers</CommonIcon
+                                        > Set Number
+                                    </svelte:fragment>
+                                </Textfield>
+                            </div>
+                        {/if}
+                        <div class="lot-input">
+                            <Select
+                                style="width: 100%;"
+                                bind:value={editableLot.category}
+                                variant="outlined"
+                                disabled={!editable}
+                            >
+                                <svelte:fragment slot="label">
+                                    <CommonIcon
+                                        class="material-icons"
+                                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                        >category</CommonIcon
+                                    > Category
+                                </svelte:fragment>
+                                {#each types.sort() as ty}
+                                    <Option value={ty}>{ty}</Option>
+                                {/each}
+                            </Select>
+                        </div>
+                        <div class="lot-input">
+                            <Select
+                                style="width: 100%;"
+                                bind:value={editableLot.condition}
+                                variant="outlined"
+                                disabled={!editable}
+                            >
+                                <svelte:fragment slot="label">
+                                    <CommonIcon
+                                        class="material-icons"
+                                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                        >grade</CommonIcon
+                                    > Condition
+                                </svelte:fragment>
+                                {#each conditions as cond}
+                                    <Option value={cond}>{cond}</Option>
+                                {/each}
+                            </Select>
+                        </div>
+                        <div class="lot-description">
+                            <Textfield
+                                textarea
+                                disabled={!editable}
+                                style="width: 100%; height: 100%;"
+                                bind:value={editableLot.description}
+                            >
+                                <svelte:fragment slot="label">
+                                    <CommonIcon
+                                        class="material-icons"
+                                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                        >subject</CommonIcon
+                                    > Description
+                                </svelte:fragment>
+                            </Textfield>
+                        </div>
+                        {#if editable}
+                            <div class="lot-description-edit-action">
+                                <Button on:click={handleCancelEdit}>
+                                    <Label>Cancel</Label>
+                                </Button>
+                                <Button on:click={handleSaveEdit}>
+                                    <Label>Save</Label>
+                                </Button>
+                            </div>
+                        {/if}
                     </div>
-                    <div class="lot-input">
-                        <Textfield
-                            disabled={!editable}
-                            variant="outlined"
-                            style="width: 100%;"
-                            bind:value={selectedLot.condition}
-                            label="Condition"
-                        />
-                    </div>
-                    <div class="lot-input">
-                        <Textfield
-                            textarea
-                            disabled={!editable}
-                            style="width: 100%;"
-                            bind:value={selectedLot.description}
-                            label="Description"
-                        />
-                    </div>
-                    {#if editable}
-                        <Button on:click={handleCancelEdit}>
-                            <Label>Cancel</Label>
-                        </Button>
-                        <Button on:click={handleSaveEdit}>
-                            <Label>Save</Label>
-                        </Button>
-                    {/if}
                 </Cell>
             </LayoutGrid>
         </Content>
@@ -305,9 +373,28 @@
         background-color: #fff;
     }
 
+    .detail {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     .lot-input {
         margin-top: 10px;
         width: 100%;
+        display: flex;
+    }
+
+    .lot-description {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        flex: 1;
+    }
+
+    .lot-description-edit-action {
+        display: flex;
+        flex-direction: row;
     }
 
     .action-bar {
