@@ -39,7 +39,7 @@
     import Button from "@smui/button";
     import ImageList, {
         Item,
-        Image,
+        Image as ImageItem,
         Supporting,
         Label as ImageLabel,
     } from "@smui/image-list";
@@ -56,6 +56,30 @@
     import { mdiDelete, mdiTextBoxEdit } from "@mdi/js";
     import Select, { Option } from "@smui/select";
     import { Icon as CommonIcon } from "@smui/common";
+    import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
+
+    let files = {
+        accepted: [],
+        rejected: [],
+    };
+
+    function handleFilesSelect(e) {
+        console.log(e.detail);
+        const { acceptedFiles, fileRejections } = e.detail;
+        files.accepted = [...files.accepted, ...acceptedFiles];
+        files.rejected = [...files.rejected, ...fileRejections];
+
+        for (let i = 0; i < acceptedFiles.length; i++) {
+            const reader = new FileReader();
+            reader.addEventListener("load", function () {
+                let newImage = new Image();
+                newImage.setAttribute("src", reader.result);
+                images = [...images, newImage];
+            });
+
+            reader.readAsDataURL(acceptedFiles[i]);
+        }
+    }
 
     let actions = [
         {
@@ -78,6 +102,8 @@
     let selectedLot: Card;
     let editableLot: Card;
     let editable = false;
+    let images: HTMLImageElement[] = [];
+    let thumbnail: HTMLImageElement;
 
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
@@ -158,6 +184,15 @@
         editableLot = { ...lot };
         // editableLot = lot;
         open = true;
+
+        let image = new Image();
+        image.setAttribute("src", editableLot.imageUrl);
+        thumbnail = image;
+        images = [image];
+    }
+
+    function handleSelectThumbnail(image: HTMLImageElement) {
+        thumbnail = image;
     }
 </script>
 
@@ -178,11 +213,25 @@
         <Content id="over-fullscreen-content">
             <LayoutGrid>
                 <Cell span={9}>
-                    <img
-                        class="image"
-                        src={editableLot.imageUrl}
-                        alt="Image {editableLot.id}"
-                    />
+                    <div class="lot-thumb">
+                        <img
+                            id="thumbnail"
+                            src={thumbnail.src}
+                            alt="Image {editableLot.id}"
+                        />
+                    </div>
+                    <div class="lot-images">
+                        {#each images as image}
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <img
+                                on:click={() => handleSelectThumbnail(image)}
+                                class="lot-image"
+                                src={image.src}
+                                alt="Image {editableLot.id}"
+                            />
+                        {/each}
+                     
+                    </div>
                 </Cell>
 
                 <Cell span={3}>
@@ -307,6 +356,15 @@
                             </Textfield>
                         </div>
                         {#if editable}
+                            <div class="lot-dropzone">
+                                <Dropzone
+                                    on:drop={handleFilesSelect}
+                                    accept={["image/*"]}
+                                    containerClasses="lot-dropzone"
+                                    inputElement
+                                />
+                            </div>
+
                             <div class="lot-description-edit-action">
                                 <Button on:click={handleCancelEdit}>
                                     <Label>Cancel</Label>
@@ -350,7 +408,7 @@
 <ImageList class="my-image-list-masonry" masonry>
     {#each lots as lot (lot.id)}
         <Item on:click={() => handleOpen(lot)}>
-            <Image src={lot.imageUrl} alt="Image {lot.id}" />
+            <ImageItem src={lot.imageUrl} alt="Image {lot.id}" />
             <Supporting>
                 <ImageLabel>
                     <b>{lot.title}</b>
@@ -374,10 +432,15 @@
         font-size: 0.8em;
     }
 
-    .image {
-        width: 100%;
+    .lot-thumb {
+        height: 500px;
+        width: 700px;
+    }
+
+    #thumbnail {
         height: 100%;
-        background-color: #fff;
+        width: 100%;
+        object-fit: contain;
     }
 
     .detail {
@@ -397,6 +460,14 @@
         width: 100%;
         display: flex;
         flex: 1;
+    }
+
+    .lot-dropzone {
+        width: 100%;
+        height: 50%;
+        align-items: center;
+        text-align: center;
+        margin-top: 10px;
     }
 
     .lot-description-edit-action {
@@ -438,5 +509,24 @@
         width: 17px;
         height: 17px;
         filter: invert(100%);
+    }
+
+    .lot-images {
+        display: flex;
+        flex-direction: row;
+        overflow-wrap: normal;
+        overflow-x: auto;
+        margin-bottom: 5px;
+    }
+
+   
+
+    .lot-image {
+        /* margin: 10px; Adjust as needed */
+        object-fit: contain;
+
+        margin-right: 10px;
+        height: 100px;
+        width: 100px;
     }
 </style>

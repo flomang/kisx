@@ -42,6 +42,7 @@
 		"smui-theme": "^7.0.0-beta.8",
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.0.1",
+		"svelte-file-dropzone": "^2.0.1",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^4.2.0"
