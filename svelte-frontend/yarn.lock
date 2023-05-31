@@ -575,6 +575,19 @@
     "@smui/ripple" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
+"@smui-extra/badge@^7.0.0-beta.8":
+  version "7.0.0-beta.8"
+  resolved "https://registry.npmjs.org/@smui-extra/badge/-/badge-7.0.0-beta.8.tgz"
+  integrity sha512-/h1qTj3sLuMT0npqfS4PNKXIdeaISke03+bF3gLYcwgTP7ZISObRem4FYp+HyIPSfexhhnO7Icb+YTE/OhdF8A==
+  dependencies:
+    "@material/feature-targeting" "^14.0.0"
+    "@material/rtl" "^14.0.0"
+    "@material/shape" "^14.0.0"
+    "@material/theme" "^14.0.0"
+    "@material/typography" "^14.0.0"
+    "@smui/common" "^7.0.0-beta.8"
+    svelte2tsx "^0.6.10"
+
 "@smui/button@^7.0.0-beta.8":
   version "7.0.0-beta.8"
   resolved "https://registry.npmjs.org/@smui/button/-/button-7.0.0-beta.8.tgz"

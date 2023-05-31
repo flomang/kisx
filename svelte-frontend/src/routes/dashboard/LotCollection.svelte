@@ -53,7 +53,7 @@
         Label,
     } from "@smui/segmented-button";
     import { Svg } from "@smui/common";
-    import { mdiDelete, mdiTextBoxEdit, mdiImage } from "@mdi/js";
+    import { mdiDelete, mdiTextBoxEdit, mdiImage, mdiTrashCan } from "@mdi/js";
     import Select, { Option } from "@smui/select";
     import { Icon as CommonIcon } from "@smui/common";
     import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
@@ -80,7 +80,7 @@
         }
     }
 
-    let actions = [
+    let actions: Action[] = [
         {
             name: "Delete",
             selected: false,
@@ -88,18 +88,30 @@
             action: handleConfirm,
         },
         {
-            name: "Add",
-            selected: false,
-            icon: mdiImage,
-            action: null,
-        },
-        {
             name: "Edit",
             selected: false,
             icon: mdiTextBoxEdit,
             action: handleToggleEdit,
         },
+        // {
+        //     name: "Add",
+        //     selected: false,
+        //     icon: mdiImage,
+        //     action: null,
+        // },
     ];
+    interface Action {
+        name: string;
+        selected: boolean;
+        icon: string;
+        action: () => void;
+    }
+    let addAction = {
+        name: "Add",
+        selected: false,
+        icon: mdiImage,
+        action: () => {},
+    };
 
     export let lots: Card[] = [];
     let open = false;
@@ -153,6 +165,9 @@
         editable = !editable;
         if (!editable) {
             editableLot = { ...selectedLot };
+            actions = actions.filter((action) => action.name != "Add");
+        } else {
+            actions.push(addAction);
         }
     }
 
@@ -161,6 +176,7 @@
         actions = actions;
         editable = false;
         editableLot = { ...selectedLot };
+        actions = actions.filter((action) => action.name != "Add");
     }
 
     function handleSaveEdit() {
@@ -199,6 +215,10 @@
     function handleSelectThumbnail(image: HTMLImageElement) {
         thumbnail = image;
     }
+
+    function handleDeleteImage(Image: HTMLImageElement) {
+        images = images.filter((img) => img.src != Image.src);
+    }
 </script>
 
 {#if editableLot != null}
@@ -218,25 +238,47 @@
         <Content id="over-fullscreen-content">
             <LayoutGrid>
                 <Cell span={7}>
-                    <div class="image-container">
-                        <div class="lot-images">
-                            {#each images as image}
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <img
-                                    on:click={() =>
-                                        handleSelectThumbnail(image)}
-                                    class="lot-image"
-                                    src={image.src}
-                                    alt="Image {editableLot.id}"
-                                />
-                            {/each}
-                        </div>
+                    <div class="image-showcase">
                         <div class="lot-thumb">
                             <img
                                 id="thumbnail"
                                 src={thumbnail.src}
                                 alt="Image {editableLot.id}"
                             />
+                        </div>
+                        <div class="lot-images">
+                            {#each images as image}
+                                <div class="image-container">
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <img
+                                        on:click={() =>
+                                            handleSelectThumbnail(image)}
+                                        class="lot-image"
+                                        src={image.src}
+                                        alt="Image {editableLot.id}"
+                                    />
+                                    {#if editable}
+                                        <div class="delete-button">
+                                            <IconButton
+                                                class="material-icons"
+                                                on:click={() =>
+                                                    handleDeleteImage(image)}
+                                                size="button"
+                                            >
+                                                <Icon
+                                                    component={Svg}
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        fill="currentColor"
+                                                        d={mdiTrashCan}
+                                                    />
+                                                </Icon>
+                                            </IconButton>
+                                        </div>
+                                    {/if}
+                                </div>
+                            {/each}
                         </div>
                     </div>
                 </Cell>
@@ -254,7 +296,10 @@
                                     selected={segment.selected}
                                     on:click={(event) => {
                                         actions = actions;
-                                        if (segment.name != "Delete" && segment.name != "Add") {
+                                        if (
+                                            segment.name != "Delete" &&
+                                            segment.name != "Add"
+                                        ) {
                                             segment.selected =
                                                 !segment.selected;
                                         }
@@ -386,18 +431,8 @@
                                 </svelte:fragment>
                             </Textfield>
                         </div>
-                        {#if editable}
-                            <!-- <div class="lot-dropzone">
-                                <Dropzone
-                                    on:drop={handleFilesSelect}
-                                    accept={["image/*"]}
-                                    containerClasses="lot-dropzone"
-                                    inputElement
-                                >
-                                    <p>Add</p>
-                                </Dropzone>
-                            </div> -->
 
+                        {#if editable}
                             <div class="lot-description-edit-action">
                                 <Button on:click={handleCancelEdit}>
                                     <Label>Cancel</Label>
@@ -496,11 +531,6 @@
         flex: 1;
     }
 
-    .lot-description-edit-action {
-        display: flex;
-        flex-direction: row;
-    }
-
     .action-bar {
         display: flex;
         flex-wrap: wrap;
@@ -554,15 +584,20 @@
     }
 
     .image-container {
+        position: relative;
+        /* display: inline-block; */
     }
 
-    .dropzone-wrapper {
-        display: flex;
-        justify-self: center;
-        align-items: center;
+    .delete-button {
+        position: absolute;
+        top: 0;
+        background-color: gray;
+        font-weight: bold;
+        color: white;
+        border: none;
+        cursor: pointer;
     }
-
-    :global(.edit-dropzone) {
+    /* :global(.edit-dropzone) {
         width: 70px;
         height: 70px;
         border: 2px dashed #ccc;
@@ -570,7 +605,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
+    } */
 
     :global(.add-dropzone) {
         width: 100%;
