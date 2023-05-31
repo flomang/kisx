@@ -53,7 +53,7 @@
         Label,
     } from "@smui/segmented-button";
     import { Svg } from "@smui/common";
-    import { mdiDelete, mdiTextBoxEdit } from "@mdi/js";
+    import { mdiDelete, mdiTextBoxEdit, mdiImage } from "@mdi/js";
     import Select, { Option } from "@smui/select";
     import { Icon as CommonIcon } from "@smui/common";
     import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
@@ -64,7 +64,6 @@
     };
 
     function handleFilesSelect(e) {
-        console.log(e.detail);
         const { acceptedFiles, fileRejections } = e.detail;
         files.accepted = [...files.accepted, ...acceptedFiles];
         files.rejected = [...files.rejected, ...fileRejections];
@@ -87,6 +86,12 @@
             selected: false,
             icon: mdiDelete,
             action: handleConfirm,
+        },
+        {
+            name: "Add",
+            selected: false,
+            icon: mdiImage,
+            action: null,
         },
         {
             name: "Edit",
@@ -212,29 +217,31 @@
         </Header>
         <Content id="over-fullscreen-content">
             <LayoutGrid>
-                <Cell span={9}>
-                    <div class="lot-thumb">
-                        <img
-                            id="thumbnail"
-                            src={thumbnail.src}
-                            alt="Image {editableLot.id}"
-                        />
-                    </div>
-                    <div class="lot-images">
-                        {#each images as image}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <Cell span={7}>
+                    <div class="image-container">
+                        <div class="lot-images">
+                            {#each images as image}
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <img
+                                    on:click={() =>
+                                        handleSelectThumbnail(image)}
+                                    class="lot-image"
+                                    src={image.src}
+                                    alt="Image {editableLot.id}"
+                                />
+                            {/each}
+                        </div>
+                        <div class="lot-thumb">
                             <img
-                                on:click={() => handleSelectThumbnail(image)}
-                                class="lot-image"
-                                src={image.src}
+                                id="thumbnail"
+                                src={thumbnail.src}
                                 alt="Image {editableLot.id}"
                             />
-                        {/each}
-                     
+                        </div>
                     </div>
                 </Cell>
 
-                <Cell span={3}>
+                <Cell span={5}>
                     <div class="detail">
                         <div class="action-bar">
                             <SegmentedButton
@@ -245,27 +252,51 @@
                                 <Segment
                                     {segment}
                                     selected={segment.selected}
-                                    on:click$preventDefault={(event) => {
+                                    on:click={(event) => {
                                         actions = actions;
-                                        if (segment.name != "Delete") {
+                                        if (segment.name != "Delete" && segment.name != "Add") {
                                             segment.selected =
                                                 !segment.selected;
                                         }
-                                        segment.action();
+                                        if (segment.action != null)
+                                            segment.action();
+
                                         blurAllElements();
                                     }}
                                 >
-                                    <Icon
-                                        component={Svg}
-                                        style="width: 1em; height: auto;"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            fill="currentColor"
-                                            d={segment.icon}
-                                        />
-                                    </Icon>
-                                    <Label>{segment.name}</Label>
+                                    {#if segment.name == "Add"}
+                                        <Dropzone
+                                            on:drop={handleFilesSelect}
+                                            accept={["image/*"]}
+                                            containerClasses="add-dropzone"
+                                            disableDefaultStyles={true}
+                                            inputElement
+                                        >
+                                            <Icon
+                                                component={Svg}
+                                                style="width: 1em; height: auto;"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    fill="currentColor"
+                                                    d={segment.icon}
+                                                />
+                                            </Icon>
+                                            <Label>{segment.name}</Label>
+                                        </Dropzone>
+                                    {:else}
+                                        <Icon
+                                            component={Svg}
+                                            style="width: 1em; height: auto;"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                fill="currentColor"
+                                                d={segment.icon}
+                                            />
+                                        </Icon>
+                                        <Label>{segment.name}</Label>
+                                    {/if}
                                 </Segment>
                             </SegmentedButton>
                         </div>
@@ -356,14 +387,16 @@
                             </Textfield>
                         </div>
                         {#if editable}
-                            <div class="lot-dropzone">
+                            <!-- <div class="lot-dropzone">
                                 <Dropzone
                                     on:drop={handleFilesSelect}
                                     accept={["image/*"]}
                                     containerClasses="lot-dropzone"
                                     inputElement
-                                />
-                            </div>
+                                >
+                                    <p>Add</p>
+                                </Dropzone>
+                            </div> -->
 
                             <div class="lot-description-edit-action">
                                 <Button on:click={handleCancelEdit}>
@@ -433,11 +466,12 @@
     }
 
     .lot-thumb {
-        height: 500px;
-        width: 700px;
+        height: 100%;
+        width: 100%;
     }
 
     #thumbnail {
+        background-color: #fff;
         height: 100%;
         width: 100%;
         object-fit: contain;
@@ -460,14 +494,6 @@
         width: 100%;
         display: flex;
         flex: 1;
-    }
-
-    .lot-dropzone {
-        width: 100%;
-        height: 50%;
-        align-items: center;
-        text-align: center;
-        margin-top: 10px;
     }
 
     .lot-description-edit-action {
@@ -517,16 +543,38 @@
         overflow-wrap: normal;
         overflow-x: auto;
         margin-bottom: 5px;
+        height: 100px;
     }
-
-   
 
     .lot-image {
         /* margin: 10px; Adjust as needed */
         object-fit: contain;
-
         margin-right: 10px;
-        height: 100px;
         width: 100px;
+    }
+
+    .image-container {
+    }
+
+    .dropzone-wrapper {
+        display: flex;
+        justify-self: center;
+        align-items: center;
+    }
+
+    :global(.edit-dropzone) {
+        width: 70px;
+        height: 70px;
+        border: 2px dashed #ccc;
+        border-radius: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    :global(.add-dropzone) {
+        width: 100%;
+        height: 100%;
+        display: flex;
     }
 </style>
