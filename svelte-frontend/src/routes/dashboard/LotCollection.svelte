@@ -135,6 +135,47 @@
         }
     `;
 
+    const UPDATE_LOT_MUTATION = gql`
+        mutation UpdateLot(
+            $lotID: String!
+            $category: String
+            $condition: String
+            $title: String
+            $externalId: String
+            $description: String
+            $deleteImageIDs: JSON
+        ) {
+            updateLot(
+                params: {
+                    lotId: $lotID
+                    category: $category
+                    condition: $condition
+                    title: $title
+                    externalId: $externalId
+                    description: $description
+                    deletedImageIds: $deleteImageIDs
+                }
+            ) {
+                lot {
+                    id
+                    category
+                    condition
+                    title
+                    externalId
+                    description
+                    metaData
+                }
+                images {
+                    id
+                    imageUrl
+                    isThumbnail
+                    createdAt
+                    updatedAt
+                }
+            }
+        }
+    `;
+
     function blurAllElements(): void {
         const activeElement = document.activeElement as HTMLElement;
         if (activeElement !== null) {
@@ -161,11 +202,32 @@
         }
     };
 
+    async function handleUpdateLot() {
+        try {
+            const { data } = await client.mutate<LotResult>({
+                mutation: UPDATE_LOT_MUTATION,
+                variables: {
+                    lotID: editableLot.id,
+                    category: editableLot.category,
+                    condition: editableLot.condition,
+                    title: editableLot.title,
+                    externalId: editableLot.setID,
+                    description: editableLot.description,
+                    deleteImageIDs: [],
+                },
+            });
+
+            console.log(JSON.stringify(data));
+        } catch (error: any) {
+            console.log(JSON.stringify(error));
+        }
+    }
+
     function handleToggleEdit() {
         editable = !editable;
         if (!editable) {
             editableLot = { ...selectedLot };
-            actions = actions.filter((action) => action.name != "Add");
+            exitEdit();
         } else {
             actions.push(addAction);
         }
@@ -176,13 +238,37 @@
         actions = actions;
         editable = false;
         editableLot = { ...selectedLot };
+        exitEdit();
+    }
+
+    async function exitEdit() {
         actions = actions.filter((action) => action.name != "Add");
     }
 
-    function handleSaveEdit() {
+    async function handleSaveEdit() {
         actions[1].selected = false;
         actions = actions;
         editable = false;
+        exitEdit();
+
+        try {
+            const { data } = await client.mutate<LotResult>({
+                mutation: UPDATE_LOT_MUTATION,
+                variables: {
+                    lotID: editableLot.id,
+                    category: editableLot.category,
+                    condition: editableLot.condition,
+                    title: editableLot.title,
+                    externalId: editableLot.setID,
+                    description: editableLot.description,
+                    deleteImageIDs: [],
+                },
+            });
+
+            console.log(JSON.stringify(data));
+        } catch (error: any) {
+            console.log(JSON.stringify(error));
+        }
     }
 
     function handleConfirm() {
