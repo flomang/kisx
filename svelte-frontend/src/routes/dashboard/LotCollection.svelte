@@ -226,29 +226,25 @@
     function handleToggleEdit() {
         editable = !editable;
         if (!editable) {
-            editableLot = { ...selectedLot };
-            exitEdit();
+            handleCancelEdit()
         } else {
             actions.push(addAction);
         }
     }
 
     function handleCancelEdit() {
-        actions[1].selected = false;
-        actions = actions;
-        editable = false;
         editableLot = { ...selectedLot };
         exitEdit();
     }
 
     async function exitEdit() {
+        actions[1].selected = false;
+        editable = false;
         actions = actions.filter((action) => action.name != "Add");
     }
 
     async function handleSaveEdit() {
-        actions[1].selected = false;
-        actions = actions;
-        editable = false;
+        selectedLot = { ...editableLot };
         exitEdit();
 
         try {
@@ -446,7 +442,6 @@
                                 </svelte:fragment>
                             </Textfield>
                         </div>
-                        {#if editableLot.setID}
                             <div class="lot-input">
                                 <Textfield
                                     variant="outlined"
@@ -462,7 +457,6 @@
                                     </svelte:fragment>
                                 </Textfield>
                             </div>
-                        {/if}
                         <div class="lot-input">
                             <Select
                                 style="width: 100%;"
