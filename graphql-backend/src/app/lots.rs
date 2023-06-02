@@ -35,7 +35,8 @@ pub struct UpdateLot {
     pub external_id: Option<String>,
     pub description: Option<String>,
     //pub new_images: ...,
-    pub delted_images: Option<Vec<String>>,
+    // vec of image uuids to delete
+    pub deleted_image_ids: Vec<String>,
 }
 
 fn validate_uuid(lot_id: &str) -> Result<(), ValidationError> {

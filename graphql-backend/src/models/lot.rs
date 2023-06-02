@@ -101,7 +101,7 @@ pub struct NewLotImage {
     pub is_thumbnail: bool,
 }
 
-#[derive(Debug, AsChangeset)]
+#[derive(Debug, Identifiable, AsChangeset)]
 #[diesel(table_name = lots)]
 pub struct UpdateLot {
     pub id: Uuid,

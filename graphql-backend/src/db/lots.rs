@@ -77,6 +77,7 @@ impl Handler<UpdateLotAuthenticated> for DbExecutor {
         conn.transaction(|connection| {
             let updated: Lot = diesel::update(lots)
                 .filter(user_id.eq(msg.auth.user.id))
+                .filter(id.eq(msg.lot.id))
                 .set(&msg.lot)
                 .get_result(connection)?;
 
