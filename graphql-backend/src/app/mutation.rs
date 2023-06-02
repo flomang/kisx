@@ -18,7 +18,7 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots, DeleteLotAuthenticated},
+    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots, DeleteLotAuthenticated, UpdateLot, UpdateLotAuthenticated},
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     users::ForgotPassword,
 };
@@ -159,6 +159,27 @@ impl MutationRoot {
         Ok(res)
     }
 
+    // update lot
+    async fn update_lot<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: UpdateLot,
+    ) -> Result<LotResponse> {
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(UpdateLotAuthenticated { auth, lot: params.into() })
+            .await??;
+
+        Ok(res)
+    }
+
+    // delete lot
     async fn delete_lot<'ctx>(
         &self,
         ctx: &Context<'ctx>,

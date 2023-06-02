@@ -100,3 +100,14 @@ pub struct NewLotImage {
     pub image_url: String,
     pub is_thumbnail: bool,
 }
+
+#[derive(Debug, AsChangeset)]
+#[diesel(table_name = lots)]
+pub struct UpdateLot {
+    pub id: Uuid,
+    pub category: Option<String>,
+    pub condition: Option<String>,
+    pub title: Option<String>,
+    pub external_id: Option<String>,
+    pub description: Option<String>,
+}

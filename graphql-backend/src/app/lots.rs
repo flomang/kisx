@@ -1,8 +1,8 @@
 use uuid::Uuid;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 use crate::{
-    models::{Lot, LotImage},
+    models::{self, Lot, LotImage},
     utils::{auth::Auth, CustomDateTime},
 };
 
@@ -24,10 +24,36 @@ pub struct CreateLot {
     pub meta_data: serde_json::Value,
 }
 
+#[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateLot {
+    #[validate(custom(function = "validate_uuid", message = "lot id must be uuid"))]
+    pub lot_id: String,
+    pub category: Option<String>,
+    pub condition: Option<String>,
+    pub title: Option<String>,
+    pub external_id: Option<String>,
+    pub description: Option<String>,
+    //pub new_images: ...,
+    pub delted_images: Option<Vec<String>>,
+}
+
+fn validate_uuid(lot_id: &str) -> Result<(), ValidationError> {
+    uuid::Uuid::parse_str(lot_id)
+        .map(|_| ())
+        .map_err(|_| ValidationError::new("invalid_uuid"))
+}
+
 #[derive(Debug)]
 pub struct CreateLotAuthenticated {
     pub auth: Auth,
     pub lot: CreateLot,
+}
+
+#[derive(Debug)]
+pub struct UpdateLotAuthenticated {
+    pub auth: Auth,
+    pub lot: models::UpdateLot,
 }
 
 #[derive(Debug)]
@@ -42,7 +68,6 @@ pub struct CreateLotImage {
     pub image_url: String,
     pub is_thumbnail: bool,
 }
-
 
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -59,8 +84,6 @@ pub struct FilterLotsAuthenticated {
     pub auth: Auth,
     pub params: FilterLots,
 }
-
-
 
 // Server Responses ↓
 
@@ -121,6 +144,21 @@ impl From<Lot> for LotInner {
             meta_data: lot.meta_data,
             created_at: CustomDateTime(lot.created_at),
             updated_at: CustomDateTime(lot.updated_at),
+        }
+    }
+}
+
+impl From<UpdateLot> for models::UpdateLot {
+    fn from(lot: UpdateLot) -> Self {
+        let id = Uuid::try_parse(&lot.lot_id).unwrap();
+
+        models::UpdateLot {
+            id,
+            category: lot.category,
+            condition: lot.condition,
+            title: lot.title,
+            external_id: lot.external_id,
+            description: lot.description,
         }
     }
 }
