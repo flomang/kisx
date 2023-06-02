@@ -58,12 +58,17 @@
     import { Icon as CommonIcon } from "@smui/common";
     import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
 
-    let files = {
+    interface Files {
+        accepted: File[];
+        rejected: File[];
+    }
+
+    let files: Files = {
         accepted: [],
         rejected: [],
     };
 
-    function handleFilesSelect(e) {
+    function handleFilesSelect(e: any) {
         const { acceptedFiles, fileRejections } = e.detail;
         files.accepted = [...files.accepted, ...acceptedFiles];
         files.rejected = [...files.rejected, ...fileRejections];
@@ -72,7 +77,7 @@
             const reader = new FileReader();
             reader.addEventListener("load", function () {
                 let newImage = new Image();
-                newImage.setAttribute("src", reader.result);
+                newImage.setAttribute("src", reader.result as string);
                 images = [...images, newImage];
             });
 
@@ -93,19 +98,17 @@
             icon: mdiTextBoxEdit,
             action: handleToggleEdit,
         },
-        // {
-        //     name: "Add",
-        //     selected: false,
-        //     icon: mdiImage,
-        //     action: null,
-        // },
     ];
+
     interface Action {
         name: string;
         selected: boolean;
         icon: string;
         action: () => void;
     }
+
+    // for adding images
+    // only available when editing
     let addAction = {
         name: "Add",
         selected: false,
@@ -226,7 +229,7 @@
     function handleToggleEdit() {
         editable = !editable;
         if (!editable) {
-            handleCancelEdit()
+            handleCancelEdit();
         } else {
             actions.push(addAction);
         }
@@ -237,10 +240,12 @@
         exitEdit();
     }
 
-    async function exitEdit() {
-        actions[1].selected = false;
+    function exitEdit() {
         editable = false;
+        // remove add image button
         actions = actions.filter((action) => action.name != "Add");
+        // unselect edit button
+        actions[1].selected = false;
     }
 
     async function handleSaveEdit() {
@@ -442,21 +447,21 @@
                                 </svelte:fragment>
                             </Textfield>
                         </div>
-                            <div class="lot-input">
-                                <Textfield
-                                    variant="outlined"
-                                    style="width: 100%;"
-                                    disabled={!editable}
-                                    bind:value={editableLot.setID}
-                                    ><svelte:fragment slot="label">
-                                        <CommonIcon
-                                            class="material-icons"
-                                            style="font-size: 1em; line-height: normal; vertical-align: top;"
-                                            >numbers</CommonIcon
-                                        > Set Number
-                                    </svelte:fragment>
-                                </Textfield>
-                            </div>
+                        <div class="lot-input">
+                            <Textfield
+                                variant="outlined"
+                                style="width: 100%;"
+                                disabled={!editable}
+                                bind:value={editableLot.setID}
+                                ><svelte:fragment slot="label">
+                                    <CommonIcon
+                                        class="material-icons"
+                                        style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                        >numbers</CommonIcon
+                                    > Set Number
+                                </svelte:fragment>
+                            </Textfield>
+                        </div>
                         <div class="lot-input">
                             <Select
                                 style="width: 100%;"
