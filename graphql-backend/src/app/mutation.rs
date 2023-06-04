@@ -9,7 +9,7 @@ use crate::{
         AppState,
     },
     error::validation_errors_to_error,
-    utils::auth::authenticate_token, models::{LotWithImages, Lot},
+    utils::auth::authenticate_token, models::LotWithImages,
 };
 
 use super::{
@@ -18,7 +18,10 @@ use super::{
         ArticleResponse, CreateArticle, CreateArticleOuter, DeleteArticle, FavoriteArticle,
         UnfavoriteArticle, UpdateArticle, UpdateArticleOuter,
     },
-    lots::{CreateLot, CreateLotAuthenticated, LotResponse, FilterLotsAuthenticated, FilterLots, DeleteLotAuthenticated, UpdateLot, UpdateLotAuthenticated},
+    lots::{
+        CreateLot, CreateLotAuthenticated, DeleteLotAuthenticated, UpdateLot,
+        UpdateLotAuthenticated,
+    },
     profiles::{FollowProfile, ProfileResponse, UnfollowProfile},
     users::ForgotPassword,
 };
@@ -139,64 +142,6 @@ impl MutationRoot {
         Ok(res)
     }
 
-    // create lot
-    async fn create_lot<'ctx>(
-        &self,
-        ctx: &Context<'ctx>,
-        params: CreateLot,
-    ) -> Result<LotResponse> {
-        params
-            .validate()
-            .map_err(|e| validation_errors_to_error(e).extend())?;
-
-        let state = ctx.data_unchecked::<AppState>();
-        let auth = authenticate_token(state, ctx).await?;
-        let res = state
-            .db
-            .send(CreateLotAuthenticated { auth, lot: params })
-            .await??;
-
-        Ok(res)
-    }
-
-    // update lot
-    async fn update_lot<'ctx>(
-        &self,
-        ctx: &Context<'ctx>,
-        params: UpdateLot,
-    ) -> Result<LotResponse> {
-        params
-            .validate()
-            .map_err(|e| validation_errors_to_error(e).extend())?;
-
-        let state = ctx.data_unchecked::<AppState>();
-        let auth = authenticate_token(state, ctx).await?;
-        let res = state
-            .db
-            .send(UpdateLotAuthenticated { auth, lot: params.into() })
-            .await??;
-
-        Ok(res)
-    }
-
-    // delete lot
-    async fn delete_lot<'ctx>(
-        &self,
-        ctx: &Context<'ctx>,
-        lot_id: String,
-    ) -> Result<usize> {
-
-        let lot_id = lot_id.parse::<Uuid>()?;
-        let state = ctx.data_unchecked::<AppState>();
-        let auth = authenticate_token(state, ctx).await?;
-        let res = state
-            .db
-            .send(DeleteLotAuthenticated { auth, lot_id })
-            .await??;
-
-        Ok(res)
-    }
-
     // update article
     async fn update_acticle<'ctx>(
         &self,
@@ -296,5 +241,61 @@ impl MutationRoot {
             })
             .await??;
         Ok(true)
+    }
+
+    // create lot
+    async fn create_lot<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: CreateLot,
+    ) -> Result<LotWithImages> {
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(CreateLotAuthenticated { auth, lot: params })
+            .await??;
+
+        Ok(res)
+    }
+
+    // update lot
+    async fn update_lot<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: UpdateLot,
+    ) -> Result<LotWithImages> {
+        params
+            .validate()
+            .map_err(|e| validation_errors_to_error(e).extend())?;
+
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(UpdateLotAuthenticated {
+                auth,
+                lot: params.into(),
+            })
+            .await??;
+
+        Ok(res)
+    }
+
+    // delete lot
+    async fn delete_lot<'ctx>(&self, ctx: &Context<'ctx>, lot_id: String) -> Result<usize> {
+        let lot_id = lot_id.parse::<Uuid>()?;
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+        let res = state
+            .db
+            .send(DeleteLotAuthenticated { auth, lot_id })
+            .await??;
+
+        Ok(res)
     }
 }

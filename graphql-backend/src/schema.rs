@@ -32,6 +32,16 @@ table! {
 }
 
 table! {
+    currencies (id) {
+        id -> Uuid,
+        name -> Text,
+        symbol -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     favorite_articles (user_id, article_id) {
         user_id -> Uuid,
         article_id -> Uuid,
@@ -76,6 +86,18 @@ table! {
 }
 
 table! {
+    prices (recorded_at, external_id, source, currency_symbol) {
+        external_id -> Text,
+        source -> Text,
+        currency_symbol -> Text,
+        amount -> Numeric,
+        recorded_at -> Timestamp,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     users (id) {
         id -> Uuid,
         username -> Text,
@@ -102,9 +124,11 @@ allow_tables_to_appear_in_same_query!(
     article_tags,
     articles,
     comments,
+    currencies,
     favorite_articles,
     followers,
     lot_images,
     lots,
+    prices,
     users,
 );

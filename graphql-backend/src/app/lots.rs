@@ -1,10 +1,7 @@
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
-use crate::{
-    models::{self, Lot, LotImage},
-    utils::{auth::Auth, CustomDateTime},
-};
+use crate::{models, utils::auth::Auth};
 
 // Client Messages ↓
 
@@ -43,6 +40,22 @@ fn validate_uuid(lot_id: &str) -> Result<(), ValidationError> {
     uuid::Uuid::parse_str(lot_id)
         .map(|_| ())
         .map_err(|_| ValidationError::new("invalid_uuid"))
+}
+
+// convert client message to db message
+impl From<UpdateLot> for models::UpdateLot {
+    fn from(lot: UpdateLot) -> Self {
+        let id = Uuid::try_parse(&lot.lot_id).unwrap();
+
+        models::UpdateLot {
+            id,
+            category: lot.category,
+            condition: lot.condition,
+            title: lot.title,
+            external_id: lot.external_id,
+            description: lot.description,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -87,108 +100,3 @@ pub struct FilterLotsAuthenticated {
 }
 
 // Server Responses ↓
-
-#[derive(async_graphql::SimpleObject, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LotInner {
-    pub id: String,
-    pub user_id: String,
-    pub category: String,
-    pub condition: String,
-    pub title: String,
-    pub external_id: Option<String>,
-    pub description: String,
-    pub meta_data: Option<serde_json::Value>,
-    //pub images: Vec<LotImageInner>,
-    pub created_at: CustomDateTime,
-    pub updated_at: CustomDateTime,
-}
-
-#[derive(async_graphql::SimpleObject, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LotImageInner {
-    pub id: String,
-    pub image_url: String,
-    pub is_thumbnail: bool,
-    pub created_at: CustomDateTime,
-    pub updated_at: CustomDateTime,
-}
-
-#[derive(async_graphql::SimpleObject, Debug, Serialize)]
-pub struct LotResponse {
-    pub lot: LotInner,
-    pub images: Vec<LotImageInner>,
-}
-
-impl From<LotImage> for LotImageInner {
-    fn from(image: LotImage) -> Self {
-        LotImageInner {
-            id: image.id.to_string(),
-            image_url: image.image_url,
-            is_thumbnail: image.is_thumbnail,
-            created_at: CustomDateTime(image.created_at),
-            updated_at: CustomDateTime(image.updated_at),
-        }
-    }
-}
-
-impl From<Lot> for LotInner {
-    fn from(lot: Lot) -> Self {
-        LotInner {
-            id: lot.id.to_string(),
-            user_id: lot.user_id.to_string(),
-            category: lot.category,
-            condition: lot.condition,
-            title: lot.title,
-            external_id: lot.external_id,
-            description: lot.description,
-            meta_data: lot.meta_data,
-            created_at: CustomDateTime(lot.created_at),
-            updated_at: CustomDateTime(lot.updated_at),
-        }
-    }
-}
-
-impl From<UpdateLot> for models::UpdateLot {
-    fn from(lot: UpdateLot) -> Self {
-        let id = Uuid::try_parse(&lot.lot_id).unwrap();
-
-        models::UpdateLot {
-            id,
-            category: lot.category,
-            condition: lot.condition,
-            title: lot.title,
-            external_id: lot.external_id,
-            description: lot.description,
-        }
-    }
-}
-
-// impl From<Lot> for LotResponse {
-//     fn from(lot: Lot) -> Self {
-//         // let images = lot.images.into_iter().map(|image| {
-//         //     LotImageInner {
-//         //         id: image.id.to_string(),
-//         //         image_url: image.image_url,
-//         //         is_thumbnail: image.is_thumbnail,
-//         //         created_at: CustomDateTime(image.created_at),
-//         //         updated_at: CustomDateTime(image.updated_at),
-//         //     }
-//         // }).collect();
-
-//         LotResponse {
-//             lot: LotInner {
-//                 id: lot.id.to_string(),
-//                 user_id: lot.user_id.to_string(),
-//                 category: lot.category,
-//                 condition: lot.condition,
-//                 tag: lot.tag,
-//                 description: lot.description,
-//                 // images: images,
-//                 meta_data: lot.meta_data,
-//                 created_at: CustomDateTime(lot.created_at),
-//                 updated_at: CustomDateTime(lot.updated_at),
-//             },
-//         }
-//     }
-// }

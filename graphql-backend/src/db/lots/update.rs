@@ -1,19 +1,20 @@
 use super::DbExecutor;
-use crate::app::lots::LotResponse;
+use crate::models::{LotWithImages, LotImage};
 use crate::{app::lots::UpdateLotAuthenticated, models::Lot, prelude::*};
 use actix::prelude::*;
 use diesel::prelude::*;
 
 
 impl Message for UpdateLotAuthenticated {
-    type Result = Result<LotResponse>;
+    type Result = Result<LotWithImages>;
 }
 
 impl Handler<UpdateLotAuthenticated> for DbExecutor {
-    type Result = Result<LotResponse>;
+    type Result = Result<LotWithImages>;
 
     fn handle(&mut self, msg: UpdateLotAuthenticated, _: &mut Self::Context) -> Self::Result {
         use crate::schema::lots::dsl::*;
+        use crate::schema::lot_images::dsl::{lot_images, lot_id};
 
         let conn = &mut self.0.get()?;
 
@@ -24,9 +25,15 @@ impl Handler<UpdateLotAuthenticated> for DbExecutor {
                 .set(&msg.lot)
                 .get_result(connection)?;
 
-            Ok(LotResponse {
+            // select all images for this lot
+            let images: Vec<LotImage> = lot_images
+                .filter(lot_id.eq(updated.id))
+                .load(connection)
+                .expect("Error loading posts");
+
+            Ok(LotWithImages {
                 lot: updated.into(),
-                images: vec![],
+                images,
             })
         })
     }

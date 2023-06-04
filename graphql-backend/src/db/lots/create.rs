@@ -1,5 +1,6 @@
 use super::DbExecutor;
-use crate::app::lots::{CreateLotAuthenticated, LotResponse};
+use crate::app::lots::{CreateLotAuthenticated};
+use crate::models::LotWithImages;
 use crate::{
     models::{Lot, LotImage, NewLot, NewLotImage},
     prelude::*,
@@ -9,11 +10,11 @@ use diesel::prelude::*;
 
 
 impl Message for CreateLotAuthenticated {
-    type Result = Result<LotResponse>;
+    type Result = Result<LotWithImages>;
 }
 
 impl Handler<CreateLotAuthenticated> for DbExecutor {
-    type Result = Result<LotResponse>;
+    type Result = Result<LotWithImages>;
 
     fn handle(&mut self, msg: CreateLotAuthenticated, _: &mut Self::Context) -> Self::Result {
         use crate::schema::{lot_images::dsl::*, lots::dsl::*};
@@ -50,8 +51,8 @@ impl Handler<CreateLotAuthenticated> for DbExecutor {
                 .values(&new_lot_images)
                 .get_results(connection)?;
 
-            Ok(LotResponse {
-                lot: inserted_lot.into(),
+            Ok(LotWithImages {
+                lot: inserted_lot,
                 images: inserted_images
                     .into_iter()
                     .map(|image| image.into())
