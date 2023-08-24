@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 
-// use crate::schema::prices;
+use crate::schema::prices;
 
 #[derive(Debug, Queryable)]
 pub struct Price {

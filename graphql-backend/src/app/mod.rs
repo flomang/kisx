@@ -59,21 +59,23 @@ async fn index_graphiql() -> Result<HttpResponse> {
 
 #[actix_web::main]
 pub async fn start_server() -> std::io::Result<()> {
-    let frontend_origin = env::var("FRONTEND_ORIGIN").ok();
 
+    // set vars from .env file 
+    let frontend_origin = env::var("FRONTEND_ORIGIN").ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
+
     let database_pool = new_pool(database_url).expect("Failed to create pool.");
     let database_address =
         SyncArbiter::start(num_cpus::get(), move || DbExecutor(database_pool.clone()));
 
-    let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
     log::info!("GraphiQL IDE: {}", bind_address);
-
     HttpServer::new(move || {
         let state = AppState {
             db: database_address.clone(),
         };
 
+        // allow wildcard for development purposes
         let cors = match frontend_origin {
             // TODO production should not be allowed to send wildcard
             Some(ref origin) if origin != "*" => Cors::default()

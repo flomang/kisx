@@ -205,27 +205,6 @@
         }
     };
 
-    async function handleUpdateLot() {
-        try {
-            const { data } = await client.mutate<LotResult>({
-                mutation: UPDATE_LOT_MUTATION,
-                variables: {
-                    lotID: editableLot.id,
-                    category: editableLot.category,
-                    condition: editableLot.condition,
-                    title: editableLot.title,
-                    externalId: editableLot.setID,
-                    description: editableLot.description,
-                    deleteImageIDs: [],
-                },
-            });
-
-            console.log(JSON.stringify(data));
-        } catch (error: any) {
-            console.log(JSON.stringify(error));
-        }
-    }
-
     function handleToggleEdit() {
         editable = !editable;
         if (!editable) {
@@ -571,7 +550,7 @@
                         </div>
                     {/if}
                     <div class="value">
-                        <img src="eth-symbol-virgil.svg" alt="" />3000.0
+                        Price Here
                     </div>
                 </ImageLabel>
             </Supporting>

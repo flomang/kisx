@@ -26,7 +26,7 @@ fn main() {
     dotenv::dotenv().ok();
 
     if env::var("RUST_LOG").ok().is_none() {
-        env::set_var("RUST_LOG", "pagecraft=debug,actix_web=info");
+        env::set_var("RUST_LOG", "graphql_backend=debug,actix_web=info");
     }
     env_logger::init();
     app::start_server();

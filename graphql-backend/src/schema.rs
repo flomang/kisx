@@ -71,6 +71,14 @@ table! {
 }
 
 table! {
+    lot_statuses (description_id) {
+        description_id -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     lots (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -82,6 +90,7 @@ table! {
         meta_data -> Nullable<Jsonb>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        status -> Text,
     }
 }
 
@@ -118,6 +127,7 @@ joinable!(comments -> users (user_id));
 joinable!(favorite_articles -> articles (article_id));
 joinable!(favorite_articles -> users (user_id));
 joinable!(lot_images -> lots (lot_id));
+joinable!(lots -> lot_statuses (status));
 joinable!(lots -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -128,6 +138,7 @@ allow_tables_to_appear_in_same_query!(
     favorite_articles,
     followers,
     lot_images,
+    lot_statuses,
     lots,
     prices,
     users,
