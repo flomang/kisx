@@ -10,11 +10,14 @@
     import CollectionStats from "./CollectionStats.svelte";
     import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
     import IconButton, { Icon } from "@smui/icon-button";
+    import Chip, { Set, TrailingAction, Text } from "@smui/chips";
+    import { filters, Filter } from "./stores";
 
     let cards: Card[] = [];
     let searchCategory = "something";
     let searchCondition = "something";
     let term = "term";
+    let status = "drafted";
     let page = 1;
     let limit = 10;
     let collectionStats = true;
@@ -28,19 +31,21 @@
 
     const QUERY_LOTS = gql`
         query GetLots(
-            $category: String!
-            $condition: String!
-            $term: String!
+            $categories: [String]!
+            $conditions: [String]!
+            $terms: [String]!
             $page: Int!
             $limit: Int!
+            $statuses: [String]!
         ) {
             getLots(
                 params: {
-                    category: $category
-                    condition: $condition
-                    term: $term
+                    categories: $categories
+                    conditions: $conditions
+                    terms: $terms
                     page: $page
                     limit: $limit
+                    statuses: $statuses
                 }
             ) {
                 lot {
@@ -53,6 +58,7 @@
                     metaData
                     createdAt
                     updatedAt
+                    status
                 }
                 images {
                     id
@@ -66,16 +72,43 @@
         }
     `;
 
-    onMount(async () => {
+    async function handleFilterCollection(filters: Filter[]) {
         try {
+            let categories: String[] = [];
+            let conditions: String[] = [];
+            let keywords: String[] = [];
+            let statuses: String[] = [];
+
+            if (filters.length > 0) {
+                categories = filters
+                    .filter((f: Filter) => f.type == "category")
+                    .map((f: Filter) => f.value);
+                conditions = filters
+                    .filter((f: Filter) => f.type == "condition")
+                    .map((f: Filter) => f.value);
+                keywords = filters
+                    .filter((f: Filter) => f.type == "keyword")
+                    .map((f: Filter) => f.value);
+                statuses = filters
+                    .filter((f: Filter) => f.type == "status")
+                    .map((f: Filter) => f.value);
+
+                console.log("conditions", conditions);
+                console.log("keywords", keywords);
+                console.log("statuses", statuses);
+                console.log("categories", categories);
+            }
+            console.log("filtering collection", filters);
+
             const { data } = await client.query<SearchResult>({
                 query: QUERY_LOTS,
                 variables: {
-                    category: searchCategory,
-                    condition: searchCondition,
-                    term,
+                    categories,
+                    conditions,
+                    terms: keywords,
                     page,
                     limit,
+                     statuses,
                 },
             });
 
@@ -100,14 +133,36 @@
                     meta_data: lot.lot.meta_data,
                 };
             });
+
+            //filters.set(params);
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
+    }
+
+    function handleDeleteChip(chip: string) {
+        // remove chip from filters
+        let new_filters = $filters.filter((f: Filter) => f.toString() != chip);
+        handleFilterCollection(new_filters);
+    }
+
+    onMount(async () => {
+        handleFilterCollection($filters);
     });
 </script>
 
 <LayoutGrid>
     <Cell span={9}>
+        <Set chips={$filters} let:chip key={(chip) => chip.k} input>
+            <Chip {chip}>
+                <Text>{chip.toString()}</Text>
+                <TrailingAction
+                    icon$class="material-icons"
+                    on:click={() => handleDeleteChip(chip.toString())}
+                    >cancel</TrailingAction
+                >
+            </Chip>
+        </Set>
         <LotCollection lots={cards} />
     </Cell>
 
@@ -122,7 +177,7 @@
                     </IconButton>
                 </Header>
                 <Content>
-                    <CollectionStats total_lots={cards.length}/>
+                    <CollectionStats total_lots={cards.length} />
                 </Content>
             </Panel>
             <Panel bind:open={filterPanelOpen}>
@@ -134,7 +189,7 @@
                     </IconButton>
                 </Header>
                 <Content>
-                    <LotFilter />
+                    <LotFilter onFilter={handleFilterCollection} />
                 </Content>
             </Panel>
             <Panel bind:open={addPanelOpen}>

@@ -71,8 +71,8 @@ table! {
 }
 
 table! {
-    lot_statuses (description_id) {
-        description_id -> Text,
+    lot_statuses (description) {
+        description -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

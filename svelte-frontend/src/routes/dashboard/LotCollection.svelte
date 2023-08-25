@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
     import { gql } from "@apollo/client/core";
     import client from "../../lib/apollo";
+    
 
     export interface Card {
         id: string;

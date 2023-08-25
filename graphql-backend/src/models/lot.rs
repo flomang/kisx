@@ -21,6 +21,7 @@ pub struct Lot {
     pub created_at: NaiveDateTime,
     #[graphql(skip)]
     pub updated_at: NaiveDateTime,
+    pub status: String,
 }
 
 #[async_graphql::ComplexObject]

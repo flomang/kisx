@@ -12,7 +12,7 @@ use std::convert::From;
 use validator::ValidationErrors;
 
 #[derive(Serialize, Deserialize, Debug, async_graphql::SimpleObject)]
-struct ValidationError {
+pub struct ValidationError {
     message: String,
     key: String,
 }

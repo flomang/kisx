@@ -86,11 +86,12 @@ pub struct CreateLotImage {
 #[derive(async_graphql::InputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FilterLots {
-    pub category: Option<String>,
-    pub condition: Option<String>,
-    pub term: Option<String>,
+    pub categories: Vec<String>,
+    pub conditions: Vec<String>,
+    pub terms: Vec<String>,
     pub page: Option<i32>,
     pub limit: Option<i32>,
+    pub statuses: Vec<String>,
 }
 
 #[derive(Debug)]
