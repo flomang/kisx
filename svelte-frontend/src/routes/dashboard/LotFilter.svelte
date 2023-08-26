@@ -13,11 +13,12 @@
     let category: string | undefined;
     let condition: string | undefined;
     let status: string | undefined;
-    let clicked = 0;
+
     // TODO populate these from the server
     let statusOptions = ["drafted", "actively listed", "sold", "deleted"];
     let types = ["box", "set", "instructions", "minifig", "part", "custom"];
     let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+
     let filters: Filter[];
     const unsubscribeFn = stored_filters.subscribe((value) => {
         filters = value;
@@ -25,6 +26,7 @@
 
     onDestroy(unsubscribeFn);
 
+    // enable the filter button if any of the filter fields are set
     $: enabled = keyword != "" || condition != undefined || category != undefined || status != undefined; 
 
     const handleFilterCollection = async () => {
@@ -51,8 +53,6 @@
         category = undefined;
         condition = undefined;
         status = undefined;
-
-        return true;
     };
 </script>
 

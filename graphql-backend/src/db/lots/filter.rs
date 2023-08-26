@@ -36,15 +36,20 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
             user_lots_query = user_lots_query.filter(condition.eq_any(msg.params.conditions));
         }
         if !msg.params.terms.is_empty() {
-            let ilike_conditions: Vec<_>  = msg
+            let ilike_conditions: Vec<_> = msg
                 .params
                 .terms
                 .iter()
                 .map(|term| format!("%{}%", term.to_lowercase()))
                 .collect();
 
-                // TODO lower case both inputs
-                user_lots_query = user_lots_query.filter(lower(description).like(ilike_conditions.join("")));
+            // lower the description column and check if it contains any of the lowercase terms
+            user_lots_query = user_lots_query.filter(
+                lower(description)
+                    .like(ilike_conditions.join(""))
+                    .or(lower(title).like(ilike_conditions.join(""))),
+            );
+            // .filter(lower(title).like(ilike_conditions.join("")));
         }
 
         let user_lots = user_lots_query.select(Lot::as_select()).load(conn)?;

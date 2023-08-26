@@ -14,12 +14,6 @@
     import { filters, Filter } from "./stores";
 
     let cards: Card[] = [];
-    let searchCategory = "something";
-    let searchCondition = "something";
-    let term = "term";
-    let status = "drafted";
-    let page = 1;
-    let limit = 10;
     let collectionStats = true;
     let filterPanelOpen = false;
     let addPanelOpen = false;
@@ -72,7 +66,7 @@
         }
     `;
 
-    async function handleFilterCollection(filters: Filter[]) {
+    async function handleFilterCollection(filters: Filter[], page: number = 1, limit: number = 10) {
         try {
             let categories: String[] = [];
             let conditions: String[] = [];
@@ -93,10 +87,10 @@
                     .filter((f: Filter) => f.type == "status")
                     .map((f: Filter) => f.value);
 
-                console.log("conditions", conditions);
-                console.log("keywords", keywords);
-                console.log("statuses", statuses);
-                console.log("categories", categories);
+                // console.log("conditions", conditions);
+                // console.log("keywords", keywords);
+                // console.log("statuses", statuses);
+                // console.log("categories", categories);
             }
             console.log("filtering collection", filters);
 
@@ -108,7 +102,7 @@
                     terms: keywords,
                     page,
                     limit,
-                     statuses,
+                    statuses,
                 },
             });
 
@@ -133,8 +127,6 @@
                     meta_data: lot.lot.meta_data,
                 };
             });
-
-            //filters.set(params);
         } catch (error: any) {
             console.log(JSON.stringify(error));
         }
@@ -153,7 +145,7 @@
 
 <LayoutGrid>
     <Cell span={9}>
-        <Set chips={$filters} let:chip key={(chip) => chip.k} input>
+        <Set chips={$filters} let:chip key={(chip) => chip.key} input>
             <Chip {chip}>
                 <Text>{chip.toString()}</Text>
                 <TrailingAction
