@@ -3,7 +3,7 @@ use std::str::FromStr;
 use super::DbExecutor;
 use crate::{
     app::lots::FilterLotsAuthenticated,
-    models::{Lot, LotImage, LotWithImages},
+    models::{Lot, LotImage, LotWithImages, LotStatus},
     prelude::*,
 };
 use actix::prelude::*;
@@ -32,7 +32,8 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
             lots.into_boxed()
         };
 
-        println!("msg.params.statuses: {:?}", msg.params.statuses);
+        // remove soft deleted lots
+        user_lots_query = user_lots_query.filter(status.ne(LotStatus::Deleted.as_str()));
 
         if !msg.params.statuses.is_empty() {
             user_lots_query = user_lots_query.filter(status.eq_any(&msg.params.statuses));
