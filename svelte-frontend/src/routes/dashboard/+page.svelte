@@ -20,11 +20,11 @@
 
     interface SearchResult {
         // array of lot results
-        getLots: LotResult[];
+        getUserLots: LotResult[];
     }
 
     const QUERY_LOTS = gql`
-        query GetLots(
+        query GetUserLots(
             $categories: [String]!
             $conditions: [String]!
             $terms: [String]!
@@ -32,7 +32,7 @@
             $limit: Int!
             $statuses: [String]!
         ) {
-            getLots(
+            getUserLots(
                 params: {
                     categories: $categories
                     conditions: $conditions
@@ -106,7 +106,7 @@
                 },
             });
 
-            let user_lots = data.getLots;
+            let user_lots = data.getUserLots;
 
             // map lots to cards
             cards = user_lots.map((lot) => {

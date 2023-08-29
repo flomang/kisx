@@ -8,14 +8,16 @@ use crate::{
 };
 use actix::prelude::*;
 use diesel::prelude::*;
+use diesel::sql_types::Text;
+sql_function!(fn lower(x: Text) -> Text);
 
+// Messages
+// Filter lots by authenticated user
 impl Message for FilterLotsAuthenticated {
     type Result = Result<Vec<LotWithImages>>;
 }
 
-use diesel::sql_types::Text;
-sql_function!(fn lower(x: Text) -> Text);
-
+// Handlers
 impl Handler<FilterLotsAuthenticated> for DbExecutor {
     type Result = Result<Vec<LotWithImages>>;
 
@@ -24,16 +26,22 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
 
         let conn = &mut self.0.get()?;
 
-        let mut user_lots_query = lots.filter(user_id.eq(msg.auth.user.id)).into_boxed();
+        let mut user_lots_query = if let Some(user) = msg.owner_id {
+            lots.filter(user_id.eq(user)).into_boxed()
+        } else {
+            lots.into_boxed()
+        };
+
+        println!("msg.params.statuses: {:?}", msg.params.statuses);
 
         if !msg.params.statuses.is_empty() {
-            user_lots_query = user_lots_query.filter(status.eq_any(msg.params.statuses));
+            user_lots_query = user_lots_query.filter(status.eq_any(&msg.params.statuses));
         }
         if !msg.params.categories.is_empty() {
-            user_lots_query = user_lots_query.filter(category.eq_any(msg.params.categories));
+            user_lots_query = user_lots_query.filter(category.eq_any(&msg.params.categories));
         }
         if !msg.params.conditions.is_empty() {
-            user_lots_query = user_lots_query.filter(condition.eq_any(msg.params.conditions));
+            user_lots_query = user_lots_query.filter(condition.eq_any(&msg.params.conditions));
         }
         if !msg.params.terms.is_empty() {
             let ilike_terms: Vec<_> = msg
@@ -47,7 +55,7 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
                 .params
                 .terms
                 .iter()
-                .map(|term| format!("{}", term.to_lowercase()))
+                .map(|term| term.to_lowercase())
                 .collect();
 
             // lower the description column and check if it contains any of the lowercase terms
@@ -79,3 +87,4 @@ impl Handler<FilterLotsAuthenticated> for DbExecutor {
         Ok(lots_with_images)
     }
 }
+

@@ -98,6 +98,7 @@ pub struct FilterLots {
 pub struct FilterLotsAuthenticated {
     pub auth: Auth,
     pub params: FilterLots,
+    pub owner_id: Option<Uuid>,
 }
 
 // Server Responses ↓

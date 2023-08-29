@@ -1,6 +1,7 @@
 use crate::{
     app::{users::UserResponse, AppState},
-    utils::auth::authenticate_token, models::LotWithImages,
+    models::{LotWithImages, LotStatus},
+    utils::auth::authenticate_token,
 };
 use async_graphql::*;
 
@@ -10,8 +11,9 @@ use super::{
         ArticleListResponse, ArticleResponse, ArticlesParams, FeedParams, GetArticle, GetArticles,
         GetFeed,
     },
+    lots::{FilterLots, FilterLotsAuthenticated},
     profiles::{GetProfile, ProfileResponse},
-    tags::{GetTags, TagsResponse}, lots::{FilterLots, FilterLotsAuthenticated},
+    tags::{GetTags, TagsResponse},
 };
 
 pub struct QueryRoot;
@@ -121,17 +123,42 @@ impl QueryRoot {
         Ok(res)
     }
 
-    // get lots
-    async fn get_lots<'ctx>(
+    // get lots by authenticated user
+    async fn get_user_lots<'ctx>(
         &self,
         ctx: &Context<'ctx>,
         params: FilterLots,
     ) -> Result<Vec<LotWithImages>> {
         let state = ctx.data_unchecked::<AppState>();
         let auth = authenticate_token(state, ctx).await?;
+        let user_id = auth.user.id;
+
         let res = state
             .db
-            .send(FilterLotsAuthenticated { auth, params })
+            .send(FilterLotsAuthenticated { auth, params, owner_id: Some(user_id) })
+            .await??;
+
+        Ok(res)
+    }
+
+    // get lots for sale authenticated user
+    async fn get_lots_for_sale<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        params: FilterLots,
+    ) -> Result<Vec<LotWithImages>> {
+        let state = ctx.data_unchecked::<AppState>();
+        let auth = authenticate_token(state, ctx).await?;
+
+        let statuses = vec![LotStatus::ForSale.as_str().to_string()];
+        let params = FilterLots {
+            statuses,
+            ..params
+        };
+
+        let res = state
+            .db
+            .send(FilterLotsAuthenticated { auth, params, owner_id: None })
             .await??;
 
         Ok(res)

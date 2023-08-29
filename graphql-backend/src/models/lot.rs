@@ -111,3 +111,27 @@ pub struct UpdateLot {
     pub external_id: Option<String>,
     pub description: Option<String>,
 }
+
+pub enum LotStatus {
+    Cancelled,
+    Deleted,
+    Drafted,
+    ForSale,
+    Pending,
+    Sold,
+    Archived,
+}
+
+impl LotStatus {
+    pub fn as_str(&self) -> &str {
+        match self {
+            LotStatus::Cancelled => "cancelled",
+            LotStatus::Deleted => "deleted",
+            LotStatus::Drafted => "drafted",
+            LotStatus::ForSale => "actively listed",
+            LotStatus::Pending => "pending sale",
+            LotStatus::Sold => "sold",
+            LotStatus::Archived => "archived",
+        }
+    }
+}
