@@ -125,6 +125,7 @@
                     condition: lot.lot.condition,
                     description: lot.lot.description,
                     meta_data: lot.lot.meta_data,
+                    status: lot.lot.status,
                 };
             });
         } catch (error: any) {

@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
     import { gql } from "@apollo/client/core";
     import client from "../../lib/apollo";
-    
 
     export interface Card {
         id: string;
@@ -12,6 +11,7 @@
         condition: string;
         description: string;
         meta_data: string;
+        status: string;
     }
 
     export interface LotImage {
@@ -31,6 +31,7 @@
             externalId: string;
             description: string;
             meta_data: string;
+            status: string;
         };
         images: LotImage[];
     }
@@ -126,8 +127,11 @@
     let images: HTMLImageElement[] = [];
     let thumbnail: HTMLImageElement;
 
-    let types = ["box", "set", "instructions", "minifig", "part", "custom"];
-    let conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+    // TODO read these from the server
+    const statuses = ["drafted", "actively listed"];
+    const types = ["box", "set", "instructions", "minifig", "part", "custom"];
+    const conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+    const noneditable = ["sold", "pending sale"];
 
     interface DeleteLotResult {
         deleteLot: number;
@@ -353,37 +357,51 @@
                 <Cell span={5}>
                     <div class="detail">
                         <div class="action-bar">
-                            <SegmentedButton
-                                segments={actions}
-                                let:segment
-                                key={(segment) => segment.name}
-                            >
-                                <Segment
-                                    {segment}
-                                    selected={segment.selected}
-                                    on:click={(event) => {
-                                        actions = actions;
-                                        if (
-                                            segment.name != "Delete" &&
-                                            segment.name != "Add"
-                                        ) {
-                                            segment.selected =
-                                                !segment.selected;
-                                        }
-                                        if (segment.action != null)
-                                            segment.action();
-
-                                        blurAllElements();
-                                    }}
+                            {#if !noneditable.includes(selectedLot.status)}
+                                <SegmentedButton
+                                    segments={actions}
+                                    let:segment
+                                    key={(segment) => segment.name}
                                 >
-                                    {#if segment.name == "Add"}
-                                        <Dropzone
-                                            on:drop={handleFilesSelect}
-                                            accept={["image/*"]}
-                                            containerClasses="add-dropzone"
-                                            disableDefaultStyles={true}
-                                            inputElement
-                                        >
+                                    <Segment
+                                        {segment}
+                                        selected={segment.selected}
+                                        on:click={(event) => {
+                                            actions = actions;
+                                            if (
+                                                segment.name != "Delete" &&
+                                                segment.name != "Add"
+                                            ) {
+                                                segment.selected =
+                                                    !segment.selected;
+                                            }
+                                            if (segment.action != null)
+                                                segment.action();
+
+                                            blurAllElements();
+                                        }}
+                                    >
+                                        {#if segment.name == "Add"}
+                                            <Dropzone
+                                                on:drop={handleFilesSelect}
+                                                accept={["image/*"]}
+                                                containerClasses="add-dropzone"
+                                                disableDefaultStyles={true}
+                                                inputElement
+                                            >
+                                                <Icon
+                                                    component={Svg}
+                                                    style="width: 1em; height: auto;"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        fill="currentColor"
+                                                        d={segment.icon}
+                                                    />
+                                                </Icon>
+                                                <Label>{segment.name}</Label>
+                                            </Dropzone>
+                                        {:else}
                                             <Icon
                                                 component={Svg}
                                                 style="width: 1em; height: auto;"
@@ -395,23 +413,12 @@
                                                 />
                                             </Icon>
                                             <Label>{segment.name}</Label>
-                                        </Dropzone>
-                                    {:else}
-                                        <Icon
-                                            component={Svg}
-                                            style="width: 1em; height: auto;"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                fill="currentColor"
-                                                d={segment.icon}
-                                            />
-                                        </Icon>
-                                        <Label>{segment.name}</Label>
-                                    {/if}
-                                </Segment>
-                            </SegmentedButton>
+                                        {/if}
+                                    </Segment>
+                                </SegmentedButton>
+                            {/if}
                         </div>
+
                         <div class="lot-input">
                             <Textfield
                                 variant="outlined"
@@ -441,6 +448,41 @@
                                     > Set Number
                                 </svelte:fragment>
                             </Textfield>
+                        </div>
+                        <div class="lot-input">
+                            {#if !noneditable.includes(selectedLot.status)}
+                                <Select
+                                    style="width: 100%;"
+                                    bind:value={editableLot.status}
+                                    variant="outlined"
+                                    disabled={!editable}
+                                >
+                                    <svelte:fragment slot="label">
+                                        <CommonIcon
+                                            class="material-icons"
+                                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                            >priority_high</CommonIcon
+                                        > Status
+                                    </svelte:fragment>
+                                    {#each statuses.sort() as ty}
+                                        <Option value={ty}>{ty}</Option>
+                                    {/each}
+                                </Select>
+                            {:else}
+                                <Textfield
+                                    variant="outlined"
+                                    style="width: 100%;"
+                                    disabled={!editable}
+                                    bind:value={editableLot.status}
+                                    ><svelte:fragment slot="label">
+                                        <CommonIcon
+                                            class="material-icons"
+                                            style="font-size: 1em; line-height: normal; vertical-align: top;"
+                                            >priority_high</CommonIcon
+                                        > Status
+                                    </svelte:fragment>
+                                </Textfield>
+                            {/if}
                         </div>
                         <div class="lot-input">
                             <Select
@@ -550,8 +592,8 @@
                             {lot.setID}
                         </div>
                     {/if}
-                    <div class="value">
-                        Price Here
+                    <div class={`status ${lot.status.replace(" ", "_")}`}>
+                        {lot.status}
                     </div>
                 </ImageLabel>
             </Supporting>
@@ -610,7 +652,7 @@
         outline: 0;
     }
 
-    .value {
+    .actively_listed {
         display: flex;
         background-color: green;
         float: right;
@@ -622,6 +664,37 @@
 
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14),
             0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .status {
+        display: flex;
+        float: right;
+        padding-inline: 5px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+            0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .drafted {
+        background-color: white;
+        color: black;
+    }
+
+    .deleted {
+        background-color: black;
+        color: #fff;
+    }
+
+    .pending_sale {
+        background-color: orange;
+        color: #fff;
+    }
+
+    .sold {
+        background-color: red;
+        color: #fff;
     }
 
     .value img {
