@@ -31,6 +31,7 @@ pub struct UpdateLot {
     pub title: Option<String>,
     pub external_id: Option<String>,
     pub description: Option<String>,
+    pub status: Option<String>,
     //pub new_images: ...,
     // vec of image uuids to delete
     pub deleted_image_ids: Vec<String>,
@@ -54,6 +55,7 @@ impl From<UpdateLot> for models::UpdateLot {
             title: lot.title,
             external_id: lot.external_id,
             description: lot.description,
+            status: lot.status,
         }
     }
 }

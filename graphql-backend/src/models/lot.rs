@@ -110,6 +110,7 @@ pub struct UpdateLot {
     pub title: Option<String>,
     pub external_id: Option<String>,
     pub description: Option<String>,
+    pub status: Option<String>,
 }
 
 pub enum LotStatus {

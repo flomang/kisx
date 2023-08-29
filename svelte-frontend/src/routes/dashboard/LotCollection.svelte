@@ -148,6 +148,7 @@
             $lotID: String!
             $category: String
             $condition: String
+            $status: String
             $title: String
             $externalId: String
             $description: String
@@ -161,6 +162,7 @@
                     title: $title
                     externalId: $externalId
                     description: $description
+                    status: $status
                     deletedImageIds: $deleteImageIDs
                 }
             ) {
@@ -172,6 +174,7 @@
                     externalId
                     description
                     metaData
+                    status
                 }
                 images {
                     id
@@ -243,6 +246,7 @@
                     lotID: editableLot.id,
                     category: editableLot.category,
                     condition: editableLot.condition,
+                    status: editableLot.status,
                     title: editableLot.title,
                     externalId: editableLot.setID,
                     description: editableLot.description,
@@ -450,7 +454,7 @@
                             </Textfield>
                         </div>
                         <div class="lot-input">
-                            {#if !noneditable.includes(selectedLot.status)}
+                            {#if !noneditable.includes(editableLot.status)}
                                 <Select
                                     style="width: 100%;"
                                     bind:value={editableLot.status}
