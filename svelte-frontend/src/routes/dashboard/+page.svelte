@@ -126,6 +126,7 @@
                     description: lot.lot.description,
                     meta_data: lot.lot.meta_data,
                     status: lot.lot.status,
+                    price: 0,
                 };
             });
         } catch (error: any) {

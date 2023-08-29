@@ -551,7 +551,7 @@
                         </div>
                     {/if}
                     <div class="value">
-                        Price Here
+                        0.25000 ETH 
                     </div>
                 </ImageLabel>
             </Supporting>

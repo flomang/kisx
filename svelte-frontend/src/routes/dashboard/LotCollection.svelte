@@ -12,6 +12,7 @@
         description: string;
         meta_data: string;
         status: string;
+        price: number;
     }
 
     export interface LotImage {
@@ -128,9 +129,15 @@
     let thumbnail: HTMLImageElement;
 
     // TODO read these from the server
-    const statuses = ["drafted", "actively listed"];
+    const statuses = ["drafted", "for sale"];
     const types = ["box", "set", "instructions", "minifig", "part", "custom"];
-    const conditions = ["sealed", "complete", "used", "missing pieces", "other"];
+    const conditions = [
+        "sealed",
+        "complete",
+        "used",
+        "missing pieces",
+        "other",
+    ];
     const noneditable = ["sold", "pending sale"];
 
     interface DeleteLotResult {
@@ -488,6 +495,19 @@
                                 </Textfield>
                             {/if}
                         </div>
+                        {#if editableLot.status == "for sale"}
+                            <div class="lot-input">
+                                <Textfield
+                                    variant="outlined"
+                                    style="width: 100%;"
+                                    disabled={!editable}
+                                    bind:value={editableLot.price}
+                                    ><svelte:fragment slot="label">
+                                       ETH Price
+                                    </svelte:fragment>
+                                </Textfield>
+                            </div>
+                        {/if}
                         <div class="lot-input">
                             <Select
                                 style="width: 100%;"
@@ -656,9 +676,9 @@
         outline: 0;
     }
 
-    .actively_listed {
+    .for_sale {
         display: flex;
-        background-color: green;
+        background-color: red;
         float: right;
         padding-inline: 5px;
         margin-bottom: 10px;
@@ -697,8 +717,7 @@
     }
 
     .sold {
-        background-color: red;
-        color: #fff;
+        color: red;
     }
 
     .value img {

@@ -106,6 +106,7 @@ fn validate_password(password: &str) -> Result<(), ValidationError> {
 pub struct LoginUser {
     #[validate(email(message = "not a valid email address"))]
     pub email: String,
+    #[graphql(secret)]
     pub password: String,
 }
 

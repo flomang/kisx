@@ -5,5 +5,5 @@ CREATE TABLE lot_statuses (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-INSERT INTO lot_statuses (description) VALUES ('deleted'), ('drafted'), ('pending sale'), ('actively listed'), ('sold'), ('cancelled');
+INSERT INTO lot_statuses (description) VALUES ('deleted'), ('drafted'), ('pending sale'), ('for sale'), ('sold'), ('cancelled sale');
 ALTER TABLE lots ADD COLUMN status TEXT REFERENCES lot_statuses(description) default 'drafted' NOT NULL;

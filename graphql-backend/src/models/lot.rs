@@ -126,10 +126,10 @@ pub enum LotStatus {
 impl LotStatus {
     pub fn as_str(&self) -> &str {
         match self {
-            LotStatus::Cancelled => "cancelled",
+            LotStatus::Cancelled => "cancelled sale",
             LotStatus::Deleted => "deleted",
             LotStatus::Drafted => "drafted",
-            LotStatus::ForSale => "actively listed",
+            LotStatus::ForSale => "for sale",
             LotStatus::Pending => "pending sale",
             LotStatus::Sold => "sold",
             LotStatus::Archived => "archived",
