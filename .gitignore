@@ -34,6 +34,7 @@ Cargo.lock
 # uncomment to ignore forge generated contracts folder
 #contracts/
 foundry-contracts/lib
+svelte-frontend/src/contracts
 
 # Compiler files
 cache/
