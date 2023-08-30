@@ -31,8 +31,9 @@ Cargo.lock
 
 # End of https://www.gitignore.io/api/rust,code
 
-# ignore forge generated contracts folder
-contracts/
+# uncomment to ignore forge generated contracts folder
+#contracts/
+foundry-contracts/lib
 
 # Compiler files
 cache/
@@ -48,3 +49,15 @@ docs/
 
 # Dotenv file
 .env
+
+/public/build/
+
+node_modules
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+artifacts
