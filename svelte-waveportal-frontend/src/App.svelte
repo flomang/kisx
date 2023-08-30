@@ -9,7 +9,7 @@
   import { ethers } from "ethers";
   import WavePortal from "../artifacts/contracts/WavePortal.sol/WavePortal.json";
 
-  const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+  const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
   async function getAllWaves() {
     if (!window.ethereum) {
@@ -23,9 +23,6 @@
 
     //const provider = new ethers.providers.Web3Provider(window.ethereum);
     const provider = new ethers.BrowserProvider(window.ethereum)
-
-    // MetaMask requires requesting permission to connect users accounts
-    await provider.send("eth_requestAccounts", []);
 
     const wavePortalContract = new ethers.Contract(
       CONTRACT_ADDRESS,

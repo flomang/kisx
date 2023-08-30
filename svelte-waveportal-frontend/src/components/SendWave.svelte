@@ -13,20 +13,17 @@
       //const provider = new ethers.providers.Web3Provider(window.ethereum);
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-
-      console.log("signer: ", signer);
       const wavePortalContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         WavePortal.abi,
         signer
       );
-      console.log("contract: ", CONTRACT_ADDRESS);
+
       const transaction = await wavePortalContract.wave(reaction, message, {
         gasLimit: 400000,
       });
-      console.log("contract: ", CONTRACT_ADDRESS);
+
       await transaction.wait();
-      console.log("contract: ", CONTRACT_ADDRESS);
 
       message = "";
       fetchWaves();

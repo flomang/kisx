@@ -29,5 +29,5 @@ npx hardhat node
 To create a production version of your app:
 
 ```bash
-npx hardhat run scripts/deploy.ts --network localhost
+npx hardhat run scripts/deploy.js --network localhost
 ```
