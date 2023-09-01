@@ -17,7 +17,6 @@ describe("NFT contract", function () {
     expect(owner).to.equal(signer.address);
     expect(name).to.equal("NFT test");
     expect(symbol).to.equal("test");
-
   });
 
   it("should revert when mint not paid", async function () {

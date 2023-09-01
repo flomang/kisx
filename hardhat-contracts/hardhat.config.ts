@@ -1,7 +1,7 @@
-/** @type import('hardhat/config').HardhatUserConfig */
-require("@nomicfoundation/hardhat-toolbox");
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
 
-module.exports = {
+const config: HardhatUserConfig = {
   solidity: "0.8.19",
   paths: {
     artifacts: "../svelte-waveportal-frontend/artifacts",
@@ -13,4 +13,4 @@ module.exports = {
   },
 };
 
-
+export default config;
