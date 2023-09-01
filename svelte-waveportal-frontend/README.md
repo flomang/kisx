@@ -14,3 +14,7 @@ example:
 ```
 const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
 ```
+
+Reset Metamask account's activity and nonce data if needed via metamask settings > advanced.
+
+
