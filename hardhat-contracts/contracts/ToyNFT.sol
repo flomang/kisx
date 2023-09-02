@@ -13,9 +13,8 @@ error NonExistentTokenURI();
 error WithdrawTransferFailure();
 
 // ERC721URIStorage is an extension of the ERC721 standard that adds a tokenURI to points
-// to the item's metadata. 
+// to the item's metadata.
 contract ToyNFT is ERC721URIStorage, Ownable {
-
     using Strings for uint256;
     using Counters for Counters.Counter;
 
@@ -26,12 +25,18 @@ contract ToyNFT is ERC721URIStorage, Ownable {
     constructor(
         string memory _name,
         string memory _symbol
-    ) ERC721(_name, _symbol) {
+    ) ERC721(_name, _symbol) {}
+
+    function currentId() public view returns (uint) {
+        return currentTokenId.current();
     }
 
     // Mints a new token and assigns it to an address.
     // The token's URI is set to the provided URL.
-    function mintTo(address recipient, string memory url) public payable returns (uint256) {
+    function mintTo(
+        address recipient,
+        string memory url
+    ) public payable returns (uint256) {
         if (recipient == address(0)) {
             revert InvalidRecipient(recipient);
         }

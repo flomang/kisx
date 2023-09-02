@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import {
-  time,
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 
@@ -12,9 +11,7 @@ describe("NFT contract", function () {
     const toyContract = await ToyNFT.deploy("NFT test", "test");
     const [owner, otherAccount] = await ethers.getSigners();
 
-    //[signer, buyer, seller] = await ethers.getSigners();
     return { toyContract, owner, otherAccount };
-
   }
 
   describe("Deployment", function () {
