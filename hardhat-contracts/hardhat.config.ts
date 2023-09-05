@@ -5,7 +5,17 @@ import '@nomicfoundation/hardhat-ethers'
 import '@nomicfoundation/hardhat-chai-matchers'
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.19",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.21",
+      },
+      {
+        version: "0.8.19",
+        settings: {},
+      },
+    ],
+  },
   paths: {
     artifacts: "../svelte-waveportal-frontend/artifacts",
   },
