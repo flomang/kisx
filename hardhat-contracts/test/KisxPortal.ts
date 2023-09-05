@@ -3,6 +3,7 @@ import { ethers } from "hardhat";
 import {
     loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { KisxPortal } from "../typechain-types/contracts/KisxPortal";
 
 describe("Kisx Portal", function () {
 
@@ -98,6 +99,29 @@ describe("Kisx Portal", function () {
 
             let pending = await kisx.findAllPending();
             expect(pending.length).to.equal(0);
+
+            let count = await kisx.pendingLotCount();
+            expect(count).to.equal(0);
+        });
+
+        it("should allow a buyer to buy a lot", async function () {
+            const { kisx, owner, account1, account2, mintPrice } = await loadFixture(deploy);
+            const price = ethers.parseEther("3.5");
+
+            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z", "Count of Monte Lego", price, "uri", { value: mintPrice }))
+                .to.emit(kisx, "LogCreate")
+                .withArgs(0, "Lego", "2023-09-05T22:27:54Z", "Count of Monte Lego", price, account1.address);;
+
+            let lot: KisxPortal.LotStruct = await kisx.connect(account2).findLot(0);
+            
+            await expect(kisx.connect(account2).buyLot(0, { value: lot.price })).to.emit(kisx, "LogSold")
+            let pending = await kisx.findAllPending();
+            expect(pending.length).to.equal(0);
+
+            let count = await kisx.pendingLotCount();
+            expect(count).to.equal(0);
+
+            await expect((await kisx.ownerOf(0))).to.equal(account2.address);
         });
     });
 });

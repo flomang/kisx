@@ -128,82 +128,45 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     /* Pass the token ID and get the lot information */
     function findLot(
         uint256 _tokenId
-    )
-        public
-        view
-        returns (
-            uint256,
-            string memory,
-            string memory,
-            uint256,
-            uint status,
-            string memory,
-            string memory,
-            address,
-            address payable,
-            string memory
-        )
-    {
-        Lot memory lot = lots[_tokenId];
-        return (
-            lot.id,
-            lot.title,
-            lot.description,
-            lot.price,
-            lot.status,
-            lot.date,
-            lot.authorName,
-            lot.author,
-            lot.owner,
-            lot.uri
-        );
+    ) public view returns (Lot memory) {
+        return lots[_tokenId];
     }
 
     function buyLot(uint256 _tokenId) public payable {
-        (
-            uint256 _id,
-            string memory _title,
-            ,
-            uint256 _price,
-            uint _status,
-            ,
-            string memory _authorName,
-            address _author,
-            address payable _current_owner,
-
-        ) = findLot(_tokenId);
-        require(_current_owner != address(0));
+        Lot memory lot = findLot(_tokenId);
+        require(lot.owner != address(0));
         require(msg.sender != address(0));
-        require(msg.sender != _current_owner);
-        require(msg.value >= _price);
-        require(lots[_tokenId].owner != address(0));
+        require(msg.sender != lot.owner);
+        require(msg.value >= lot.price);
+        require(lot.status == 1, "The lot is not for sale");
+
         // transfer ownership of the art
-        _safeTransfer(_current_owner, msg.sender, _tokenId, "");
+        _safeTransfer(lot.owner, msg.sender, _tokenId, "");
         //return extra payment
-        if (msg.value > _price)
-            payable(msg.sender).transfer(msg.value - _price);
+        if (msg.value > lot.price)
+            payable(msg.sender).transfer(msg.value - lot.price);
         //make a payment to the current owner
-        _current_owner.transfer(_price);
+        lot.owner.transfer(lot.price);
         lots[_tokenId].owner = payable(msg.sender);
         lots[_tokenId].status = 0;
 
         LotTxn memory _lotTxn = LotTxn({
-            id: _id,
-            price: _price,
-            seller: _current_owner,
+            id: lot.id,
+            price: lot.price,
+            seller: lot.owner,
             buyer: msg.sender,
             txnDate: block.timestamp,
-            status: _status
+            status: lot.status
         });
-        lotTxns[_id].push(_lotTxn);
+        lotTxns[lot.id].push(_lotTxn);
         pendingLotCount.decrement();
         emit LogSold(
             _tokenId,
-            _title,
-            _authorName,
-            _price,
-            _author,
-            _current_owner,
+            lot.title,
+            lot.authorName,
+            lot.price,
+            lot.author,
+            lot.owner,
             msg.sender
         );
     }
