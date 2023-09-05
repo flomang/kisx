@@ -22,7 +22,7 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         address payable owner;
         // 1 means token has sale status (or still in selling) and 0 means token is already sold, ownership transferred and moved to off-market gallery
         uint status;
-        string image;
+        string uri;
     }
 
     struct LotTxn {
@@ -36,12 +36,13 @@ contract KisxPortal is ERC721URIStorage, Ownable {
 
     // gets updated during minting(creation), buying and reselling
     Counters.Counter public pendingLotCount;
+    Counters.Counter public index;
 
     // mint price token
     uint256 public mintPrice;
 
     mapping(uint256 => LotTxn[]) private lotTxns;
-    uint256 public index; // uint256 value; is cheaper than uint256 value = 0;.
+    // uint256 public index; // uint256 value; is cheaper than uint256 value = 0;.
     Lot[] public lots;
 
     // log events back to the user interface
@@ -61,9 +62,10 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         string _category,
         string _authorName,
         uint256 _price,
-        address _author,
-        address _current_owner
+        address _author
     );
+
+    event LogCancel(uint _tokenId);
 
     event LogResell(uint _tokenId, uint _status, uint256 _price);
 
@@ -80,13 +82,13 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     }
 
     /* Create or minting the token */
-    function createLotToken(
+    function createLot(
         string memory _title,
         string memory _description,
         string memory _date,
         string memory _authorName,
         uint256 _price,
-        string memory _image
+        string memory _uri
     ) public payable returns (uint256 tokenId) {
         require(bytes(_title).length > 0, "The title cannot be empty");
         require(bytes(_date).length > 0, "The Date cannot be empty");
@@ -95,11 +97,11 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             "The description cannot be empty"
         );
         require(_price > 0, "The price cannot be empty");
-        require(bytes(_image).length > 0, "The image cannot be empty");
         require(msg.value >= mintPrice, "The mint price is not paid");
 
-        Lot memory _art = Lot({
-            id: index,
+        tokenId = index.current();
+        Lot memory _lot = Lot({
+            id: tokenId,
             title: _title,
             description: _description,
             price: _price,
@@ -108,23 +110,19 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             author: payable(msg.sender),
             owner: payable(msg.sender),
             status: 1,
-            image: _image
+            uri: _uri
         });
-        lots.push(_art); // push to the array
-        // array length -1 to get the token ID = 0, 1,2 ...
-        tokenId = lots.length - 1;
+        lots.push(_lot);
         _safeMint(msg.sender, tokenId);
-        emit LogCreate(
-            tokenId,
-            _title,
-            _date,
-            _authorName,
-            _price,
-            msg.sender,
-            msg.sender
-        );
-        index++;
-        pendingLotCount.increment;
+        _setTokenURI(tokenId, _uri);
+
+        emit LogCreate(tokenId, _title, _date, _authorName, _price, msg.sender);
+        index.increment();
+        pendingLotCount.increment();
+
+        // refund extra payment
+        if (msg.value > mintPrice)
+            payable(msg.sender).transfer(msg.value - mintPrice);
     }
 
     /* Pass the token ID and get the lot information */
@@ -146,18 +144,18 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             string memory
         )
     {
-        Lot memory art = lots[_tokenId];
+        Lot memory lot = lots[_tokenId];
         return (
-            art.id,
-            art.title,
-            art.description,
-            art.price,
-            art.status,
-            art.date,
-            art.authorName,
-            art.author,
-            art.owner,
-            art.image
+            lot.id,
+            lot.title,
+            lot.description,
+            lot.price,
+            lot.status,
+            lot.date,
+            lot.authorName,
+            lot.author,
+            lot.owner,
+            lot.uri
         );
     }
 
@@ -210,61 +208,50 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         );
     }
 
+    function cancelLot(uint256 _tokenId) public payable {
+        require(msg.sender != address(0));
+        if (msg.sender != owner()) {
+            require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
+        }
+        lots[_tokenId].status = 0;
+        pendingLotCount.decrement();
+        emit LogCancel(_tokenId);
+    }
+
     function resellLot(uint256 _tokenId, uint256 _price) public payable {
         require(msg.sender != address(0));
-        require(isOwnerOf(_tokenId,msg.sender));
+        require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
         lots[_tokenId].status = 1;
         lots[_tokenId].price = _price;
         pendingLotCount.increment();
         emit LogResell(_tokenId, 1, _price);
     }
 
-    function findAllPending()
-        public
-        view
-        returns (
-            uint256[] memory,
-            address[] memory,
-            address[] memory,
-            uint[] memory
-        )
-    {
+    function findAllPending() public view returns (uint256[] memory ids) {
         if (pendingLotCount.current() == 0) {
-            return (
-                new uint256[](0),
-                new address[](0),
-                new address[](0),
-                new uint[](0)
-            );
+            return (new uint[](0));
         }
 
         uint256 arrLength = lots.length;
-        uint256[] memory ids = new uint256[](pendingLotCount.current());
-        address[] memory authors = new address[](pendingLotCount.current());
-        address[] memory owners = new address[](pendingLotCount.current());
-        uint[] memory status = new uint[](pendingLotCount.current());
+        ids = new uint256[](pendingLotCount.current());
         uint256 idx = 0;
         for (uint i = 0; i < arrLength; ++i) {
             Lot memory lot = lots[i];
             if (lot.status == 1) {
                 ids[idx] = lot.id;
-                authors[idx] = lot.author;
-                owners[idx] = lot.owner;
-                status[idx] = lot.status;
                 idx++;
             }
         }
-        return (ids, authors, owners, status);
     }
 
     /* Return the token ID's that belong to the caller */
-    function findMyLots() public view returns (uint256[] memory _myLots) {
+    function findMyLots() public view returns (uint256[] memory myLots) {
         require(msg.sender != address(0));
         uint256 numOftokens = balanceOf(msg.sender);
         if (numOftokens == 0) {
             return new uint256[](0);
         } else {
-            uint256[] memory myLots = new uint256[](numOftokens);
+            myLots = new uint256[](numOftokens);
             uint256 idx = 0;
             uint256 arrLength = lots.length;
             for (uint256 i = 0; i < arrLength; i++) {
@@ -273,7 +260,6 @@ contract KisxPortal is ERC721URIStorage, Ownable {
                     idx++;
                 }
             }
-            return myLots;
         }
     }
 
