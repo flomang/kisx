@@ -8,34 +8,53 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
+// A contract that is ownable and allows users to buy and sell Lego sets as NFTs
 contract KisxPortal is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
+    // a list of possible lot statuses
+    enum LotStatus {
+        OnSale,
+        Sold,
+        OffMarket
+    }
+    // a list of possible lot types
+    enum LotType {
+        Set,
+        Minifig,
+        Part,
+        MOC,
+        Box,
+        Instruction,
+        Other
+    }
+
+    // define a struct that will be used to store the lot information
     struct Lot {
         uint256 id;
         string title;
         string description;
         uint256 price;
         string date;
-        string authorName;
-        address payable author;
         address payable owner;
-        // 1 means token has sale status (or still in selling) and 0 means token is already sold, ownership transferred and moved to off-market gallery
-        uint status;
+        LotStatus status;
+        LotType lotType;
         string uri;
     }
 
+    // define a struct that will be used to log the transaction
     struct LotTxn {
-        uint256 id;
+        uint256 lotId;
         uint256 price;
         address seller;
         address buyer;
         uint txnDate;
-        uint status;
+        LotStatus status;
     }
 
-    // gets updated during minting(creation), buying and reselling
+    // tracks number of lots on sale and gets updated during minting(creation), buying and reselling
     Counters.Counter public pendingLotCount;
+    // token index counter that gets updated during minting(creation)
     Counters.Counter public index;
 
     // mint price token
@@ -46,29 +65,37 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     Lot[] public lots;
 
     // log events back to the user interface
-    event LogSold(
+    event LotSold(
         uint _tokenId,
         string _title,
-        string _authorName,
         uint256 _price,
-        address _author,
         address _current_owner,
         address _buyer
     );
 
-    event LogCreate(
+    event LotCreate(
         uint _tokenId,
         string _title,
         string _category,
-        string _authorName,
         uint256 _price,
         address _author
     );
 
-    event LogCancel(uint _tokenId);
+    event LotCancel(uint _tokenId);
 
-    event LogResell(uint _tokenId, uint _status, uint256 _price);
+    event LotResell(uint _tokenId, uint _status, uint256 _price);
 
+    event LotUpdated(Lot _updated);
+
+    error UnauthorizedWithdrawFailure();
+
+    modifier validSender() {
+        require(msg.sender != address(0), "Sender address must not be zero");
+        _;
+    }
+
+    // this contract is an ERC721 non-fungible token
+    // https://docs.openzeppelin.com/contracts/4.x/erc721
     constructor(
         string memory _name,
         string memory _symbol,
@@ -86,10 +113,10 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         string memory _title,
         string memory _description,
         string memory _date,
-        string memory _authorName,
         uint256 _price,
-        string memory _uri
-    ) public payable returns (uint256 tokenId) {
+        string memory _uri,
+        LotType _lotType
+    ) public payable validSender returns (uint256 tokenId) {
         require(bytes(_title).length > 0, "The title cannot be empty");
         require(bytes(_date).length > 0, "The Date cannot be empty");
         require(
@@ -106,17 +133,18 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             description: _description,
             price: _price,
             date: _date,
-            authorName: _authorName,
-            author: payable(msg.sender),
             owner: payable(msg.sender),
-            status: 1,
+            status: LotStatus.OnSale,
+            lotType: _lotType,
             uri: _uri
         });
         lots.push(_lot);
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, _uri);
 
-        emit LogCreate(tokenId, _title, _date, _authorName, _price, msg.sender);
+        emit LotCreate(tokenId, _title, _date, _price, msg.sender);
+
+        // increment our token index counter
         index.increment();
         pendingLotCount.increment();
 
@@ -126,19 +154,18 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     }
 
     /* Pass the token ID and get the lot information */
-    function findLot(
-        uint256 _tokenId
-    ) public view returns (Lot memory) {
+    function findLot(uint256 _tokenId) public view returns (Lot memory) {
         return lots[_tokenId];
     }
 
-    function buyLot(uint256 _tokenId) public payable {
+    // buy the lot
+    // ownership of lot is transferred to the buyer
+    function buyLot(uint256 _tokenId) public payable validSender {
         Lot memory lot = findLot(_tokenId);
         require(lot.owner != address(0));
-        require(msg.sender != address(0));
         require(msg.sender != lot.owner);
         require(msg.value >= lot.price);
-        require(lot.status == 1, "The lot is not for sale");
+        require(lot.status == LotStatus.OnSale, "The lot is not for sale");
 
         // transfer ownership of the art
         _safeTransfer(lot.owner, msg.sender, _tokenId, "");
@@ -148,48 +175,78 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         //make a payment to the current owner
         lot.owner.transfer(lot.price);
         lots[_tokenId].owner = payable(msg.sender);
-        lots[_tokenId].status = 0;
+        lots[_tokenId].status = LotStatus.OffMarket;
 
         LotTxn memory _lotTxn = LotTxn({
-            id: lot.id,
+            lotId: lot.id,
             price: lot.price,
             seller: lot.owner,
             buyer: msg.sender,
             txnDate: block.timestamp,
-            status: lot.status
+            status: LotStatus.Sold
         });
         lotTxns[lot.id].push(_lotTxn);
         pendingLotCount.decrement();
-        emit LogSold(
-            _tokenId,
-            lot.title,
-            lot.authorName,
-            lot.price,
-            lot.author,
-            lot.owner,
-            msg.sender
-        );
+        emit LotSold(lot.id, lot.title, lot.price, lot.owner, msg.sender);
     }
 
-    function cancelLot(uint256 _tokenId) public payable {
-        require(msg.sender != address(0));
+    // cancel the lot
+    function cancelLot(uint256 _tokenId) public validSender {
         if (msg.sender != owner()) {
             require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
         }
-        lots[_tokenId].status = 0;
+        lots[_tokenId].status = LotStatus.OffMarket;
         pendingLotCount.decrement();
-        emit LogCancel(_tokenId);
+        emit LotCancel(_tokenId);
     }
 
-    function resellLot(uint256 _tokenId, uint256 _price) public payable {
-        require(msg.sender != address(0));
+    // resell the lot
+    function resellLot(uint256 _tokenId, uint256 _price) public validSender {
+        // must be the owner
         require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
-        lots[_tokenId].status = 1;
+        lots[_tokenId].status = LotStatus.OnSale;
         lots[_tokenId].price = _price;
         pendingLotCount.increment();
-        emit LogResell(_tokenId, 1, _price);
+        emit LotResell(_tokenId, 1, _price);
     }
 
+    // resell the lot
+    function updateLot(
+        uint256 _tokenId,
+        string memory _title,
+        string memory _description,
+        string memory _date,
+        uint256 _price,
+        string memory _uri,
+        LotType _lotType,
+        LotStatus _status
+    ) public validSender {
+        // must be the owner
+        require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
+        Lot memory lot = findLot(_tokenId);
+
+        if (lot.status == LotStatus.OnSale && _status == LotStatus.OffMarket) {
+            pendingLotCount.decrement();
+        } else if (
+            lot.status == LotStatus.OffMarket && _status == LotStatus.OnSale
+        ) {
+            pendingLotCount.increment();
+        }
+
+        lot.status = _status;
+        lot.price = _price;
+        lot.title = _title;
+        lot.description = _description;
+        lot.date = _date;
+        lot.lotType = _lotType;
+        lot.uri = _uri;
+        lots[_tokenId] = lot;
+
+        emit LotUpdated(lot);
+    }
+
+    // find all the lots that are on sale
+    // return an array of token ID's
     function findAllPending() public view returns (uint256[] memory ids) {
         if (pendingLotCount.current() == 0) {
             return (new uint[](0));
@@ -200,7 +257,7 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         uint256 idx = 0;
         for (uint i = 0; i < arrLength; ++i) {
             Lot memory lot = lots[i];
-            if (lot.status == 1) {
+            if (lot.status == LotStatus.OnSale) {
                 ids[idx] = lot.id;
                 idx++;
             }
@@ -234,5 +291,14 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         address owner = ownerOf(tokenId);
         require(owner != address(0));
         return owner == account;
+    }
+
+    // Only the account owner can withdraw the contract's balance.
+    function withdrawBalance(address payable payee) external onlyOwner {
+        uint256 balance = address(this).balance;
+        (bool transferTx, ) = payee.call{value: balance}("");
+        if (!transferTx) {
+            revert UnauthorizedWithdrawFailure();
+        }
     }
 }
