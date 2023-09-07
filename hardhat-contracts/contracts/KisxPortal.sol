@@ -76,7 +76,7 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     event LotCreate(
         uint _tokenId,
         string _title,
-        string _category,
+        string _description,
         uint256 _price,
         address _author
     );
@@ -142,7 +142,7 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, _uri);
 
-        emit LotCreate(tokenId, _title, _date, _price, msg.sender);
+        emit LotCreate(tokenId, _title, _description, _price, msg.sender);
 
         // increment our token index counter
         index.increment();

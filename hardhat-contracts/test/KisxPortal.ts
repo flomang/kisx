@@ -57,9 +57,9 @@ describe("Kisx Portal", function () {
             const { kisx, owner, account1, mintPrice } = await loadFixture(deploy);
             const price = ethers.parseEther("3.5");
 
-            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z",  price, "uri", 0, { value: mintPrice }))
+            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z", price, "uri", 0, { value: mintPrice }))
                 .to.emit(kisx, "LotCreate")
-                .withArgs(0, "Lego", "2023-09-05T22:27:54Z",  price, account1.address);;
+                .withArgs(0, "Lego", "Lego Collection", price, account1.address);;
 
             let pending = await kisx.findAllPending();
             let myLots = await kisx.connect(account1).findMyLots();
@@ -79,9 +79,7 @@ describe("Kisx Portal", function () {
             const { kisx, owner, account1, account2, mintPrice } = await loadFixture(deploy);
             const price = ethers.parseEther("3.5");
 
-            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z",  price, "uri", 0, { value: mintPrice }))
-                .to.emit(kisx, "LotCreate")
-                .withArgs(0, "Lego", "2023-09-05T22:27:54Z",  price, account1.address);;
+            await kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z", price, "uri", 0, { value: mintPrice })
 
             await expect(kisx.connect(account2).cancelLot(0)).to.be.revertedWith("You are not the owner");;
         });
@@ -90,9 +88,7 @@ describe("Kisx Portal", function () {
             const { kisx, owner, account1, account2, mintPrice } = await loadFixture(deploy);
             const price = ethers.parseEther("3.5");
 
-            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z",  price, "uri", 0, { value: mintPrice }))
-                .to.emit(kisx, "LotCreate")
-                .withArgs(0, "Lego", "2023-09-05T22:27:54Z",  price, account1.address);;
+            await kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z", price, "uri", 0, { value: mintPrice })
 
             await expect(kisx.connect(owner).cancelLot(0)).to.emit(kisx, "LotCancel")
                 .withArgs(0);
@@ -108,12 +104,10 @@ describe("Kisx Portal", function () {
             const { kisx, owner, account1, account2, mintPrice } = await loadFixture(deploy);
             const price = ethers.parseEther("3.5");
 
-            await expect(kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z",  price, "uri", 0, { value: mintPrice }))
-                .to.emit(kisx, "LotCreate")
-                .withArgs(0, "Lego", "2023-09-05T22:27:54Z",  price, account1.address);;
+            await kisx.connect(account1).createLot("Lego", "Lego Collection", "2023-09-05T22:27:54Z", price, "uri", 0, { value: mintPrice })
 
             let lot: KisxPortal.LotStruct = await kisx.connect(account2).findLot(0);
-            
+
             await expect(kisx.connect(account2).buyLot(0, { value: lot.price })).to.emit(kisx, "LotSold")
             let pending = await kisx.findAllPending();
             expect(pending.length).to.equal(0);
