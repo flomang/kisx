@@ -14,12 +14,14 @@ contract KisxPortal is ERC721URIStorage, Ownable {
 
     // a list of possible lot statuses
     enum LotStatus {
+        None,
         OnSale,
         Sold,
         OffMarket
     }
     // a list of possible lot types
     enum LotType {
+        None,
         Set,
         Minifig,
         Part,
@@ -162,21 +164,21 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     // ownership of lot is transferred to the buyer
     function buyLot(uint256 _tokenId) public payable validSender {
         Lot memory lot = findLot(_tokenId);
-        require(lot.owner != address(0));
-        require(msg.sender != lot.owner);
-        require(msg.value >= lot.price);
+        // lot owner must not be zero
+        require(lot.owner != address(0), "The owner cannot be zero");
+        // buyer must not be the owner
+        require(msg.sender != lot.owner, "You are the owner");
+        // buyer must pay the price
+        require(msg.value >= lot.price, "The price is not paid");
+        // lot must be on sale
         require(lot.status == LotStatus.OnSale, "The lot is not for sale");
 
-        // transfer ownership of the art
+        // transfer ownership of tokenId from lot owner to sender
         _safeTransfer(lot.owner, msg.sender, _tokenId, "");
-        //return extra payment
-        if (msg.value > lot.price)
-            payable(msg.sender).transfer(msg.value - lot.price);
         //make a payment to the current owner
         lot.owner.transfer(lot.price);
-        lots[_tokenId].owner = payable(msg.sender);
-        lots[_tokenId].status = LotStatus.OffMarket;
 
+        // log the transaction
         LotTxn memory _lotTxn = LotTxn({
             lotId: lot.id,
             price: lot.price,
@@ -186,17 +188,31 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             status: LotStatus.Sold
         });
         lotTxns[lot.id].push(_lotTxn);
+
         pendingLotCount.decrement();
         emit LotSold(lot.id, lot.title, lot.price, lot.owner, msg.sender);
+
+        // update the lot information
+        lots[_tokenId].owner = payable(msg.sender);
+        lots[_tokenId].status = LotStatus.OffMarket;
+
+        //return extra payment
+        if (msg.value > lot.price)
+            payable(msg.sender).transfer(msg.value - lot.price);
     }
 
     // cancel the lot
     function cancelLot(uint256 _tokenId) public validSender {
+        // owner can cancel the lot
         if (msg.sender != owner()) {
+            // sender must own token
             require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
         }
+        if (lots[_tokenId].status == LotStatus.OnSale) {
+            pendingLotCount.decrement();
+        }
+
         lots[_tokenId].status = LotStatus.OffMarket;
-        pendingLotCount.decrement();
         emit LotCancel(_tokenId);
     }
 
@@ -233,13 +249,28 @@ contract KisxPortal is ERC721URIStorage, Ownable {
             pendingLotCount.increment();
         }
 
-        lot.status = _status;
-        lot.price = _price;
-        lot.title = _title;
-        lot.description = _description;
-        lot.date = _date;
-        lot.lotType = _lotType;
-        lot.uri = _uri;
+        if (_status != LotStatus.None) {
+            lot.status = _status;
+        }
+        if (_lotType != LotType.None) {
+            lot.lotType = _lotType;
+        }
+        if (_price > 0) {
+            lot.price = _price;
+        }
+        if (bytes(_title).length > 0) {
+            lot.title = _title;
+        }
+        if (bytes(_description).length > 0) {
+            lot.description = _description;
+        }
+        if (bytes(_date).length > 0) {
+            lot.date = _date;
+        }
+        if (bytes(_uri).length > 0) {
+            lot.uri = _uri;
+        }
+
         lots[_tokenId] = lot;
 
         emit LotUpdated(lot);
