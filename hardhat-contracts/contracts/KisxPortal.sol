@@ -54,7 +54,7 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         LotStatus status;
     }
 
-     // emit lot sold event 
+    // emit lot sold event
     event LotSold(
         uint _tokenId,
         string _title,
@@ -81,7 +81,10 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     // emit lot updated event
     event LotUpdated(Lot _updated);
 
-    // emit unauthorized withdraw failure error 
+    // emit balance withdrawn event
+    event BalanceWithdrawn(address _payee, uint256 _balance);
+
+    // emit unauthorized withdraw failure error
     error UnauthorizedWithdrawFailure();
 
     // tracks number of lots on sale and gets updated during minting(creation), buying and reselling
@@ -125,12 +128,16 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         LotType _lotType
     ) public payable validSender returns (uint256 tokenId) {
         require(bytes(_title).length > 0, "The title cannot be empty");
-        require(bytes(_date).length > 0, "The Date cannot be empty");
+        require(bytes(_date).length > 0, "The date cannot be empty");
         require(
             bytes(_description).length > 0,
             "The description cannot be empty"
         );
-        require(_price > 0, "The price cannot be empty");
+        require(_price > 0, "The price cannot be 0");
+        require(
+            _lotType > LotType.None && _lotType <= LotType.Other,
+            "The lot type cannot be None"
+        );
         require(msg.value >= mintPrice, "The mint price is not paid");
 
         tokenId = index.current();
@@ -223,16 +230,6 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     }
 
     // resell the lot
-    function resellLot(uint256 _tokenId, uint256 _price) public validSender {
-        // must be the owner
-        require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
-        lots[_tokenId].status = LotStatus.OnSale;
-        lots[_tokenId].price = _price;
-        pendingLotCount.increment();
-        emit LotResell(_tokenId, 1, _price);
-    }
-
-    // resell the lot
     function updateLot(
         uint256 _tokenId,
         string memory _title,
@@ -245,6 +242,13 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     ) public validSender {
         // must be the owner
         require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
+
+        // lot type must be within the range
+        require(
+            _lotType <= LotType.Other && _status <= LotStatus.OffMarket,
+            "param must be within the range"
+        );
+
         Lot memory lot = findLot(_tokenId);
 
         if (lot.status == LotStatus.OnSale && _status == LotStatus.OffMarket) {
@@ -337,5 +341,6 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         if (!transferTx) {
             revert UnauthorizedWithdrawFailure();
         }
+        emit BalanceWithdrawn(payee, balance);
     }
 }
