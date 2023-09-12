@@ -54,6 +54,36 @@ contract KisxPortal is ERC721URIStorage, Ownable {
         LotStatus status;
     }
 
+     // emit lot sold event 
+    event LotSold(
+        uint _tokenId,
+        string _title,
+        uint256 _price,
+        address _current_owner,
+        address _buyer
+    );
+
+    // emit lot created event
+    event LotCreate(
+        uint _tokenId,
+        string _title,
+        string _description,
+        uint256 _price,
+        address _author
+    );
+
+    // emit lot cancelled event
+    event LotCancel(uint _tokenId);
+
+    // emit lot resell event
+    event LotResell(uint _tokenId, uint _status, uint256 _price);
+
+    // emit lot updated event
+    event LotUpdated(Lot _updated);
+
+    // emit unauthorized withdraw failure error 
+    error UnauthorizedWithdrawFailure();
+
     // tracks number of lots on sale and gets updated during minting(creation), buying and reselling
     Counters.Counter public pendingLotCount;
     // token index counter that gets updated during minting(creation)
@@ -65,31 +95,6 @@ contract KisxPortal is ERC721URIStorage, Ownable {
     mapping(uint256 => LotTxn[]) private lotTxns;
     // uint256 public index; // uint256 value; is cheaper than uint256 value = 0;.
     Lot[] public lots;
-
-    // log events back to the user interface
-    event LotSold(
-        uint _tokenId,
-        string _title,
-        uint256 _price,
-        address _current_owner,
-        address _buyer
-    );
-
-    event LotCreate(
-        uint _tokenId,
-        string _title,
-        string _description,
-        uint256 _price,
-        address _author
-    );
-
-    event LotCancel(uint _tokenId);
-
-    event LotResell(uint _tokenId, uint _status, uint256 _price);
-
-    event LotUpdated(Lot _updated);
-
-    error UnauthorizedWithdrawFailure();
 
     modifier validSender() {
         require(msg.sender != address(0), "Sender address must not be zero");
@@ -203,17 +208,18 @@ contract KisxPortal is ERC721URIStorage, Ownable {
 
     // cancel the lot
     function cancelLot(uint256 _tokenId) public validSender {
-        // owner can cancel the lot
+        // contract owner can cancel the lot
         if (msg.sender != owner()) {
             // sender must own token
             require(isOwnerOf(_tokenId, msg.sender), "You are not the owner");
         }
-        if (lots[_tokenId].status == LotStatus.OnSale) {
-            pendingLotCount.decrement();
-        }
 
-        lots[_tokenId].status = LotStatus.OffMarket;
-        emit LotCancel(_tokenId);
+        // lot must be on sale
+        if (lots[_tokenId].status == LotStatus.OnSale) {
+            lots[_tokenId].status = LotStatus.OffMarket;
+            pendingLotCount.decrement();
+            emit LotCancel(_tokenId);
+        }
     }
 
     // resell the lot
