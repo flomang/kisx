@@ -15,14 +15,6 @@
 				/>
 			</svg>
 		</figure>
-		<label for="message">Write your message below:</label>
-		<input type="text">
-		
-		<textarea
-		  id="message"
-		  class="textBox"
-		  value='something'
-		/>
 	</div>
 </div>
 
