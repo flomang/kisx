@@ -4,6 +4,7 @@
     import { goto } from "$app/navigation";
     import { getToastStore } from "@skeletonlabs/skeleton";
     import type { ToastSettings } from "@skeletonlabs/skeleton";
+    import Icon from "@iconify/svelte";
 
     const toastStore = getToastStore();
 
@@ -11,6 +12,7 @@
     let password = "";
     let message = "";
     let remember = false;
+    let show = false;
 
     interface SigninResult {
         signin: {
@@ -62,8 +64,8 @@
             message = error.message;
             const t: ToastSettings = {
                 message: error.message,
-                background: 'variant-filled-error',
-                autohide: true 
+                background: "variant-filled-error",
+                autohide: true,
             };
             toastStore.trigger(t);
         }
@@ -117,15 +119,50 @@
                         >Password</label
                     >
                 </div>
-                <div class="mt-2">
-                    <input
-                        type="password"
-                        bind:value={password}
-                        on:input={handleInput}
-                        autocomplete="current-password"
-                        required
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
+                <div class="mt-2 relative">
+                    {#if show}
+                        <input
+                            type="text"
+                            bind:value={password}
+                            on:input={handleInput}
+                            autocomplete="current-password"
+                            required
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        <div
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                        >
+                            <button on:click={() => (show = !show)}>
+                                <Icon
+                                    icon="majesticons:eye-off-line"
+                                    color="gray"
+                                    width="30"
+                                    height="30"
+                                /></button
+                            >
+                        </div>
+                    {:else}
+                        <input
+                            type="password"
+                            bind:value={password}
+                            on:input={handleInput}
+                            autocomplete="current-password"
+                            required
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        <div
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                        >
+                            <button on:click={() => (show = !show)}>
+                                <Icon
+                                    icon="majesticons:eye-line"
+                                    color="gray"
+                                    width="30"
+                                    height="30"
+                                /></button
+                            >
+                        </div>
+                    {/if}
                 </div>
             </div>
             <div>
@@ -150,7 +187,8 @@
                 <a
                     href="/signup"
                     class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                    > Not a member?</a
+                >
+                    Not a member?</a
                 >
             </div>
         </div>
