@@ -5,6 +5,7 @@
     import { getToastStore } from "@skeletonlabs/skeleton";
     import type { ToastSettings } from "@skeletonlabs/skeleton";
     import { fade } from "svelte/transition";
+    import Icon from "@iconify/svelte";
 
     const toastStore = getToastStore();
 
@@ -17,6 +18,7 @@
     let emailError = "";
     let passwordError = "";
     let success = false;
+    let show = false;
 
     interface SignupResult {
         signup: {
@@ -207,24 +209,64 @@
                         >
                         {#if passwordError != ""}
                             <div class="text-sm text-red-500" transition:fade>
-                                fails requirements 
+                                fails requirements
                             </div>
                         {/if}
                     </div>
                     <div class="mt-2">
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            bind:value={password}
-                            on:input={handleInputPassword}
-                            autocomplete="current-password"
-                            required
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-white-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 {passwordError !=
-                            ''
-                                ? 'input-error'
-                                : ''}"
-                        />
+                        {#if show}
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    bind:value={password}
+                                    on:input={handleInputPassword}
+                                    autocomplete="current-password"
+                                    required
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-white-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 {passwordError !=
+                                    ''
+                                        ? 'input-error'
+                                        : ''}"
+                                />
+                                <div
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                >
+                                    <button on:click={() => (show = !show)}>
+                                        <Icon
+                                            icon="majesticons:eye-off-line"
+                                            color="gray"
+                                            width="30"
+                                            height="30"
+                                        /></button
+                                    >
+                                </div>
+                            </div>
+                        {:else}
+                            <div class="relative">
+                                <input
+                                    type="password"
+                                    bind:value={password}
+                                    on:input={handleInputPassword}
+                                    autocomplete="current-password"
+                                    required
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-white-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 {passwordError !=
+                                    ''
+                                        ? 'input-error'
+                                        : ''}"
+                                />
+                                <div
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                >
+                                    <button on:click={() => (show = !show)}>
+                                        <Icon
+                                            icon="majesticons:eye-line"
+                                            color="gray"
+                                            width="30"
+                                            height="30"
+                                        /></button
+                                    >
+                                </div>
+                            </div>
+                        {/if}
                     </div>
                 </div>
 
